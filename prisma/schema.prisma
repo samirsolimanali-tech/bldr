@@ -1,0 +1,246 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum ProviderStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum PurchaseType {
+  NATIVE
+  REDIRECT
+}
+
+enum EngagementType {
+  BUY_NOW
+  REQUEST_QUOTE
+  BOOK_CALL
+}
+
+enum OrderStatus {
+  PENDING
+  PENDING_VERIFICATION
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum OrderSource {
+  NATIVE
+  REDIRECT
+}
+
+enum GatewayType {
+  GEIDEA
+  FAWRY
+  EXTERNAL
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  CLOSED
+}
+
+enum PayoutStatus {
+  PENDING
+  PAID
+}
+
+enum UserRole {
+  ADMIN
+  PROVIDER
+  CUSTOMER
+}
+
+// ─── Models ───────────────────────────────────────────────────────────────────
+
+model Provider {
+  id            String         @id @default(cuid())
+  slug          String         @unique
+  name          String
+  tagline       String?
+  bio           String?        @db.Text
+  logoUrl       String?
+  bannerUrl     String?
+  website       String?
+  isHouseBrand  Boolean        @default(false)
+  status        ProviderStatus @default(PENDING)
+  rejectedReason String?
+  conversionToken String?      @unique
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  users           ProviderUser[]
+  listings        Listing[]
+  orders          Order[]
+  leads           Lead[]
+  commissionRules CommissionRule[]
+  payouts         Payout[]
+  trackingEvents  TrackingEvent[]
+}
+
+model ProviderUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  firstName    String
+  lastName     String
+  role         UserRole @default(PROVIDER)
+  providerId   String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  provider Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  firstName    String
+  lastName     String
+  role         UserRole @default(ADMIN)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Listing {
+  id             String         @id @default(cuid())
+  title          String
+  description    String         @db.Text
+  price          Decimal        @db.Decimal(12, 2)
+  currency       String         @default("USD")
+  category       String
+  tags           String[]
+  mediaUrls      String[]
+  purchaseType   PurchaseType   @default(NATIVE)
+  engagementType EngagementType @default(BUY_NOW)
+  redirectUrl    String?
+  isFeatured     Boolean        @default(false)
+  isPublished    Boolean        @default(false)
+  providerId     String
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  provider       Provider        @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  orders         Order[]
+  leads          Lead[]
+  trackingEvents TrackingEvent[]
+}
+
+model Lead {
+  id             String         @id @default(cuid())
+  listingId      String
+  providerId     String
+  name           String
+  email          String
+  phone          String?
+  message        String?        @db.Text
+  engagementType EngagementType
+  status         LeadStatus     @default(NEW)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  listing  Listing  @relation(fields: [listingId], references: [id])
+  provider Provider @relation(fields: [providerId], references: [id])
+}
+
+model Order {
+  id                String      @id @default(cuid())
+  listingId         String
+  providerId        String
+  customerEmail     String
+  customerName      String?
+  amount            Decimal     @db.Decimal(12, 2)
+  currency          String      @default("USD")
+  status            OrderStatus @default(PENDING)
+  source            OrderSource @default(NATIVE)
+  externalReference String?
+  gatewayUsed       GatewayType
+  gatewaySessionId  String?
+  gatewayMetadata   Json?
+  commissionAmount  Decimal?    @db.Decimal(12, 2)
+  netAmount         Decimal?    @db.Decimal(12, 2)
+  commissionRate    Decimal?    @db.Decimal(5, 4)
+  trackingEventId   String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  listing       Listing        @relation(fields: [listingId], references: [id])
+  provider      Provider       @relation(fields: [providerId], references: [id])
+  trackingEvent TrackingEvent? @relation(fields: [trackingEventId], references: [id])
+  transactions  Transaction[]
+  payout        Payout?        @relation(fields: [payoutId], references: [id])
+  payoutId      String?
+}
+
+model Transaction {
+  id              String   @id @default(cuid())
+  orderId         String
+  rawPayload      Json
+  signatureValid  Boolean  @default(false)
+  gatewayRef      String?
+  createdAt       DateTime @default(now())
+
+  order Order @relation(fields: [orderId], references: [id])
+}
+
+model TrackingEvent {
+  id          String   @id @default(cuid())
+  clickId     String   @unique @default(cuid())
+  listingId   String
+  providerId  String
+  redirectUrl String
+  ipAddress   String?
+  userAgent   String?
+  referrer    String?
+  createdAt   DateTime @default(now())
+
+  listing  Listing  @relation(fields: [listingId], references: [id])
+  provider Provider @relation(fields: [providerId], references: [id])
+  orders   Order[]
+}
+
+model CommissionRule {
+  id         String   @id @default(cuid())
+  providerId String?  // null = global default
+  rate       Decimal  @db.Decimal(5, 4) // e.g. 0.1000 = 10%
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  provider Provider? @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId]) // one rule per provider (or one global)
+}
+
+model Payout {
+  id               String       @id @default(cuid())
+  providerId       String
+  periodStart      DateTime
+  periodEnd        DateTime
+  grossAmount      Decimal      @db.Decimal(12, 2)
+  commissionAmount Decimal      @db.Decimal(12, 2)
+  netAmount        Decimal      @db.Decimal(12, 2)
+  status           PayoutStatus @default(PENDING)
+  paidAt           DateTime?
+  note             String?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  provider Provider @relation(fields: [providerId], references: [id])
+  orders   Order[]
+}

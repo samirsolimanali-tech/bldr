@@ -1,0 +1,17 @@
+{
+  "name": "@bldr/ui",
+  "version": "0.1.0",
+  "main": "./index.ts",
+  "scripts": {
+    "build": "echo 'no build needed — imported as source'",
+    "dev": "echo 'no dev needed'"
+  },
+  "peerDependencies": {
+    "react": "^18 || ^19",
+    "react-dom": "^18 || ^19"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "@types/react": "^18.3.11"
+  }
+}
