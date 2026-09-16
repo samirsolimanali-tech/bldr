@@ -1,553 +1,393 @@
-import type { Metadata } from 'next';
+'use client';
+
+import React, { useState } from 'react';
 import Link from 'next/link';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
-import {
-  AcademicCapIcon,
-  VideoCameraIcon,
-  MegaphoneIcon,
-  BriefcaseIcon,
-  BuildingOfficeIcon,
-  CodeBracketIcon,
-  BanknotesIcon,
-  HeartPulseIcon,
-  SearchIcon,
-  SparklesIcon,
-  ShieldCheckIcon,
-  StarIcon,
-  ArrowRightIcon,
-  CheckCircleIcon,
-  ZapIcon,
-  CreditCardIcon,
-  ExternalLinkIcon,
-} from '@bldr/ui';
+import { BldrNav, BldrFooter } from '@bldr/ui';
 
-export const metadata: Metadata = {
-  title: 'bldr — The Premier Service Marketplace',
-  description: 'Curated and verified service providers across education, media production, consulting, marketing, and training.',
-};
-
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-
-async function getFeaturedListings() {
-  try {
-    const res = await fetch(`${API}/listings/featured?limit=6`, { next: { revalidate: 60 } });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.data || data || [];
-  } catch {
-    return [];
-  }
-}
-
-async function getCategories() {
-  try {
-    const res = await fetch(`${API}/listings/categories`, { next: { revalidate: 300 } });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data || [];
-  } catch {
-    return [];
-  }
-}
-
-const HOUSE_SERVICES = [
-  {
-    title: 'Education Solutions',
-    category: 'Education',
-    Icon: AcademicCapIcon,
-    description: 'Curriculum architecture, accreditation advisory, and institutional learning frameworks.',
-    turnaround: '2–4 weeks',
-  },
-  {
-    title: 'Media Production',
-    category: 'Media',
-    Icon: VideoCameraIcon,
-    description: 'Studio-grade video production, broadcast podcasts, sound engineering, and brand documentaries.',
-    turnaround: '1–2 weeks',
-  },
-  {
-    title: 'Tutor Marketing',
-    category: 'Marketing',
-    Icon: MegaphoneIcon,
-    description: 'Direct-response student acquisition funnels, paid performance marketing, and booking automation.',
-    turnaround: '3–5 days',
-  },
-  {
-    title: 'Business Consulting',
-    category: 'Consulting',
-    Icon: BriefcaseIcon,
-    description: 'Growth architecture, operational scaling, governance frameworks, and executive advisory.',
-    turnaround: 'Flexible',
-  },
-  {
-    title: 'Corporate Training',
-    category: 'Training',
-    Icon: BuildingOfficeIcon,
-    description: 'Custom leadership academies, technical workforce upskilling, and enterprise compliance modules.',
-    turnaround: 'Modular',
-  },
-];
-
-function CategoryIcon({ category, size = 18 }: { category: string; size?: number }) {
-  switch (category) {
-    case 'Education':
-      return <AcademicCapIcon size={size} />;
-    case 'Media':
-      return <VideoCameraIcon size={size} />;
-    case 'Marketing':
-      return <MegaphoneIcon size={size} />;
-    case 'Consulting':
-      return <BriefcaseIcon size={size} />;
-    case 'Training':
-      return <BuildingOfficeIcon size={size} />;
-    case 'Technology':
-      return <CodeBracketIcon size={size} />;
-    case 'Finance':
-      return <BanknotesIcon size={size} />;
-    case 'Health':
-      return <HeartPulseIcon size={size} />;
-    default:
-      return <SparklesIcon size={size} />;
-  }
-}
-
-function formatPrice(price: number, currency: string) {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: currency || 'USD',
-    minimumFractionDigits: 0,
-  }).format(price);
-}
-
-export default async function HomePage() {
-  const [featured, categories] = await Promise.all([getFeaturedListings(), getCategories()]);
+export default function HomePage() {
+  const [lang, setLang] = useState<'EN' | 'AR'>('EN');
 
   return (
-    <>
-      <Navbar />
-      <main>
-        {/* ── Hero Section with Ambient Lighting Mesh ───────────────────── */}
-        <section className="hero-wrapper">
-          <div className="hero-ambient" />
-          <div className="container hero-content">
-            <div className="live-pill">
-              <span className="pulse-dot" />
-              <span>Vetted Provider Network · Zero-Drift Financial Settlement</span>
-            </div>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#F4F5F7' }}>
+      {/* ─── Navigation ────────────────────────────────────────── */}
+      <BldrNav lang={lang} onLanguageChange={setLang} />
 
-            <h1
-              style={{
-                fontSize: 'clamp(36px, 5.5vw, 62px)',
-                letterSpacing: '-0.03em',
-                lineHeight: 1.15,
-                marginBottom: '20px',
-                color: 'var(--text-primary)',
-              }}
-            >
-              The marketplace for{' '}
-              <span style={{ color: 'var(--brand)', fontStyle: 'italic', fontWeight: 600 }}>
-                exceptional services
-              </span>
-            </h1>
-
-            <p
-              style={{
-                fontSize: 'clamp(16px, 1.8vw, 19px)',
-                color: 'var(--text-secondary)',
-                maxWidth: '640px',
-                margin: '0 auto 32px',
-                lineHeight: 1.6,
-              }}
-            >
-              Compare and commission top-tier expertise in education, creative media, marketing, and strategic consulting with verified escrow protection.
-            </p>
-
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '14px', flexWrap: 'wrap' }}>
-              <Link href="/browse" className="btn btn-primary btn-lg">
-                Explore All Services
-                <ArrowRightIcon size={16} />
-              </Link>
-              <Link href="/providers/bldr" className="btn btn-secondary btn-lg">
-                bldr House Services
-              </Link>
-            </div>
-
-            {/* Glassmorphic Search Container */}
-            <div className="search-container-premium">
-              <form action="/browse" method="get">
-                <div className="search-bar-glass">
-                  <SearchIcon size={20} style={{ color: 'var(--text-muted)', marginLeft: '4px' }} />
-                  <input
-                    name="q"
-                    type="text"
-                    placeholder="Search by specialty, service line, or provider name..."
-                    autoComplete="off"
-                  />
-                  <button type="submit" className="btn btn-primary btn-sm" style={{ padding: '8px 18px' }}>
-                    Search
-                  </button>
-                </div>
-              </form>
-
-              {/* Quick Filter Chips */}
-              <div className="search-chips">
-                <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                  Popular:
+      <main style={{ flex: 1 }}>
+        {/* ─── Hero Section ──────────────────────────────────────── */}
+        <section style={{ padding: '80px 32px 90px', background: '#F4F5F7' }}>
+          <div style={{ maxWidth: 1280, margin: '0 auto', display: 'grid', gridTemplateColumns: 'minmax(0, 1.15fr) minmax(0, 0.85fr)', gap: 54, alignItems: 'center' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 26 }}>
+              <div style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 9,
+                alignSelf: 'flex-start',
+                height: 32,
+                padding: '0 14px',
+                borderRadius: 999,
+                background: '#FFFFFF',
+                border: '1px solid rgba(20,20,22,0.08)',
+                boxShadow: '0 2px 6px rgba(20,20,22,0.04)',
+              }}>
+                <span style={{ display: 'block', width: 7, height: 7, borderRadius: '50%', background: 'linear-gradient(90deg, #D10721, #FD9426)' }} />
+                <span style={{ fontSize: 12.5, fontWeight: 400, color: '#47454A' }}>
+                  Cairo · venture studio, founded July 2026
                 </span>
-                {['Education', 'Media', 'Marketing', 'Consulting', 'Training'].map((cat) => (
-                  <Link key={cat} href={`/browse?category=${cat}`} className="search-chip">
-                    <CategoryIcon category={cat} size={13} />
-                    <span>{cat}</span>
-                  </Link>
-                ))}
               </div>
-            </div>
 
-            {/* Key Trust Metrics */}
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-                gap: '24px',
-                maxWidth: '780px',
-                margin: '56px auto 0',
-                paddingTop: '32px',
-                borderTop: '1px solid rgba(228, 225, 218, 0.7)',
-              }}
-            >
-              <div>
-                <div className="tabular-nums" style={{ fontSize: '26px', fontWeight: 800, color: 'var(--brand)', fontFamily: 'var(--font-display)' }}>
-                  100%
-                </div>
-                <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: 500, marginTop: '2px' }}>
-                  Vetted Providers
-                </div>
-              </div>
-              <div>
-                <div className="tabular-nums" style={{ fontSize: '26px', fontWeight: 800, color: 'var(--brand)', fontFamily: 'var(--font-display)' }}>
-                  $0 Drift
-                </div>
-                <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: 500, marginTop: '2px' }}>
-                  Integer Cents Settlement
-                </div>
-              </div>
-              <div>
-                <div className="tabular-nums" style={{ fontSize: '26px', fontWeight: 800, color: 'var(--brand)', fontFamily: 'var(--font-display)' }}>
-                  Dual Gateways
-                </div>
-                <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: 500, marginTop: '2px' }}>
-                  Geidea & Fawry Verified
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+              <h1 style={{
+                margin: 0,
+                fontSize: 'clamp(36px, 5vw, 60px)',
+                lineHeight: 1.06,
+                fontWeight: 500,
+                letterSpacing: '-0.045em',
+                color: '#141416',
+                textWrap: 'pretty',
+              }}>
+                We build the product, the brand, and the team that runs it.
+              </h1>
 
-        {/* ── House-Brand Service Lines ───────────────────────────────────── */}
-        <section className="section" style={{ background: '#FFFFFF', borderBottom: '1px solid var(--border)' }}>
-          <div className="container">
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'flex-end',
-                marginBottom: '36px',
-                flexWrap: 'wrap',
-                gap: '16px',
-              }}
-            >
-              <div>
-                <div className="section-eyebrow">Direct Delivery</div>
-                <h2 style={{ fontSize: '28px', fontWeight: 800 }}>bldr House Service Lines</h2>
-                <p style={{ color: 'var(--text-secondary)', marginTop: '4px', fontSize: '15px' }}>
-                  Institutional-grade execution delivered directly by bldr's multidisciplinary team.
-                </p>
-              </div>
-              <Link href="/providers/bldr" className="btn btn-secondary btn-sm">
-                View Org Profile <ArrowRightIcon size={14} />
-              </Link>
-            </div>
+              <p style={{
+                margin: 0,
+                maxWidth: 520,
+                fontSize: 17,
+                lineHeight: 1.68,
+                fontWeight: 300,
+                color: '#47454A',
+              }}>
+                bldr operates specialist units and builds its own ventures. You work with the units you need and keep one point of contact for all of it — nobody hands the outcome to somebody else.
+              </p>
 
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-                gap: '20px',
-              }}
-            >
-              {HOUSE_SERVICES.map((svc) => {
-                const IconComponent = svc.Icon;
-                return (
-                  <Link
-                    key={svc.title}
-                    href={`/browse?category=${svc.category}&provider=bldr`}
-                    style={{ textDecoration: 'none' }}
-                  >
-                    <div className="card card-interactive" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '18px' }}>
-                        <div className="icon-badge">
-                          <IconComponent size={22} />
-                        </div>
-                        <span className="badge badge-muted" style={{ fontSize: '10px' }}>
-                          {svc.turnaround}
-                        </span>
-                      </div>
-
-                      <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '8px', color: 'var(--text-primary)' }}>
-                        {svc.title}
-                      </h3>
-                      <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.55, flex: 1 }}>
-                        {svc.description}
-                      </p>
-
-                      <div
-                        style={{
-                          marginTop: '20px',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          fontSize: '12px',
-                          fontWeight: 700,
-                          color: 'var(--brand)',
-                        }}
-                      >
-                        Explore Line <ArrowRightIcon size={13} />
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        {/* ── Featured Listings ───────────────────────────────────────────── */}
-        <section className="section">
-          <div className="container">
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'flex-end',
-                marginBottom: '36px',
-                flexWrap: 'wrap',
-                gap: '16px',
-              }}
-            >
-              <div>
-                <div className="section-eyebrow">Curated Showcase</div>
-                <h2 style={{ fontSize: '28px', fontWeight: 800 }}>Featured Services</h2>
-                <p style={{ color: 'var(--text-secondary)', marginTop: '4px', fontSize: '15px' }}>
-                  Hand-selected offerings from verified independent providers and bldr originals.
-                </p>
-              </div>
-              <Link href="/browse?featured=true" className="btn btn-secondary btn-sm">
-                Browse Full Catalog <ArrowRightIcon size={14} />
-              </Link>
-            </div>
-
-            {featured.length === 0 ? (
-              <div
-                style={{
-                  textAlign: 'center',
-                  padding: '80px 24px',
-                  background: 'var(--bg-surface)',
-                  borderRadius: 'var(--radius-lg)',
-                  border: '1px solid var(--border)',
-                }}
-              >
-                <div className="icon-badge" style={{ margin: '0 auto 16px', width: '56px', height: '56px' }}>
-                  <SparklesIcon size={26} />
-                </div>
-                <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '8px' }}>Catalog Loading</h3>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '14px', maxWidth: '400px', margin: '0 auto 20px' }}>
-                  Featured services are being refreshed. Explore the complete directory to find verified offerings.
-                </p>
-                <Link href="/browse" className="btn btn-primary">
-                  Browse All Services
+              <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>
+                <a
+                  href="mailto:contact@bldr.io"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    height: 50,
+                    padding: '0 28px',
+                    borderRadius: 999,
+                    background: '#141416',
+                    color: '#FFFFFF',
+                    fontSize: 15,
+                    fontWeight: 400,
+                    textDecoration: 'none',
+                    boxShadow: '0 4px 14px rgba(20,20,22,0.14)',
+                  }}
+                >
+                  Start a project
+                </a>
+                <Link
+                  href="/pay/sh-8k2m9q"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    height: 50,
+                    padding: '0 26px',
+                    borderRadius: 999,
+                    background: '#FFFFFF',
+                    border: '1px solid rgba(20,20,22,0.12)',
+                    color: '#141416',
+                    fontSize: 15,
+                    fontWeight: 400,
+                    textDecoration: 'none',
+                    boxShadow: '0 2px 6px rgba(20,20,22,0.04)',
+                  }}
+                >
+                  Try Central Payment Page →
                 </Link>
               </div>
-            ) : (
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-                  gap: '24px',
-                }}
-              >
-                {featured.map((listing: any) => {
-                  const isRedirect = listing.purchaseType === 'REDIRECT';
-                  const isBuyNow = listing.engagementType === 'BUY_NOW';
+            </div>
 
-                  return (
-                    <Link
-                      key={listing.id}
-                      href={`/listings/${listing.id}`}
-                      style={{ textDecoration: 'none' }}
-                    >
-                      <article className="card card-interactive" style={{ height: '100%', display: 'flex', flexDirection: 'column', padding: '24px' }}>
-                        {/* Header metadata row */}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <div
-                              style={{
-                                width: '28px',
-                                height: '28px',
-                                borderRadius: '6px',
-                                background: 'rgba(38, 60, 139, 0.08)',
-                                color: 'var(--brand)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                fontSize: '12px',
-                                fontWeight: 700,
-                              }}
-                            >
-                              {(listing.provider?.name || 'P').slice(0, 1)}
-                            </div>
-                            <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>
-                              {listing.provider?.name || 'Verified Provider'}
-                            </span>
-                          </div>
-
-                          {listing.provider?.isHouseBrand ? (
-                            <span className="badge badge-brand">bldr Original</span>
-                          ) : isRedirect ? (
-                            <span className="badge badge-muted" style={{ gap: '4px' }}>
-                              <ExternalLinkIcon size={11} /> Partner Store
-                            </span>
-                          ) : (
-                            <span className="badge badge-green" style={{ gap: '4px' }}>
-                              <ShieldCheckIcon size={12} /> Verified Native
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Title & Description */}
-                        <h3
-                          style={{
-                            fontSize: '18px',
-                            fontWeight: 700,
-                            lineHeight: 1.35,
-                            marginBottom: '10px',
-                            color: 'var(--text-primary)',
-                          }}
-                        >
-                          {listing.title}
-                        </h3>
-                        <p
-                          style={{
-                            fontSize: '13px',
-                            color: 'var(--text-secondary)',
-                            lineHeight: 1.6,
-                            marginBottom: '20px',
-                            flex: 1,
-                            display: '-webkit-box',
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical',
-                            overflow: 'hidden',
-                          }}
-                        >
-                          {listing.description}
-                        </p>
-
-                        {/* Card Footer: Price & Action */}
-                        <div
-                          style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            paddingTop: '16px',
-                            borderTop: '1px solid var(--border)',
-                          }}
-                        >
-                          <div>
-                            <div
-                              className="tabular-nums"
-                              style={{
-                                fontSize: '20px',
-                                fontWeight: 800,
-                                color: 'var(--text-primary)',
-                                fontFamily: 'var(--font-display)',
-                              }}
-                            >
-                              {formatPrice(listing.price, listing.currency)}
-                            </div>
-                            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                              {!isBuyNow ? 'Starting price' : 'Fixed pricing'}
-                            </div>
-                          </div>
-
-                          <span
-                            className={isBuyNow ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm'}
-                            style={{ gap: '6px' }}
-                          >
-                            {isBuyNow ? (
-                              <>
-                                <CreditCardIcon size={14} /> Buy Now
-                              </>
-                            ) : listing.engagementType === 'REQUEST_QUOTE' ? (
-                              'Request Quote'
-                            ) : (
-                              'Book Call'
-                            )}
-                          </span>
-                        </div>
-                      </article>
-                    </Link>
-                  );
-                })}
+            {/* Studio Visual Mosaic */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gridTemplateRows: '140px 140px 110px',
+              gap: 12,
+            }}>
+              <div style={{
+                gridColumn: 'span 2',
+                background: '#FFFFFF',
+                borderRadius: 16,
+                border: '1px solid rgba(20,20,22,0.08)',
+                padding: 20,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                boxShadow: '0 2px 8px rgba(20,20,22,0.04)',
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#FD9426' }}>Ventures &amp; Products</span>
+                  <span style={{ fontSize: 10.5, fontFamily: 'monospace', color: '#8A94A6' }}>Cairo Studio</span>
+                </div>
+                <div>
+                  <div style={{ fontSize: 20, fontWeight: 500, color: '#141416', letterSpacing: '-0.02em' }}>StudyHub · منصة الحصة · Apex</div>
+                  <div style={{ fontSize: 13, color: '#47454A', fontWeight: 300, marginTop: 4 }}>Integrated seamlessly via bldr Central Payment Hub</div>
+                </div>
               </div>
-            )}
-          </div>
-        </section>
 
-        {/* ── Enterprise & Provider Onboarding Banner ──────────────────────── */}
-        <section className="section" style={{ background: 'var(--bg-surface)', borderTop: '1px solid var(--border)' }}>
-          <div className="container">
-            <div
-              style={{
-                background: 'linear-gradient(135deg, rgba(38, 60, 139, 0.04) 0%, rgba(224, 138, 62, 0.04) 100%)',
-                border: '1px solid var(--border-strong)',
-                borderRadius: 'var(--radius-xl)',
-                padding: '56px 40px',
+              <div style={{
+                background: '#FFFFFF',
+                borderRadius: 16,
+                border: '1px solid rgba(20,20,22,0.08)',
+                padding: 16,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+              }}>
+                <span style={{ fontSize: 11, fontWeight: 600, color: '#D10721' }}>ORCHESTRATION</span>
+                <span style={{ fontSize: 14, fontWeight: 500, color: '#141416' }}>1 Unified API, 0 PSP Lock-in</span>
+              </div>
+
+              <div style={{
+                background: '#FFFFFF',
+                borderRadius: 16,
+                border: '1px solid rgba(20,20,22,0.08)',
+                padding: 16,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+              }}>
+                <span style={{ fontSize: 11, fontWeight: 600, color: '#2E6F5E' }}>PAYMENT HUBS</span>
+                <span style={{ fontSize: 14, fontWeight: 500, color: '#141416' }}>Geidea · Fawry · Meeza</span>
+              </div>
+
+              <div style={{
+                gridColumn: 'span 2',
+                background: '#141416',
+                color: '#FFFFFF',
+                borderRadius: 16,
+                padding: '16px 20px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                flexWrap: 'wrap',
-                gap: '32px',
-              }}
-            >
-              <div style={{ maxWidth: '600px' }}>
-                <div className="section-eyebrow">Provider Network</div>
-                <h2 style={{ fontSize: 'clamp(24px, 3.5vw, 36px)', fontWeight: 800, marginBottom: '12px' }}>
-                  Are you an exceptional service provider?
-                </h2>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '15px', lineHeight: 1.6 }}>
-                  Expand your client reach on bldr. Enjoy direct escrow settlements, automatic commission ledgering, and dedicated enterprise showcase placement.
+              }}>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 500 }}>Central Payment Hub Admin</div>
+                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', fontWeight: 300 }}>Super Admin &amp; Finance Management</div>
+                </div>
+                <a
+                  href="http://localhost:3002"
+                  style={{
+                    padding: '6px 14px',
+                    borderRadius: 999,
+                    background: '#2E6F5E',
+                    color: '#FFFFFF',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    textDecoration: 'none',
+                  }}
+                >
+                  Open Hub →
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ─── What's Broken Section ─────────────────────────────── */}
+        <section style={{ padding: '0 32px 84px', background: '#F4F5F7' }}>
+          <div style={{
+            maxWidth: 1280,
+            margin: '0 auto',
+            background: '#FFFFFF',
+            border: '1px solid rgba(20,20,22,0.08)',
+            borderRadius: 22,
+            padding: '48px 40px',
+            position: 'relative',
+            overflow: 'hidden',
+          }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, textAlign: 'center', marginBottom: 36 }}>
+              <span style={{ fontSize: 12, fontWeight: 500, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#D10721' }}>
+                What&apos;s Broken in Traditional Models
+              </span>
+              <h2 style={{ fontSize: 'clamp(26px, 3.5vw, 40px)', fontWeight: 500, letterSpacing: '-0.04em', color: '#141416', margin: 0 }}>
+                Everyone did their part. Nobody owned the outcome.
+              </h2>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+              {[
+                { title: 'Software House', sub: 'waiting on final specs', angle: '-2deg' },
+                { title: 'Marketing Agency', sub: "hasn't seen the product", angle: '1.5deg' },
+                { title: 'Consultant', sub: 'left after the slide deck', angle: '-1deg' },
+                { title: 'Your Team', sub: 'never trained to run it', angle: '2deg' },
+                { title: 'Systems Vendor', sub: 'scope ended at handover', angle: '-1.5deg' },
+              ].map((card, i) => (
+                <div
+                  key={i}
+                  style={{
+                    background: '#F4F5F7',
+                    border: '1px solid rgba(20,20,22,0.08)',
+                    borderRadius: 14,
+                    padding: '20px 22px',
+                    boxShadow: '0 4px 12px rgba(20,20,22,0.04)',
+                    transform: `rotate(${card.angle})`,
+                    transition: 'transform 0.2s ease',
+                  }}
+                >
+                  <div style={{ fontSize: 16, fontWeight: 500, color: '#141416', letterSpacing: '-0.02em' }}>{card.title}</div>
+                  <div style={{ marginTop: 6, fontSize: 13.5, fontWeight: 300, color: '#47454A' }}>{card.sub}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ─── How We're Built ───────────────────────────────────── */}
+        <section id="built" style={{ padding: '56px 32px 84px', background: '#F4F5F7' }}>
+          <div style={{ maxWidth: 1280, margin: '0 auto', display: 'grid', gridTemplateColumns: 'minmax(0, 0.9fr) minmax(0, 1.1fr)', gap: 64, alignItems: 'start' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 18, position: 'sticky', top: 110 }}>
+              <span style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#D10721' }}>
+                How We&apos;re Built
+              </span>
+              <h2 style={{ margin: 0, fontSize: 44, lineHeight: 1.1, fontWeight: 500, letterSpacing: '-0.045em', color: '#141416' }}>
+                Different specialisms.<br />One accountability line.
+              </h2>
+              <p style={{ margin: 0, maxWidth: 420, fontSize: 16.5, lineHeight: 1.68, fontWeight: 300, color: '#47454A' }}>
+                The same specialists you would otherwise hire separately, working off one plan, one schedule and one owner. Units are added when the work calls for them.
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14, position: 'relative', paddingLeft: 24, borderLeft: '2px solid rgba(20,20,22,0.08)' }}>
+              {[
+                { title: 'bldr Management', was: 'was: the consultant who left', desc: 'Strategy, business development, partnerships & financial architecture' },
+                { title: 'Tech House', was: 'was: the software house', desc: 'Software platforms, central payment orchestration, automated infrastructure' },
+                { title: 'Sidekick', was: 'was: the marketing agency', desc: 'Branding, advertising, content, performance campaigns' },
+                { title: 'Career Hub', was: 'was: your untrained team', desc: 'Professional training, workshops, operations and team handover' },
+              ].map((unit, i) => (
+                <div
+                  key={i}
+                  style={{
+                    background: '#FFFFFF',
+                    border: '1px solid rgba(20,20,22,0.08)',
+                    borderRadius: 14,
+                    padding: '20px 24px',
+                    boxShadow: '0 2px 8px rgba(20,20,22,0.04)',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 16 }}>
+                    <div style={{ fontSize: 17, fontWeight: 500, color: '#141416', letterSpacing: '-0.02em' }}>{unit.title}</div>
+                    <div style={{ fontSize: 12.5, fontWeight: 300, color: '#6B6970' }}>{unit.was}</div>
+                  </div>
+                  <div style={{ marginTop: 6, fontSize: 14.5, fontWeight: 300, lineHeight: 1.6, color: '#47454A' }}>{unit.desc}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ─── Education & EdTech Showcase ───────────────────────── */}
+        <section id="education" style={{ background: '#141416', padding: '84px 32px', color: '#FFFFFF' }}>
+          <div style={{ maxWidth: 1280, margin: '0 auto', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 60, alignItems: 'center' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
+              <span style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#FD9426' }}>
+                Education &amp; EdTech
+              </span>
+              <h2 style={{ margin: 0, fontSize: 44, lineHeight: 1.1, fontWeight: 500, letterSpacing: '-0.045em', color: '#FFFFFF' }}>
+                We have run the thing we are asked to build.
+              </h2>
+              <p style={{ margin: 0, maxWidth: 480, fontSize: 16.5, lineHeight: 1.68, fontWeight: 300, color: 'rgba(255,255,255,0.72)' }}>
+                Plenty of software houses will build you a learning platform. Very few have run a cohort, priced a course, or managed live payment gateway reconciliation in Cairo. When they haven&apos;t, you end up teaching the vendor your business.
+              </p>
+              <div style={{ display: 'flex', gap: 14 }}>
+                <Link
+                  href="/pay/sh-8k2m9q"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    height: 48,
+                    padding: '0 24px',
+                    borderRadius: 999,
+                    background: '#FFFFFF',
+                    color: '#141416',
+                    fontSize: 14.5,
+                    fontWeight: 500,
+                    textDecoration: 'none',
+                  }}
+                >
+                  View Sample Hosted Checkout →
+                </Link>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div style={{
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.12)',
+                borderRadius: 18,
+                padding: 24,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 8,
+              }}>
+                <div style={{ fontSize: 19, fontWeight: 500, color: '#FFFFFF', letterSpacing: '-0.03em' }}>StudyHub</div>
+                <p style={{ margin: 0, fontSize: 14.5, fontWeight: 300, lineHeight: 1.6, color: 'rgba(255,255,255,0.66)' }}>
+                  An Arabic-first operating system for tutors and tutoring centres. Integrates directly into the bldr Central Payment Hub for instant checkout.
                 </p>
               </div>
 
-              <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
-                <a
-                  href={`${process.env.NEXT_PUBLIC_PROVIDER_PORTAL_URL || 'http://localhost:3001'}/register`}
-                  className="btn btn-primary btn-lg"
-                >
-                  Apply as Provider <ArrowRightIcon size={16} />
-                </a>
-                <a
-                  href={`${process.env.NEXT_PUBLIC_PROVIDER_PORTAL_URL || 'http://localhost:3001'}/login`}
-                  className="btn btn-secondary btn-lg"
-                >
-                  Provider Sign In
-                </a>
+              <div style={{
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.12)',
+                borderRadius: 18,
+                padding: 24,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 8,
+              }}>
+                <div style={{ fontSize: 19, fontWeight: 500, color: '#FFFFFF', letterSpacing: '-0.03em' }}>منصة الحصة</div>
+                <p style={{ margin: 0, fontSize: 14.5, fontWeight: 300, lineHeight: 1.6, color: 'rgba(255,255,255,0.66)' }}>
+                  A gamified Egyptian K-12 learning platform with micro-transactions, automated coupon validation, and Fawry/Geidea integrations.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ─── How We Work Section ───────────────────────────────── */}
+        <section id="work" style={{ padding: '84px 32px', background: '#F4F5F7' }}>
+          <div style={{ maxWidth: 1280, margin: '0 auto', background: '#FFFFFF', border: '1px solid rgba(20,20,22,0.08)', borderRadius: 22, padding: '48px 42px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 0.9fr) minmax(0, 1.1fr)', gap: 54, alignItems: 'start' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <span style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#D10721' }}>
+                  How We Work
+                </span>
+                <h2 style={{ margin: 0, fontSize: 38, lineHeight: 1.1, fontWeight: 500, letterSpacing: '-0.045em', color: '#141416' }}>
+                  A sequence, not a proposal cycle.
+                </h2>
+                <p style={{ margin: 0, fontSize: 16, lineHeight: 1.68, fontWeight: 300, color: '#47454A' }}>
+                  Every engagement starts with a paid consulting session. It is the cleanest way to evaluate our alignment, and the fee is credited against the project if one follows.
+                </p>
+                <div style={{ fontSize: 13.5, fontWeight: 300, color: '#6B6970' }}>
+                  Fixed price, fixed duration, a written deliverable you keep.
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {[
+                  { step: '01', title: 'Consulting Session', desc: 'Architecture, scope, and strategic roadmap.' },
+                  { step: '02', title: 'Proposition & Brand', desc: 'Design tokens, copy, and positioning.' },
+                  { step: '03', title: 'Build & Integration', desc: 'Full-stack engineering & payment orchestration.' },
+                  { step: '04', title: 'Handover & Run', desc: 'Team training and production live release.' },
+                ].map((s) => (
+                  <div key={s.step} style={{ display: 'flex', gap: 16, padding: '14px 18px', background: '#F4F5F7', borderRadius: 12 }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: '#D10721', fontFamily: 'monospace' }}>{s.step}</span>
+                    <div>
+                      <div style={{ fontSize: 15, fontWeight: 500, color: '#141416' }}>{s.title}</div>
+                      <div style={{ fontSize: 13, color: '#47454A', fontWeight: 300 }}>{s.desc}</div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         </section>
       </main>
-      <Footer />
-    </>
+
+      {/* ─── Footer ────────────────────────────────────────────── */}
+      <BldrFooter />
+    </div>
   );
 }

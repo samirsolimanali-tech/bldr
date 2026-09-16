@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: { default: 'Admin Portal — bldr', template: '%s | Admin' },
-  description: 'bldr Admin Portal',
+  title: { default: 'Central Payment Hub — bldr', template: '%s | Payment Hub' },
+  description: 'bldr Central Payment Hub — Executive Overview, Ventures, Payment Links & Ledger',
   robots: 'noindex, nofollow',
 };
 

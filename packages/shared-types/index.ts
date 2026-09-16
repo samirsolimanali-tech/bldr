@@ -193,3 +193,112 @@ export interface CheckoutResult {
   value: string;
   gatewayUsed: GatewayType;
 }
+
+// ─── Central Payment Hub Types (PRD v1.0) ───────────────────────────────────
+
+export interface VentureDTO {
+  id: string;
+  code: string; // e.g. "SH", "AC", "EH", "CH"
+  name: string; // e.g. "StudyHub", "Apex Classes", "EL HESA", "Career Hub"
+  slug: string;
+  description?: string;
+  status: 'ACTIVE' | 'SUSPENDED' | 'ONBOARDING';
+  logoUrl?: string;
+  brandColor?: string; // Hex color for header theming
+  chipBg: string;
+  chipFg: string;
+  webhookUrl?: string;
+  successUrl?: string;
+  failureUrl?: string;
+  orderPrefix: string;
+  supportEmail?: string;
+  supportPhone?: string;
+  defaultGateway: GatewayType;
+  createdAt: string;
+  totalGrossVolume?: number;
+  totalTransactions?: number;
+}
+
+export type PaymentLinkStatus = 'ACTIVE' | 'PAID' | 'EXPIRED' | 'CANCELLED';
+
+export interface PaymentLinkDTO {
+  id: string;
+  slug: string; // e.g. "sh-8k2m9q"
+  url: string; // e.g. "pay.bldr.com/l/sh-8k2m9q"
+  ventureId: string;
+  ventureCode: string;
+  ventureName: string;
+  chipBg: string;
+  chipFg: string;
+  orderNumber: string;
+  description: string;
+  amount: number | null; // null for open / caller-supplied
+  currency: string;
+  isFixed: boolean;
+  maxUses: number;
+  usedCount: number;
+  expiresAt: string | null;
+  status: PaymentLinkStatus;
+  qrCodeUrl?: string;
+  createdAt: string;
+}
+
+export interface TransactionTimelineEvent {
+  time: string;
+  title: string;
+  body: string;
+  actor: string;
+  dotColor: string;
+  tag?: string;
+  tagBg?: string;
+  tagFg?: string;
+}
+
+export interface LedgerEntry {
+  type: string;
+  amount: string;
+  direction: 'CR' | 'DR';
+  dirBg: string;
+  dirFg: string;
+  reference: string;
+  postedAt: string;
+}
+
+export interface TransactionDetailDTO {
+  id: string; // txn_01J8F4KQ2M
+  orderNumber: string; // SH-COURSE-4581
+  paymentLinkId?: string;
+  ventureId: string;
+  ventureCode: string;
+  ventureName: string;
+  customerEmail: string;
+  customerName?: string;
+  amount: number;
+  currency: string;
+  netAmount: number;
+  feeAmount: number;
+  vatAmount: number;
+  refundableBalance: number;
+  status: 'PAID' | 'FAILED' | 'PENDING' | 'REFUNDED' | 'EXPIRED';
+  paymentMethod: 'CARD' | 'WALLET' | 'FAWRY_CASH' | 'MEEZA';
+  gatewayUsed: GatewayType;
+  gatewayRef?: string;
+  paidAt?: string;
+  createdAt: string;
+  events: TransactionTimelineEvent[];
+  ledgerEntries: LedgerEntry[];
+}
+
+export interface ExecutiveOverviewKPIs {
+  grossVolume: number;
+  grossDelta: string;
+  netCollected: number;
+  netDelta: string;
+  pspFees: number;
+  feesDelta: string;
+  activeLinksCount: number;
+  linksDelta: string;
+  refundRate: number;
+  refundRateDelta: string;
+  periodLabel: string;
+}
