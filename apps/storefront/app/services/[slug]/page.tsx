@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { BldrNav, BldrFooter, ProjectContactModal, tokens, formatEGP } from '@bldr/ui';
-import { SERVICES_CATALOG, ServiceItem } from '../page';
+import { SERVICES_CATALOG, ServiceItem } from '../data';
 
 export default function ServiceDetailPage() {
   const params = useParams();
@@ -89,7 +89,31 @@ export default function ServiceDetailPage() {
                 {isRtl ? service.shortDescAr : service.shortDesc}
               </p>
 
-              <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', alignItems: 'center' }}>
+                <button
+                  type="button"
+                  onClick={() => setIsContactOpen(true)}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    height: 48,
+                    padding: '0 28px',
+                    borderRadius: 8,
+                    background: tokens.colors.brandDark,
+                    color: '#FFFFFF',
+                    fontSize: 15,
+                    fontWeight: 700,
+                    border: 'none',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 14px rgba(20,20,22,0.2)',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  <span>✉️</span>
+                  <span>{isRtl ? 'تواصل معنا لبدء المشروع' : 'Start a Project / Contact Us'}</span>
+                </button>
+
                 <Link
                   href={`/pay/${service.paySlug}`}
                   style={{
@@ -97,37 +121,20 @@ export default function ServiceDetailPage() {
                     alignItems: 'center',
                     gap: 8,
                     height: 48,
-                    padding: '0 26px',
-                    borderRadius: 8,
-                    background: '#2E6F5E',
-                    color: '#FFFFFF',
-                    fontSize: 14.5,
-                    fontWeight: 700,
-                    textDecoration: 'none',
-                    boxShadow: '0 4px 14px rgba(46, 111, 94, 0.3)',
-                  }}
-                >
-                  <span>💳</span>
-                  <span>{isRtl ? 'حجز ودفع عبر بوابة الدفع المركزية' : 'Book via Central Payment Gateway'}</span>
-                </Link>
-
-                <button
-                  type="button"
-                  onClick={() => setIsContactOpen(true)}
-                  style={{
-                    height: 48,
-                    padding: '0 22px',
+                    padding: '0 20px',
                     borderRadius: 8,
                     background: '#FFFFFF',
                     border: '1px solid #D3DAE4',
                     color: '#12203C',
                     fontSize: 14,
                     fontWeight: 600,
-                    cursor: 'pointer',
+                    textDecoration: 'none',
+                    transition: 'all 0.15s ease',
                   }}
                 >
-                  {isRtl ? 'طلب استشارة مخصصة ←' : 'Request Custom Scope →'}
-                </button>
+                  <span>💳</span>
+                  <span>{isRtl ? 'حجز فوري أونلاين' : 'Direct Booking / Pay Now'}</span>
+                </Link>
               </div>
             </div>
 
@@ -245,6 +252,51 @@ export default function ServiceDetailPage() {
                 </button>
               </div>
             </div>
+          </div>
+
+          {/* Main CTA Section */}
+          <div style={{
+            marginTop: 48,
+            background: 'linear-gradient(135deg, #141416 0%, #1E2229 100%)',
+            borderRadius: 20,
+            padding: '44px 36px',
+            color: '#FFFFFF',
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 28,
+            flexWrap: 'wrap',
+          }}>
+            <div style={{ maxWidth: 600 }}>
+              <h3 style={{ fontSize: 24, fontWeight: 700, margin: '0 0 10px', color: '#FFFFFF' }}>
+                {isRtl ? 'جاهز لبدء هذا المشروع معك ومع فريقنا؟' : 'Ready to launch this service with bldr?'}
+              </h3>
+              <p style={{ fontSize: 14.5, color: '#A0AAB8', margin: 0, lineHeight: 1.6 }}>
+                {isRtl
+                  ? 'أرسل لنا تفاصيل مشروعك أو التحديات التي تواجهك وسيتواصل معك شريك الاستوديو خلال ٢٤ ساعة لمناقشة خطة العمل.'
+                  : 'Submit your brief and an engagement partner will review your goals and schedule a strategic discovery call within 24 hours.'}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsContactOpen(true)}
+              style={{
+                height: 50,
+                padding: '0 32px',
+                borderRadius: 999,
+                background: '#FFFFFF',
+                color: '#141416',
+                fontSize: 15,
+                fontWeight: 700,
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 4px 16px rgba(255,255,255,0.2)',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              {isRtl ? 'ابدأ مشروعك / نموذج التواصل ←' : 'Start a project / Contact form →'}
+            </button>
           </div>
         </div>
       </main>
