@@ -338,12 +338,16 @@ export default function AdminDashboardPage() {
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6, height: 160, borderBottom: '1px solid #E3E8EF', paddingBottom: 0 }}>
-                    {Array.from({ length: 30 }).map((_, i) => {
-                      const h = 25 + Math.sin(i * 0.4) * 20 + (i % 5) * 12;
+                    {[
+                      32, 44, 38, 55, 62, 48, 58, 70, 64, 52,
+                      68, 76, 82, 74, 60, 69, 78, 85, 91, 75,
+                      68, 80, 88, 84, 72, 79, 86, 92, 88, 94,
+                    ].map((h, i) => {
+                      const failedH = Math.round(Math.max(4, h * 0.12));
                       return (
                         <div key={i} style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', gap: 2 }}>
-                          <div style={{ height: `${Math.max(4, h * 0.12)}%`, background: '#D3DAE4', borderRadius: '2px 2px 0 0' }} />
-                          <div style={{ height: `${Math.min(92, h)}%`, background: '#2E6F5E', borderRadius: '0 0 2px 2px' }} />
+                          <div style={{ height: `${failedH}%`, background: '#D3DAE4', borderRadius: '2px 2px 0 0' }} />
+                          <div style={{ height: `${h}%`, background: '#2E6F5E', borderRadius: '0 0 2px 2px' }} />
                         </div>
                       );
                     })}
