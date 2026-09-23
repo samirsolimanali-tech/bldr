@@ -35,6 +35,20 @@ const SAMPLE_PAYMENTS: Record<string, PaymentDetails> = {
     supportEmail: 'support@studyhub.example',
     supportPhone: '+20 10 0000 0000',
   },
+  'sh-4r7t1a': {
+    slug: 'sh-4r7t1a',
+    orderNumber: 'SH-BUNDLE-0212',
+    ventureName: 'StudyHub',
+    ventureCode: 'SH',
+    chipBg: '#E6EFEB',
+    chipFg: '#2E6F5E',
+    description: 'Physics Complete Bundle',
+    amount: 1200.0,
+    currency: 'EGP',
+    expiresInMinutes: 48,
+    supportEmail: 'support@studyhub.example',
+    supportPhone: '+20 10 0000 0000',
+  },
   'ac-9w3e5z': {
     slug: 'ac-9w3e5z',
     orderNumber: 'AC-REV-1188',
@@ -49,12 +63,112 @@ const SAMPLE_PAYMENTS: Record<string, PaymentDetails> = {
     supportEmail: 'support@apexclasses.example',
     supportPhone: '+20 12 0000 0000',
   },
+  'eh-2n6b8v': {
+    slug: 'eh-2n6b8v',
+    orderNumber: 'EH-CONS-0455',
+    ventureName: 'EL HESA',
+    ventureCode: 'EH',
+    chipBg: '#FBF3E0',
+    chipFg: '#B8860B',
+    description: 'Gamified Learning Consultation Fee',
+    amount: 600.0,
+    currency: 'EGP',
+    expiresInMinutes: 30,
+    supportEmail: 'support@elhesa.example',
+    supportPhone: '+20 11 0000 0000',
+  },
+  'ch-5t8o2p': {
+    slug: 'ch-5t8o2p',
+    orderNumber: 'CH-WS-0031',
+    ventureName: 'Career Hub',
+    ventureCode: 'CH',
+    chipBg: '#F0EAF7',
+    chipFg: '#7A4CA0',
+    description: 'CV Workshop — Oct Cohort',
+    amount: 350.0,
+    currency: 'EGP',
+    expiresInMinutes: 120,
+    supportEmail: 'support@careerhub.example',
+    supportPhone: '+20 15 0000 0000',
+  },
 };
+
+function resolvePayment(slug: string): PaymentDetails {
+  if (SAMPLE_PAYMENTS[slug]) {
+    return SAMPLE_PAYMENTS[slug];
+  }
+
+  // Dynamic venture extraction from prefix
+  const prefix = slug.slice(0, 2).toLowerCase();
+  if (prefix === 'eh') {
+    return {
+      slug,
+      orderNumber: `EH-${slug.slice(3, 7).toUpperCase() || 'PAY-8921'}`,
+      ventureName: 'EL HESA',
+      ventureCode: 'EH',
+      chipBg: '#FBF3E0',
+      chipFg: '#B8860B',
+      description: 'Gamified Learning & Course Access',
+      amount: 450.0,
+      currency: 'EGP',
+      expiresInMinutes: 45,
+      supportEmail: 'support@elhesa.example',
+      supportPhone: '+20 11 0000 0000',
+    };
+  }
+  if (prefix === 'ch') {
+    return {
+      slug,
+      orderNumber: `CH-${slug.slice(3, 7).toUpperCase() || 'WS-4012'}`,
+      ventureName: 'Career Hub',
+      ventureCode: 'CH',
+      chipBg: '#F0EAF7',
+      chipFg: '#7A4CA0',
+      description: 'Career Training & Workshop Pass',
+      amount: 350.0,
+      currency: 'EGP',
+      expiresInMinutes: 60,
+      supportEmail: 'support@careerhub.example',
+      supportPhone: '+20 15 0000 0000',
+    };
+  }
+  if (prefix === 'ac') {
+    return {
+      slug,
+      orderNumber: `AC-${slug.slice(3, 7).toUpperCase() || 'ENR-9102'}`,
+      ventureName: 'Apex Classes',
+      ventureCode: 'AC',
+      chipBg: '#E8EEF7',
+      chipFg: '#2C5F9E',
+      description: 'Academic Cohort Enrollment',
+      amount: 1800.0,
+      currency: 'EGP',
+      expiresInMinutes: 60,
+      supportEmail: 'support@apexclasses.example',
+      supportPhone: '+20 12 0000 0000',
+    };
+  }
+
+  return {
+    slug,
+    orderNumber: `SH-${slug.slice(3, 7).toUpperCase() || 'COURSE-4581'}`,
+    ventureName: 'StudyHub',
+    ventureCode: 'SH',
+    chipBg: '#E6EFEB',
+    chipFg: '#2E6F5E',
+    description: 'Educational Course & Tutor Services',
+    amount: 750.0,
+    currency: 'EGP',
+    expiresInMinutes: 30,
+    supportEmail: 'support@studyhub.example',
+    supportPhone: '+20 10 0000 0000',
+  };
+}
 
 export default function CentralPaymentPage() {
   const params = useParams();
   const rawSlug = (params?.slug as string) || 'sh-8k2m9q';
-  const payment = SAMPLE_PAYMENTS[rawSlug] || SAMPLE_PAYMENTS['sh-8k2m9q'];
+  const payment = resolvePayment(rawSlug);
 
   const [lang, setLang] = useState<'EN' | 'AR'>('EN');
   const [method, setMethod] = useState<'CARD' | 'WALLET' | 'KIOSK'>('CARD');
