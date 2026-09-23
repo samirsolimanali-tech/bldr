@@ -164,42 +164,35 @@ export default function ServicesPage() {
                   </div>
                 </div>
 
-                {/* Price & Dual Action Buttons */}
+                {/* Scope & Contact Action Buttons (No Prices) */}
                 <div>
-                  <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', paddingBottom: 16, borderBottom: '1px solid #E3E8EF', marginBottom: 16 }}>
-                    <span style={{ fontSize: 12, color: '#8A94A6', fontWeight: 600 }}>{isRtl ? 'القيمة الاستثمارية:' : 'Investment:'}</span>
-                    <span style={{ fontSize: 22, fontWeight: 800, color: '#12203C', fontFamily: tokens.fonts.mono }}>
-                      {formatEGP(service.priceEGP)}
-                    </span>
-                  </div>
-
-                  {/* Dual Action Buttons */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                    {/* Mode A: Central Gateway Direct Checkout */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 10, paddingTop: 6 }}>
+                    {/* View Service Details */}
                     <Link
-                      href={`/pay/${service.paySlug}`}
+                      href={`/services/${service.slug}`}
                       style={{
                         height: 42,
                         borderRadius: 8,
-                        background: '#2E6F5E',
+                        background: tokens.colors.brandDark,
                         color: '#FFFFFF',
                         fontSize: 13,
-                        fontWeight: 700,
+                        fontWeight: 600,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         gap: 6,
                         textDecoration: 'none',
-                        boxShadow: '0 2px 6px rgba(46, 111, 94, 0.25)',
+                        boxShadow: '0 2px 6px rgba(20, 20, 22, 0.15)',
+                        transition: 'background 0.15s ease',
                       }}
                     >
-                      <span>💳</span>
-                      <span>{isRtl ? 'دفع فوري بالبوابة' : 'Instant Checkout'}</span>
+                      {isRtl ? 'تفاصيل الخدمة ←' : 'View Scope →'}
                     </Link>
 
-                    {/* Mode B: Single Service Landing Page */}
-                    <Link
-                      href={`/services/${service.slug}`}
+                    {/* Direct Contact Modal Trigger */}
+                    <button
+                      type="button"
+                      onClick={() => setIsContactOpen(true)}
                       style={{
                         height: 42,
                         borderRadius: 8,
@@ -211,11 +204,12 @@ export default function ServicesPage() {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        textDecoration: 'none',
+                        cursor: 'pointer',
+                        transition: 'background 0.15s ease',
                       }}
                     >
-                      {isRtl ? 'تفاصيل الخدمة ←' : 'View Scope →'}
-                    </Link>
+                      {isRtl ? 'تواصل معنا' : 'Contact Us'}
+                    </button>
                   </div>
                 </div>
               </div>

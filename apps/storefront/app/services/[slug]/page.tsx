@@ -114,31 +114,28 @@ export default function ServiceDetailPage() {
                   <span>{isRtl ? 'تواصل معنا لبدء المشروع' : 'Start a Project / Contact Us'}</span>
                 </button>
 
-                <Link
-                  href={`/pay/${service.paySlug}`}
+                <div
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: 8,
+                    gap: 6,
                     height: 48,
-                    padding: '0 20px',
+                    padding: '0 18px',
                     borderRadius: 8,
-                    background: '#FFFFFF',
-                    border: '1px solid #D3DAE4',
-                    color: '#12203C',
-                    fontSize: 14,
-                    fontWeight: 600,
-                    textDecoration: 'none',
-                    transition: 'all 0.15s ease',
+                    background: '#F8FAFC',
+                    border: '1px solid #E3E8EF',
+                    color: '#47454A',
+                    fontSize: 13.5,
+                    fontWeight: 500,
                   }}
                 >
-                  <span>💳</span>
-                  <span>{isRtl ? 'حجز فوري أونلاين' : 'Direct Booking / Pay Now'}</span>
-                </Link>
+                  <span>⏱️</span>
+                  <span>{isRtl ? `مدة التنفيذ: ${service.deliveryTimeAr}` : `Delivery Timeline: ${service.deliveryTime}`}</span>
+                </div>
               </div>
             </div>
 
-            {/* Pricing Card */}
+            {/* Engagement Summary Card (No Prices) */}
             <div style={{
               background: '#F8FAFC',
               borderRadius: 16,
@@ -150,13 +147,15 @@ export default function ServiceDetailPage() {
             }}>
               <div>
                 <span style={{ fontSize: 11, fontWeight: 700, color: '#8A94A6', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                  {isRtl ? 'التسعير المباشر للباقة' : 'Package Investment'}
+                  {isRtl ? 'نموذج العمل والتعاقد' : 'Engagement Model'}
                 </span>
-                <div style={{ fontSize: 32, fontWeight: 800, color: '#12203C', fontFamily: tokens.fonts.mono, marginTop: 4 }}>
-                  {formatEGP(service.priceEGP)}
+                <div style={{ fontSize: 20, fontWeight: 700, color: '#12203C', marginTop: 6 }}>
+                  {isRtl ? 'شراكة مرنة ومخصصة' : 'Tailored Studio Partnership'}
                 </div>
-                <div style={{ fontSize: 12.5, color: '#5A6A80', marginTop: 4 }}>
-                  {isRtl ? `مدة التنفيذ: ${service.deliveryTimeAr}` : `Delivery Timeline: ${service.deliveryTime}`}
+                <div style={{ fontSize: 13, color: '#5A6A80', marginTop: 4, lineHeight: 1.5 }}>
+                  {isRtl
+                    ? 'نصمم نطاق العمل وجدول المخرجات بناءً على أهداف مشروعك وميزانيتك المحددة.'
+                    : 'Milestones, deliverables, and team allocation are customized to your objectives.'}
                 </div>
               </div>
 
@@ -164,22 +163,44 @@ export default function ServiceDetailPage() {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <span style={{ fontSize: 12, fontWeight: 700, color: '#1B2A4A' }}>
-                  {isRtl ? 'وسائل الدفع المقبولة فوراً:' : 'Supported Payment Methods:'}
+                  {isRtl ? 'مزايا العمل مع bldr:' : 'What to Expect:'}
                 </span>
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                  {['Visa', 'Mastercard', 'Meeza', 'Vodafone Cash', 'Fawry Kiosk'].map((badge) => (
-                    <span key={badge} style={{ fontSize: 11, padding: '3px 8px', borderRadius: 4, background: '#FFFFFF', border: '1px solid #D3DAE4', color: '#5A6A80', fontWeight: 600 }}>
-                      {badge}
-                    </span>
-                  ))}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 12.5, color: '#47454A' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ color: '#2E6F5E', fontWeight: 800 }}>✓</span>
+                    <span>{isRtl ? 'جلسة تحديد نطاق العمل خلال ٢٤ ساعة' : 'Discovery & scoping call within 24 hours'}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ color: '#2E6F5E', fontWeight: 800 }}>✓</span>
+                    <span>{isRtl ? 'مدير مشروع متخصص مسؤول عن النتائج' : 'Dedicated venture lead directly accountable'}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ color: '#2E6F5E', fontWeight: 800 }}>✓</span>
+                    <span>{isRtl ? 'تقارير أسبوعية وتسليمات واضحة' : 'Transparent weekly milestone reporting'}</span>
+                  </div>
                 </div>
               </div>
 
-              <div style={{ fontSize: 12, color: '#8A94A6', lineHeight: 1.5 }}>
-                {isRtl
-                  ? '🔒 معاملات مؤمنة بنظام التشفير المركزي من bldr مع إصدار فوري للفواتير والإشعارات.'
-                  : '🔒 Processed via bldr Central Payment Hub with verified double-entry ledger settlement.'}
-              </div>
+              <button
+                type="button"
+                onClick={() => setIsContactOpen(true)}
+                style={{
+                  height: 42,
+                  borderRadius: 8,
+                  background: '#FFFFFF',
+                  border: '1px solid #D3DAE4',
+                  color: '#12203C',
+                  fontSize: 13.5,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginTop: 6,
+                }}
+              >
+                {isRtl ? 'طلب عرض مخصص ←' : 'Request Tailored Scope →'}
+              </button>
             </div>
           </div>
 

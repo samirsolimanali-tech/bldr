@@ -505,7 +505,7 @@ export function BldrNav({ lang = 'EN', onLanguageChange, onStartProject }: BldrN
         </nav>
 
         {/* Right Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <div
             style={{
               display: 'flex',
@@ -527,6 +527,27 @@ export function BldrNav({ lang = 'EN', onLanguageChange, onStartProject }: BldrN
             <span style={{ color: lang === 'EN' ? tokens.colors.brandDark : tokens.colors.textLight, fontWeight: lang === 'EN' ? 700 : 400 }}>EN</span>
           </div>
 
+          <a
+            href="/apply-provider"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              height: 38,
+              padding: '0 16px',
+              borderRadius: 999,
+              background: '#FFFFFF',
+              border: '1px solid rgba(20,20,22,0.14)',
+              color: tokens.colors.brandDark,
+              fontSize: 13.5,
+              fontWeight: 600,
+              textDecoration: 'none',
+              transition: 'all 0.15s ease',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {isRtl ? 'انضم كمزود خدمة' : 'Apply as Provider'}
+          </a>
+
           <button
             type="button"
             onClick={onStartProject}
@@ -534,17 +555,18 @@ export function BldrNav({ lang = 'EN', onLanguageChange, onStartProject }: BldrN
               display: 'inline-flex',
               alignItems: 'center',
               height: 40,
-              padding: '0 22px',
+              padding: '0 20px',
               borderRadius: 999,
               background: tokens.colors.brandDark,
               color: '#FFFFFF',
-              fontSize: 14,
-              fontWeight: 500,
+              fontSize: 13.5,
+              fontWeight: 600,
               border: 'none',
               cursor: 'pointer',
               boxShadow: '0 2px 8px rgba(20,20,22,0.14)',
               transition: 'all 0.15s ease',
               fontFamily: 'inherit',
+              whiteSpace: 'nowrap',
             }}
           >
             {isRtl ? 'ابدأ مشروعك' : 'Start a project'}
