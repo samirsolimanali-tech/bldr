@@ -106,39 +106,47 @@ export function SimulatedPaymentModal({
 }
 
 
-// ─── Main Website Navigation (BldrNav.dc.html) ───────────────────────────────
+// ─── Main Website Navigation ─────────────────────────────────────────
 export interface BldrNavProps {
-  activeTab?: string;
   lang?: 'EN' | 'AR';
   onLanguageChange?: (lang: 'EN' | 'AR') => void;
+  onStartProject?: () => void;
 }
 
-export function BldrNav({ activeTab = 'home', lang = 'EN', onLanguageChange }: BldrNavProps) {
+export function BldrNav({ lang = 'EN', onLanguageChange, onStartProject }: BldrNavProps) {
+  const isRtl = lang === 'AR';
+  const navItems = isRtl
+    ? [
+        { label: 'الخدمات والتسويق', href: '/services' },
+        { label: 'المنتجات والدورات', href: '/products' },
+        { label: 'منظومة العمل', href: '/#built' },
+        { label: 'بوابة الدفع المركزية', href: 'http://localhost:3002' },
+      ]
+    : [
+        { label: 'Services', href: '/services' },
+        { label: 'Products & Courses', href: '/products' },
+        { label: "How we're built", href: '/#built' },
+        { label: 'Payment Hub', href: 'http://localhost:3002' },
+      ];
+
   return (
-    <div style={{
-      position: 'sticky',
-      top: 0,
-      zIndex: 50,
-      background: 'rgba(244, 245, 247, 0.88)',
-      backdropFilter: 'blur(18px)',
-      WebkitBackdropFilter: 'blur(18px)',
-      borderBottom: '1px solid rgba(20, 20, 22, 0.08)',
-      fontFamily: tokens.fonts.display,
-    }}>
-      <div style={{
-        maxWidth: 1280,
-        margin: '0 auto',
-        padding: '0 32px',
-        height: 74,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 24,
-      }}>
-        {/* Logo */}
+    <div
+      dir={isRtl ? 'rtl' : 'ltr'}
+      style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 50,
+        background: 'rgba(244, 245, 247, 0.94)',
+        backdropFilter: 'blur(10px)',
+        borderBottom: '1px solid rgba(20, 20, 22, 0.08)',
+        fontFamily: isRtl ? "'Readex Pro', sans-serif" : tokens.fonts.display,
+      }}
+    >
+      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 32px', height: 72, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        {/* Brand */}
         <a href="/" style={{
           fontSize: 26,
-          fontWeight: 500,
+          fontWeight: 700,
           letterSpacing: '-0.045em',
           color: tokens.colors.brandDark,
           textDecoration: 'none',
@@ -157,18 +165,13 @@ export function BldrNav({ activeTab = 'home', lang = 'EN', onLanguageChange }: B
 
         {/* Links */}
         <nav style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
-          {[
-            { label: "How we're built", href: '/#built' },
-            { label: 'Education & EdTech', href: '/#education' },
-            { label: 'Our Work', href: '/#work' },
-            { label: 'Payment Hub', href: 'http://localhost:3002' },
-          ].map((item) => (
+          {navItems.map((item) => (
             <a
               key={item.label}
               href={item.href}
               style={{
                 fontSize: 14.5,
-                fontWeight: 300,
+                fontWeight: 400,
                 color: tokens.colors.brandDark,
                 textDecoration: 'none',
                 transition: 'color 0.15s ease',
@@ -181,24 +184,30 @@ export function BldrNav({ activeTab = 'home', lang = 'EN', onLanguageChange }: B
 
         {/* Right Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            fontSize: 13,
-            fontWeight: 400,
-            color: tokens.colors.textMuted,
-            cursor: 'pointer',
-          }}
-          onClick={() => onLanguageChange?.(lang === 'EN' ? 'AR' : 'EN')}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              fontSize: 13,
+              fontWeight: 500,
+              color: tokens.colors.textMuted,
+              cursor: 'pointer',
+              userSelect: 'none',
+              padding: '6px 10px',
+              borderRadius: 8,
+              background: 'rgba(20,20,22,0.04)',
+            }}
+            onClick={() => onLanguageChange?.(lang === 'EN' ? 'AR' : 'EN')}
           >
-            <span style={{ color: lang === 'AR' ? tokens.colors.brandDark : tokens.colors.textLight, fontWeight: lang === 'AR' ? 600 : 400 }}>AR</span>
+            <span style={{ color: lang === 'AR' ? tokens.colors.brandDark : tokens.colors.textLight, fontWeight: lang === 'AR' ? 700 : 400 }}>عربي</span>
             <span style={{ color: 'rgba(20,20,22,0.2)' }}>·</span>
-            <span style={{ color: lang === 'EN' ? tokens.colors.brandDark : tokens.colors.textLight, fontWeight: lang === 'EN' ? 600 : 400 }}>EN</span>
+            <span style={{ color: lang === 'EN' ? tokens.colors.brandDark : tokens.colors.textLight, fontWeight: lang === 'EN' ? 700 : 400 }}>EN</span>
           </div>
 
-          <a
-            href="mailto:contact@bldr.io"
+          <button
+            type="button"
+            onClick={onStartProject}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -208,20 +217,244 @@ export function BldrNav({ activeTab = 'home', lang = 'EN', onLanguageChange }: B
               background: tokens.colors.brandDark,
               color: '#FFFFFF',
               fontSize: 14,
-              fontWeight: 400,
-              textDecoration: 'none',
-              boxShadow: '0 2px 8px rgba(20,20,22,0.12)',
-              transition: 'transform 0.1s ease',
+              fontWeight: 500,
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(20,20,22,0.14)',
+              transition: 'all 0.15s ease',
+              fontFamily: 'inherit',
             }}
           >
-            Start a project
-          </a>
+            {isRtl ? 'ابدأ مشروعك' : 'Start a project'}
+          </button>
         </div>
       </div>
 
-      {/* Subtle brand gradient progress bar */}
+      {/* Brand gradient progress bar */}
       <div style={{ height: 2, background: 'rgba(20, 20, 22, 0.05)' }}>
         <div style={{ height: 2, background: `linear-gradient(90deg, ${tokens.colors.gradientStart}, ${tokens.colors.gradientEnd})`, width: '100%' }} />
+      </div>
+    </div>
+  );
+}
+
+// ─── Contact & Project Inquiry Modal ────────────────────────────────────────
+export interface ProjectContactModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  lang?: 'EN' | 'AR';
+}
+
+export function ProjectContactModal({ isOpen, onClose, lang = 'EN' }: ProjectContactModalProps) {
+  const [form, setForm] = React.useState({
+    name: '',
+    email: '',
+    phone: '',
+    service: 'Marketing & Growth (Sidekick)',
+    budget: '$5,000 – $15,000',
+    details: '',
+  });
+  const [submitted, setSubmitted] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+
+  if (!isOpen) return null;
+
+  const isRtl = lang === 'AR';
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      setSubmitted(true);
+    }, 600);
+  };
+
+  return (
+    <div
+      dir={isRtl ? 'rtl' : 'ltr'}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 999,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '16px',
+        background: 'rgba(18, 32, 60, 0.65)',
+        backdropFilter: 'blur(8px)',
+        fontFamily: isRtl ? "'Readex Pro', sans-serif" : tokens.fonts.ui,
+      }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div
+        style={{
+          width: '100%',
+          maxWidth: 540,
+          background: '#FFFFFF',
+          borderRadius: 18,
+          boxShadow: '0 24px 60px rgba(0,0,0,0.3)',
+          overflow: 'hidden',
+          position: 'relative',
+        }}
+      >
+        <div style={{ height: 4, background: `linear-gradient(90deg, ${tokens.colors.gradientStart}, ${tokens.colors.gradientEnd})` }} />
+
+        <div style={{ padding: '28px 32px 32px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
+            <div>
+              <h2 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: '#12203C' }}>
+                {isRtl ? 'ابدأ مشروعك مع bldr' : 'Start a Project with bldr'}
+              </h2>
+              <p style={{ margin: '6px 0 0', fontSize: 13.5, color: '#5A6A80' }}>
+                {isRtl ? 'أخبرنا عن مشروعك أو الخدمة المطلوبة وسنتواصل معك خلال 24 ساعة.' : 'Tell us about your venture, product, or campaign. We will get back within 24 hours.'}
+              </p>
+            </div>
+            <button
+              onClick={onClose}
+              style={{
+                background: 'none',
+                border: 'none',
+                fontSize: 22,
+                cursor: 'pointer',
+                color: '#8A94A6',
+                padding: '0 4px',
+                lineHeight: 1,
+              }}
+            >
+              ✕
+            </button>
+          </div>
+
+          {submitted ? (
+            <div style={{ textAlign: 'center', padding: '32px 16px' }}>
+              <div style={{ fontSize: 48, marginBottom: 12 }}>🚀</div>
+              <h3 style={{ fontSize: 20, fontWeight: 800, color: '#12203C', margin: '0 0 8px' }}>
+                {isRtl ? 'تم استلام طلبك بنجاح!' : 'Inquiry Received Successfully!'}
+              </h3>
+              <p style={{ color: '#5A6A80', fontSize: 14, margin: '0 0 24px' }}>
+                {isRtl ? 'فريق bldr سيراجع التفاصيل ويتواصل معك عبر البريد الإلكتروني أو الواتساب.' : 'Our partner and specialist unit leads will review your brief and follow up.'}
+              </p>
+              <button
+                onClick={() => {
+                  setSubmitted(false);
+                  onClose();
+                }}
+                style={{
+                  height: 42,
+                  padding: '0 24px',
+                  borderRadius: 8,
+                  background: '#12203C',
+                  color: '#FFFFFF',
+                  fontSize: 14,
+                  fontWeight: 600,
+                  border: 'none',
+                  cursor: 'pointer',
+                }}
+              >
+                {isRtl ? 'إغلاق' : 'Close Window'}
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#1B2A4A', marginBottom: 5 }}>
+                    {isRtl ? 'الاسم الكامل' : 'Full Name'}
+                  </label>
+                  <input
+                    required
+                    placeholder={isRtl ? 'مثال: أحمد كريم' : 'e.g. Alex Rivera'}
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: (e.target as HTMLInputElement).value })}
+                    style={{ width: '100%', height: 40, padding: '0 12px', borderRadius: 8, border: '1px solid #D3DAE4', fontSize: 13, boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#1B2A4A', marginBottom: 5 }}>
+                    {isRtl ? 'البريد الإلكتروني' : 'Work Email'}
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="you@company.com"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: (e.target as HTMLInputElement).value })}
+                    style={{ width: '100%', height: 40, padding: '0 12px', borderRadius: 8, border: '1px solid #D3DAE4', fontSize: 13, boxSizing: 'border-box' }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#1B2A4A', marginBottom: 5 }}>
+                    {isRtl ? 'رقم الهاتف / واتساب' : 'Phone / WhatsApp'}
+                  </label>
+                  <input
+                    placeholder="+20 10 0000 0000"
+                    value={form.phone}
+                    onChange={(e) => setForm({ ...form, phone: (e.target as HTMLInputElement).value })}
+                    style={{ width: '100%', height: 40, padding: '0 12px', borderRadius: 8, border: '1px solid #D3DAE4', fontSize: 13, boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#1B2A4A', marginBottom: 5 }}>
+                    {isRtl ? 'الخدمة المطلوبة' : 'Primary Service'}
+                  </label>
+                  <select
+                    value={form.service}
+                    onChange={(e) => setForm({ ...form, service: (e.target as HTMLSelectElement).value })}
+                    style={{ width: '100%', height: 40, padding: '0 10px', borderRadius: 8, border: '1px solid #D3DAE4', fontSize: 13, background: '#FFFFFF', boxSizing: 'border-box' }}
+                  >
+                    <option value="Marketing & Growth (Sidekick)">Marketing & Ads (Sidekick)</option>
+                    <option value="Full Brand Identity">Brand Identity & Design</option>
+                    <option value="Software & Tech House">Software & Platforms (Tech House)</option>
+                    <option value="Payment Gateway Integration">Payment Central Hub Setup</option>
+                    <option value="Consulting Session">Strategic Consulting Session</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#1B2A4A', marginBottom: 5 }}>
+                  {isRtl ? 'تفاصيل المشروع / نطاق العمل' : 'Project Brief / What are you looking to build?'}
+                </label>
+                <textarea
+                  required
+                  rows={3}
+                  placeholder={isRtl ? 'أخبرنا عن أهدافك، الميزانية المتوقعة، أو التحديات الحالية...' : 'Briefly describe your objectives, target timeline, or what you need help solving...'}
+                  value={form.details}
+                  onChange={(e) => setForm({ ...form, details: (e.target as HTMLTextAreaElement).value })}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #D3DAE4', fontSize: 13, fontFamily: 'inherit', boxSizing: 'border-box' }}
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  height: 44,
+                  marginTop: 6,
+                  borderRadius: 8,
+                  background: '#12203C',
+                  color: '#FFFFFF',
+                  fontSize: 14,
+                  fontWeight: 700,
+                  border: 'none',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                }}
+              >
+                {loading ? (isRtl ? 'جاري الإرسال...' : 'Sending Brief...') : (isRtl ? 'إرسال طلب المشروع ←' : 'Submit Project Brief →')}
+              </button>
+            </form>
+          )}
+        </div>
       </div>
     </div>
   );

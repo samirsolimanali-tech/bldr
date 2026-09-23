@@ -110,6 +110,25 @@ const INITIAL_VENTURES: VentureItem[] = [
     txns: 137,
     sr: '96.2%',
   },
+  {
+    id: 'v-5',
+    code: 'SK',
+    name: 'Sidekick Studio',
+    chipBg: '#FBEBE9',
+    chipFg: '#D10721',
+    activity: 'Marketing & Services Selling',
+    orderPrefix: 'SK-',
+    defaultGateway: 'GEIDEA',
+    webhookUrl: 'https://sidekick.internal/api/webhooks/payment',
+    status: 'ACTIVE',
+    gross: '860,000.00',
+    fees: '21,500.00',
+    vat: '3,010.00',
+    refunds: '4,000.00',
+    net: '831,490.00',
+    txns: 215,
+    sr: '97.2%',
+  },
 ];
 
 interface LinkItem {
@@ -130,6 +149,8 @@ interface LinkItem {
 const INITIAL_LINKS: LinkItem[] = [
   { slug: 'sh-8k2m9q', code: 'SH', venture: 'StudyHub', chipBg: '#E6EFEB', chipFg: '#2E6F5E', desc: 'Math Course — Term 1', order: 'SH-COURSE-4581', amount: 'EGP 750.00', mode: 'Fixed', uses: '1 / 1', expiry: '—', status: 'PAID' },
   { slug: 'sh-4r7t1a', code: 'SH', venture: 'StudyHub', chipBg: '#E6EFEB', chipFg: '#2E6F5E', desc: 'Physics Bundle', order: 'SH-BUNDLE-0212', amount: 'EGP 1,200.00', mode: 'Fixed', uses: '0 / 1', expiry: '20 Sep 2026', status: 'ACTIVE' },
+  { slug: 'sk-ads-camp', code: 'SK', venture: 'Sidekick Studio', chipBg: '#FBEBE9', chipFg: '#D10721', desc: 'Performance Ads & Paid Growth', order: 'SK-ADS-7721', amount: 'EGP 12,000.00', mode: 'Fixed', uses: '4 / 10', expiry: '15 Oct 2026', status: 'ACTIVE' },
+  { slug: 'sk-brand-kit', code: 'SK', venture: 'Sidekick Studio', chipBg: '#FBEBE9', chipFg: '#D10721', desc: 'Brand Identity & Design System', order: 'SK-BRD-5091', amount: 'EGP 25,000.00', mode: 'Fixed', uses: '2 / 5', expiry: '20 Oct 2026', status: 'ACTIVE' },
   { slug: 'ac-9w3e5z', code: 'AC', venture: 'Apex Classes', chipBg: '#E8EEF7', chipFg: '#2C5F9E', desc: 'Grade 12 Revision', order: 'AC-REV-1188', amount: 'EGP 2,400.00', mode: 'Fixed', uses: '3 / 5', expiry: '30 Sep 2026', status: 'ACTIVE' },
   { slug: 'eh-2n6b8v', code: 'EH', venture: 'EL HESA', chipBg: '#FBF3E0', chipFg: '#B8860B', desc: 'Consultation fee', order: 'EH-CONS-0455', amount: 'Open', mode: 'Open', uses: '0 / 1', expiry: '18 Sep 2026', status: 'ACTIVE' },
   { slug: 'ch-5t8o2p', code: 'CH', venture: 'Career Hub', chipBg: '#F0EAF7', chipFg: '#7A4CA0', desc: 'CV Workshop — Oct cohort', order: 'CH-WS-0031', amount: 'EGP 350.00', mode: 'Fixed', uses: '12 / 20', expiry: '01 Oct 2026', status: 'ACTIVE' },
@@ -152,6 +173,7 @@ interface TxnItem {
 }
 
 const INITIAL_TXNS: TxnItem[] = [
+  { id: 'txn_01J8F5SK88', order: 'SK-ADS-7721', ventureCode: 'SK', ventureName: 'Sidekick Studio', chipBg: '#FBEBE9', chipFg: '#D10721', customer: 'omar.growth@startup.eg', amount: 'EGP 12,000.00', net: 'EGP 11,680.00', method: 'Card (Visa)', gateway: 'Geidea', date: '14 Sep 2026 · 15:10', status: 'PAID' },
   { id: 'txn_01J8F4KQ2M', order: 'SH-COURSE-4581', ventureCode: 'SH', ventureName: 'StudyHub', chipBg: '#E6EFEB', chipFg: '#2E6F5E', customer: 'ahmed.k@example.com', amount: 'EGP 750.00', net: 'EGP 728.62', method: 'Card (Visa)', gateway: 'Geidea', date: '14 Sep 2026 · 14:32', status: 'PAID' },
   { id: 'txn_01J8F3NP9B', order: 'AC-REV-1188', ventureCode: 'AC', ventureName: 'Apex Classes', chipBg: '#E8EEF7', chipFg: '#2C5F9E', customer: 'nour.m@example.com', amount: 'EGP 2,400.00', net: 'EGP 2,334.00', method: 'Card (Mastercard)', gateway: 'Geidea', date: '14 Sep 2026 · 13:18', status: 'PAID' },
   { id: 'txn_01J8F2KL7A', order: 'EH-ASMT-0177', ventureCode: 'EH', ventureName: 'EL HESA', chipBg: '#FBF3E0', chipFg: '#B8860B', customer: 'youssef.h@example.com', amount: 'EGP 600.00', net: 'EGP 583.50', method: 'Kiosk (Fawry)', gateway: 'Fawry', date: '14 Sep 2026 · 11:45', status: 'PAID' },
