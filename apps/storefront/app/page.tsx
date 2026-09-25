@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { BldrNav, BldrFooter, ProjectContactModal } from '@bldr/ui';
+import ProjectsCarousel from './components/ProjectsCarousel';
 
 export default function HomePage() {
   const [lang, setLang] = useState<'EN' | 'AR'>('EN');
@@ -327,76 +328,126 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ─── Education & EdTech Showcase ───────────────────────── */}
-        <section id="education" style={{ background: '#141416', padding: '84px 32px', color: '#FFFFFF' }}>
-          <div style={{ maxWidth: 1280, margin: '0 auto', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 60, alignItems: 'center' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
-              <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#FD9426' }}>
-                {isRtl ? 'التعليم وتكنولوجيا التعليم' : 'Education & EdTech'}
+        {/* ─── Featured Projects & Portfolio Showcase ────────────── */}
+        <section id="projects" style={{ background: '#141416', padding: '84px 32px', color: '#FFFFFF', position: 'relative', overflow: 'hidden' }}>
+          {/* Subtle background ambient glow */}
+          <div
+            style={{
+              position: 'absolute',
+              top: '20%',
+              [isRtl ? 'left' : 'right']: '5%',
+              width: 480,
+              height: 480,
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(44, 95, 158, 0.12) 0%, transparent 70%)',
+              pointerEvents: 'none',
+              filter: 'blur(60px)',
+            }}
+          />
+
+          <div style={{ maxWidth: 1280, margin: '0 auto', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.15fr)', gap: 56, alignItems: 'center' }}>
+            {/* Left Side: Strategic Copy & CTA */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 24, zIndex: 1 }}>
+              <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#FD9426' }}>
+                {isRtl ? 'سوابق الأعمال والمشاريع المنفذة' : 'Selected Work & Case Studies'}
               </span>
-              <h2 style={{ margin: 0, fontSize: 40, lineHeight: 1.15, fontWeight: 600, letterSpacing: '-0.04em', color: '#FFFFFF' }}>
-                {isRtl ? 'نحن ندير بأنفسنا المنصات التي نبنيها.' : 'We have run the thing we are asked to build.'}
+
+              <h2 style={{ margin: 0, fontSize: 'clamp(32px, 3.8vw, 42px)', lineHeight: 1.15, fontWeight: 700, letterSpacing: '-0.04em', color: '#FFFFFF' }}>
+                {isRtl ? 'منصات برمجية حقيقية.\nونتائج تجارية مثبتة بالأرقام.' : 'Production platforms.\nReal commercial impact.'}
               </h2>
-              <p style={{ margin: 0, maxWidth: 480, fontSize: 16, lineHeight: 1.68, fontWeight: 300, color: 'rgba(255,255,255,0.72)' }}>
+
+              <p style={{ margin: 0, maxWidth: 500, fontSize: 16, lineHeight: 1.68, fontWeight: 300, color: 'rgba(255,255,255,0.74)' }}>
                 {isRtl
-                  ? 'العديد من الشركات البرمجية تبني منصات تعليمية، لكن قلة منها قامت بإدارة مجموعات طلابية حقيقية وتسعير دورات وإدارة تسويات بوابات الدفع في مصر.'
-                  : 'Plenty of software houses will build you a learning platform. Very few have run a cohort, priced a course, or managed live payment gateway reconciliation in Cairo.'}
+                  ? 'نحن لا نبني نماذج نظرية. من العيادات السحابية الذكية ومنصات التعليم المشفرة، إلى أنظمة أتمتة سلاسل الإمداد ومحركات نمو التجارة الرقمية، استكشف كيف نهندس ونطلق منصات تقود قطاعاتها في مصر والشرق الأوسط.'
+                  : 'We do not build theoretical prototypes. From cloud telehealth systems and DRM-protected EdTech portals to enterprise dispatch engines, explore the software platforms and growth systems we have engineered and scaled.'}
               </p>
-              <div style={{ display: 'flex', gap: 14 }}>
+
+              {/* Fast Proof Metrics */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, maxWidth: 480, paddingTop: 6 }}>
+                <div style={{ borderLeft: isRtl ? 'none' : '2px solid rgba(255,255,255,0.15)', borderRight: isRtl ? '2px solid rgba(255,255,255,0.15)' : 'none', paddingLeft: isRtl ? 0 : 14, paddingRight: isRtl ? 14 : 0 }}>
+                  <div style={{ fontSize: 24, fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.02em' }}>38k+</div>
+                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', fontWeight: 400, marginTop: 2 }}>
+                    {isRtl ? 'مريض مسجل ومنتظم' : 'Patients Managed'}
+                  </div>
+                </div>
+
+                <div style={{ borderLeft: isRtl ? 'none' : '2px solid rgba(255,255,255,0.15)', borderRight: isRtl ? '2px solid rgba(255,255,255,0.15)' : 'none', paddingLeft: isRtl ? 0 : 14, paddingRight: isRtl ? 14 : 0 }}>
+                  <div style={{ fontSize: 24, fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.02em' }}>45k+</div>
+                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', fontWeight: 400, marginTop: 2 }}>
+                    {isRtl ? 'طالب في المنصات' : 'Enrolled Students'}
+                  </div>
+                </div>
+
+                <div style={{ borderLeft: isRtl ? 'none' : '2px solid rgba(255,255,255,0.15)', borderRight: isRtl ? '2px solid rgba(255,255,255,0.15)' : 'none', paddingLeft: isRtl ? 0 : 14, paddingRight: isRtl ? 14 : 0 }}>
+                  <div style={{ fontSize: 24, fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.02em' }}>99.95%</div>
+                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', fontWeight: 400, marginTop: 2 }}>
+                    {isRtl ? 'استقرار وجاهزية' : 'Platform Uptime'}
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', alignItems: 'center', paddingTop: 6 }}>
                 <Link
-                  href="/products"
+                  href="/projects"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    height: 48,
-                    padding: '0 24px',
+                    gap: 8,
+                    height: 50,
+                    padding: '0 28px',
                     borderRadius: 999,
                     background: '#FFFFFF',
                     color: '#141416',
                     fontSize: 14.5,
-                    fontWeight: 600,
+                    fontWeight: 700,
                     textDecoration: 'none',
+                    boxShadow: '0 4px 16px rgba(255,255,255,0.15)',
+                    transition: 'all 0.2s ease',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
+                >
+                  <span>{isRtl ? 'استكشف كافة المشاريع وسوابق الأعمال' : 'Explore All Projects & Case Studies'}</span>
+                  <span>{isRtl ? '←' : '→'}</span>
+                </Link>
+
+                <button
+                  type="button"
+                  onClick={() => setIsContactOpen(true)}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    height: 50,
+                    padding: '0 22px',
+                    borderRadius: 999,
+                    background: 'transparent',
+                    border: '1px solid rgba(255,255,255,0.22)',
+                    color: 'rgba(255,255,255,0.85)',
+                    fontSize: 14,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.45)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.22)';
                   }}
                 >
-                  {isRtl ? 'استعرض دورات المنصات التعليمية ←' : 'Browse Platform Courses →'}
-                </Link>
+                  <span>✉️</span>
+                  <span>{isRtl ? 'ابدأ مشروعك معنا' : 'Start a Project'}</span>
+                </button>
               </div>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <div style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.12)',
-                borderRadius: 18,
-                padding: 24,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 8,
-              }}>
-                <div style={{ fontSize: 19, fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.03em' }}>StudyHub</div>
-                <p style={{ margin: 0, fontSize: 14.5, fontWeight: 300, lineHeight: 1.6, color: 'rgba(255,255,255,0.66)' }}>
-                  {isRtl
-                    ? 'نظام تشغيل وإدارة متكامل للمدرسين ومراكز الدروس، مربوط مباشرة ببوابة bldr المركزية لقبول المدفوعات فورياً.'
-                    : 'An Arabic-first operating system for tutors and tutoring centres. Integrates directly into the bldr Central Payment Hub for instant checkout.'}
-                </p>
-              </div>
-
-              <div style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.12)',
-                borderRadius: 18,
-                padding: 24,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 8,
-              }}>
-                <div style={{ fontSize: 19, fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.03em' }}>منصة الحصة</div>
-                <p style={{ margin: 0, fontSize: 14.5, fontWeight: 300, lineHeight: 1.6, color: 'rgba(255,255,255,0.66)' }}>
-                  {isRtl
-                    ? 'منصة تعليمية مصرية تفاعلية بآليات التلعيب، وتدعم المعاملات المصغرة وأكواد فوري والمحافظ الإلكترونية.'
-                    : 'A gamified Egyptian K-12 learning platform with micro-transactions, automated coupon validation, and Fawry/Geidea integrations.'}
-                </p>
-              </div>
+            {/* Right Side: Automated Rotating Projects Carousel */}
+            <div style={{ position: 'relative', zIndex: 1 }}>
+              <ProjectsCarousel lang={lang} />
             </div>
           </div>
         </section>
