@@ -31,20 +31,40 @@ export default function HomePage() {
       />
 
       <main style={{ flex: 1 }}>
-        {/* ─── Hero Section with Blueprint Sketch Background ──────────────────────── */}
+        {/* ─── Hero Section with Blueprint Gradient Reveal ──────────────────────── */}
         <section
           style={{
             position: 'relative',
-            padding: '72px 32px 84px',
+            padding: '84px 32px 96px',
+            minHeight: 560,
+            display: 'flex',
+            alignItems: 'center',
             background: isBlue
-              ? "linear-gradient(rgba(36, 56, 86, 0.82), rgba(25, 41, 64, 0.88)), url('/images/hero-blueprint-blue.jpg') center/cover no-repeat"
-              : "linear-gradient(rgba(244, 245, 247, 0.84), rgba(244, 245, 247, 0.90)), url('/images/hero-blueprint-light.jpg') center/cover no-repeat",
+              ? isRtl
+                ? "linear-gradient(270deg, #1C2B3F 0%, #1C2B3F 36%, rgba(28, 43, 63, 0.88) 52%, rgba(28, 43, 63, 0.38) 72%, rgba(28, 43, 63, 0.05) 100%), url('/images/hero-blueprint-blue.jpg') left center / cover no-repeat"
+                : "linear-gradient(90deg, #1C2B3F 0%, #1C2B3F 36%, rgba(28, 43, 63, 0.88) 52%, rgba(28, 43, 63, 0.38) 72%, rgba(28, 43, 63, 0.05) 100%), url('/images/hero-blueprint-blue.jpg') right center / cover no-repeat"
+              : isRtl
+                ? "linear-gradient(270deg, #F4F5F7 0%, #F4F5F7 36%, rgba(244, 245, 247, 0.88) 52%, rgba(244, 245, 247, 0.35) 72%, rgba(244, 245, 247, 0.05) 100%), url('/images/hero-blueprint-light.jpg') left center / cover no-repeat"
+                : "linear-gradient(90deg, #F4F5F7 0%, #F4F5F7 36%, rgba(244, 245, 247, 0.88) 52%, rgba(244, 245, 247, 0.35) 72%, rgba(244, 245, 247, 0.05) 100%), url('/images/hero-blueprint-light.jpg') right center / cover no-repeat",
             borderBottom: isBlue ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(20, 20, 22, 0.08)',
             transition: 'background 0.3s ease',
+            overflow: 'hidden',
           }}
         >
-          <div style={{ maxWidth: 1280, margin: '0 auto', display: 'grid', gridTemplateColumns: 'minmax(0, 1.15fr) minmax(0, 0.85fr)', gap: 54, alignItems: 'center' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+          <div
+            style={{
+              maxWidth: 1280,
+              width: '100%',
+              margin: '0 auto',
+              display: 'grid',
+              gridTemplateColumns: 'minmax(0, 1.25fr) minmax(0, 0.75fr)',
+              gap: 48,
+              alignItems: 'center',
+              position: 'relative',
+              zIndex: 2,
+            }}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 650 }}>
               
               {/* Header Badges with Blueprint Switcher */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
@@ -110,7 +130,7 @@ export default function HomePage() {
 
               <p style={{
                 margin: 0,
-                maxWidth: 520,
+                maxWidth: 540,
                 fontSize: 16.5,
                 lineHeight: 1.68,
                 fontWeight: 300,
@@ -186,55 +206,37 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Studio Hero Visual */}
+            {/* Right Half: Open Canvas revealing the Blueprint sketches */}
             <div
               style={{
-                position: 'relative',
-                borderRadius: 24,
-                overflow: 'hidden',
-                boxShadow: isBlue
-                  ? '0 25px 60px -15px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.2)'
-                  : '0 20px 50px -12px rgba(20, 20, 22, 0.12), 0 0 0 1px rgba(20, 20, 22, 0.06)',
-                background: '#FFFFFF',
-                aspectRatio: '4 / 3',
+                minHeight: 380,
                 display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
+                alignItems: 'flex-end',
+                justifyContent: isRtl ? 'flex-start' : 'flex-end',
+                position: 'relative',
               }}
             >
-              <img
-                src="/images/bldr-hero.jpg"
-                alt="bldr Cairo Venture Studio"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  display: 'block',
-                }}
-              />
-
-              {/* Ambient Studio Badge */}
+              {/* Subtle Architectural Blueprint Badge */}
               <div
                 style={{
-                  position: 'absolute',
-                  bottom: 16,
-                  [isRtl ? 'right' : 'left']: 16,
-                  background: 'rgba(255, 255, 255, 0.94)',
-                  backdropFilter: 'blur(12px)',
-                  WebkitBackdropFilter: 'blur(12px)',
-                  padding: '8px 16px',
-                  borderRadius: 999,
-                  border: '1px solid rgba(255, 255, 255, 0.6)',
-                  boxShadow: '0 4px 14px rgba(0, 0, 0, 0.1)',
-                  display: 'flex',
+                  display: 'inline-flex',
                   alignItems: 'center',
                   gap: 8,
+                  padding: '8px 16px',
+                  borderRadius: 999,
+                  background: isBlue ? 'rgba(15, 23, 42, 0.65)' : 'rgba(255, 255, 255, 0.85)',
+                  border: isBlue ? '1px solid rgba(255, 255, 255, 0.18)' : '1px solid rgba(20, 20, 22, 0.1)',
+                  backdropFilter: 'blur(10px)',
+                  WebkitBackdropFilter: 'blur(10px)',
+                  color: isBlue ? 'rgba(255, 255, 255, 0.85)' : '#47454A',
+                  fontSize: 12,
+                  fontWeight: 500,
+                  letterSpacing: '0.01em',
+                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
                 }}
               >
-                <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#D10721' }} />
-                <span style={{ fontSize: 12.5, fontWeight: 600, color: '#141416', letterSpacing: '-0.01em' }}>
-                  {isRtl ? 'ستوديو وبوابة المشاريع · القاهرة' : 'Venture Studio & Platform · Cairo'}
-                </span>
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#38BDF8' }} />
+                <span>{isRtl ? 'مخطط بنية المشاريع والنماذج الأولية' : 'Venture Architecture & Engineering Blueprint'}</span>
               </div>
             </div>
           </div>
