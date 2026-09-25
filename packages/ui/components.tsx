@@ -132,78 +132,50 @@ export function BldrNav({ lang = 'EN', onLanguageChange, onStartProject }: BldrN
   const servicesList = [
     {
       slug: 'performance-ads',
-      title: isRtl ? 'إدارة الحملات الإعلانية الممولة' : 'Performance Ads & Paid Growth',
-      desc: isRtl ? 'إدارة الحملات الإعلانية على ميتا وجوجل وتيك توك' : 'Meta, Google & TikTok lead acquisition engine',
-      unit: 'Sidekick',
-      color: '#D10721',
+      title: isRtl ? 'الإعلانات الممولة والنمو' : 'Performance Ads',
     },
     {
       slug: 'brand-identity',
-      title: isRtl ? 'بناء الهوية البصرية ونظام التصميم' : 'Full Brand Identity & Design System',
-      desc: isRtl ? 'تصميم الهوية المتكاملة والأدلة الإرشادية' : 'Distinctive visual system crafted for MENA',
-      unit: 'Sidekick',
-      color: '#D10721',
+      title: isRtl ? 'الهوية البصرية والتصميم' : 'Brand Identity',
     },
     {
       slug: 'tutor-marketing',
-      title: isRtl ? 'منظومة التسويق وحجز المقاعد للمدرسين' : 'Tutor & Academy Growth Funnel',
-      desc: isRtl ? 'صفحات تسجيل وربط آلي مع الواتساب وفوري' : 'Turnkey funnel & WhatsApp booking for educators',
-      unit: 'Sidekick',
-      color: '#D10721',
+      title: isRtl ? 'تسويق المعلمين والأكاديميات' : 'Tutor & Academy Funnel',
     },
     {
       slug: 'media-production',
-      title: isRtl ? 'الإنتاج المرئي وصناعة الفيديوهات' : 'Commercial Media & Video Production',
-      desc: isRtl ? 'تصوير استوديو 4K ومونتاج ريلز وإعلانات' : 'Studio 4K filming, Reels & motion graphics',
-      unit: 'Sidekick',
-      color: '#D10721',
+      title: isRtl ? 'الإنتاج المرئي والفيديو' : 'Media & Video Production',
     },
     {
       slug: 'payment-integration',
-      title: isRtl ? 'ربط بوابات الدفع المركزية' : 'Central Payment Gateway Integration',
-      desc: isRtl ? 'ربط Geidea وفوري والمحافظ الإلكترونية' : 'Geidea, Fawry & Mobile Wallets checkout hub',
-      unit: 'Tech House',
-      color: '#0066CC',
+      title: isRtl ? 'بوابة الدفع المركزية' : 'Payment Gateway',
     },
     {
       slug: 'consulting-session',
-      title: isRtl ? 'جلسة استشارة استراتيجية وتدقيق العمل' : 'Strategic Consulting & Business Audit',
-      desc: isRtl ? 'جلسة تشخيصية 90 دقيقة لنموذج العمل والنمو' : '90-minute structured architecture session',
-      unit: 'bldr',
-      color: '#141416',
+      title: isRtl ? 'استشارات وتدقيق الأعمال' : 'Strategic Consulting',
     },
   ];
 
   const productsList = [
     {
       href: '/products?type=Course',
-      title: isRtl ? 'الدورات والمعسكرات التدريبية' : 'Courses & Live Bootcamps',
-      desc: isRtl ? 'معسكر تطوير الويب، مراجعات الثانوية، وشهادات السحابة' : 'Full-stack engineering, AWS prep, exam cohorts',
-      badge: isRtl ? 'دورات' : 'Courses',
+      title: isRtl ? 'الدورات والمعسكرات' : 'Courses & Bootcamps',
     },
     {
       href: '/products?type=Workshop',
-      title: isRtl ? 'ورش العمل التطبيقية' : 'Workshops & Intensive Sprints',
-      desc: isRtl ? 'صناعة المحتوى المرئي، تجهيز السيرة الذاتية والمقابلات' : 'Creator studio masterclasses, career workshops',
-      badge: isRtl ? 'ورش عمل' : 'Workshops',
+      title: isRtl ? 'ورش العمل التطبيقية' : 'Workshops & Sprints',
     },
     {
       href: '/products?type=Assessment',
-      title: isRtl ? 'التقييمات واشتراكات المنصات' : 'Assessments & Learning Passes',
-      desc: isRtl ? 'اشتراك منصة الحصة التعليمية وبنوك الأسئلة' : 'Gamified Egyptian K-12 learning & diagnostic pass',
-      badge: isRtl ? 'تقييم' : 'Passes',
+      title: isRtl ? 'الاشتراكات والتقييمات' : 'Assessments & Passes',
     },
     {
       href: '/products?type=Book',
-      title: isRtl ? 'الكتب الإرشادية وحقائب الأدوات' : 'Books, Guides & Toolkits',
-      desc: isRtl ? 'دليل التجارة الإلكترونية ونماذج اقتصاديات المشاريع' : 'Egyptian E-Commerce Playbook, startup decks',
-      badge: isRtl ? 'كتب وأدلة' : 'Books',
+      title: isRtl ? 'الكتب والأدلة' : 'Books & Toolkits',
     },
     {
       href: '/products?type=Event',
-      title: isRtl ? 'الفعاليات وتجمعات الرواد' : 'Events & Summits',
-      desc: isRtl ? 'تجمع مؤسسي شركات التكنولوجيا المالية والشبكات' : 'FinTech founders mixer, studio networking summit',
-      badge: isRtl ? 'فعاليات' : 'Events',
+      title: isRtl ? 'الفعاليات والتجمعات' : 'Events & Summits',
     },
   ];
 
@@ -260,7 +232,7 @@ export function BldrNav({ lang = 'EN', onLanguageChange, onStartProject }: BldrN
         </a>
 
         {/* Minimal Navigation: Only Services and Products */}
-        <nav style={{ display: 'flex', alignItems: 'center', gap: 36, position: 'relative' }}>
+        <nav style={{ display: 'flex', alignItems: 'center', gap: 32, position: 'relative' }}>
           {/* Services with Hover Dropdown */}
           <div
             style={{ position: 'relative' }}
@@ -270,18 +242,18 @@ export function BldrNav({ lang = 'EN', onLanguageChange, onStartProject }: BldrN
             <a
               href="/services"
               style={{
-                fontSize: 15,
+                fontSize: 14.5,
                 fontWeight: 500,
                 color: activeDropdown === 'services' ? tokens.colors.brandDark : '#323742',
                 textDecoration: 'none',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: 6,
+                gap: 5,
                 padding: '8px 4px',
                 transition: 'color 0.15s ease',
               }}
             >
-              <span>{isRtl ? 'الخدمات والتسويق' : 'Services'}</span>
+              <span>{isRtl ? 'الخدمات' : 'Services'}</span>
               <svg
                 width="10"
                 height="6"
@@ -296,88 +268,78 @@ export function BldrNav({ lang = 'EN', onLanguageChange, onStartProject }: BldrN
               </svg>
             </a>
 
-            {/* Services Dropdown Menu */}
+            {/* Minimal Services Dropdown */}
             {activeDropdown === 'services' && (
               <div
                 style={{
                   position: 'absolute',
                   top: '100%',
-                  [isRtl ? 'right' : 'left']: -20,
-                  width: 380,
-                  padding: '14px 12px 10px',
+                  [isRtl ? 'right' : 'left']: 0,
+                  width: 230,
+                  padding: '6px',
                   background: '#FFFFFF',
-                  borderRadius: 14,
+                  borderRadius: 12,
                   border: '1px solid rgba(20, 20, 22, 0.08)',
-                  boxShadow: '0 18px 40px rgba(0, 0, 0, 0.12)',
+                  boxShadow: '0 12px 30px rgba(0, 0, 0, 0.08)',
                   zIndex: 200,
-                  animation: 'fadeIn 0.18s ease-out',
+                  animation: 'fadeIn 0.15s ease-out',
                 }}
               >
-                <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: '#8A94A6', padding: '0 10px 8px', letterSpacing: '0.04em' }}>
-                  {isRtl ? 'الخدمات المتاحة' : 'Specialized Services'}
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                   {servicesList.map((s) => (
                     <a
                       key={s.slug}
                       href={`/services/${s.slug}`}
                       style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 2,
-                        padding: '9px 12px',
-                        borderRadius: 8,
+                        padding: '8px 12px',
+                        borderRadius: 6,
                         textDecoration: 'none',
-                        color: 'inherit',
-                        transition: 'background 0.12s ease',
+                        fontSize: 13.5,
+                        fontWeight: 500,
+                        color: '#1E293B',
+                        display: 'block',
+                        transition: 'all 0.12s ease',
                       }}
                       onMouseEnter={(e) => {
-                        (e.currentTarget as HTMLElement).style.background = '#F7F8FA';
+                        (e.currentTarget as HTMLElement).style.background = '#F1F5F9';
+                        (e.currentTarget as HTMLElement).style.color = '#0F172A';
                       }}
                       onMouseLeave={(e) => {
                         (e.currentTarget as HTMLElement).style.background = 'transparent';
+                        (e.currentTarget as HTMLElement).style.color = '#1E293B';
                       }}
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                        <span style={{ fontSize: 13.5, fontWeight: 600, color: '#1B2A4A' }}>
-                          {s.title}
-                        </span>
-                        <span
-                          style={{
-                            fontSize: 10,
-                            fontWeight: 700,
-                            padding: '2px 6px',
-                            borderRadius: 4,
-                            background: `${s.color}14`,
-                            color: s.color,
-                          }}
-                        >
-                          {s.unit}
-                        </span>
-                      </div>
-                      <span style={{ fontSize: 12, color: '#6A788E', lineHeight: 1.35 }}>
-                        {s.desc}
-                      </span>
+                      {s.title}
                     </a>
                   ))}
                 </div>
 
-                <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid #EEF1F5', textAlign: 'center' }}>
-                  <a
-                    href="/services"
-                    style={{
-                      fontSize: 12.5,
-                      fontWeight: 600,
-                      color: tokens.colors.brandDark,
-                      textDecoration: 'none',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 4,
-                    }}
-                  >
-                    <span>{isRtl ? 'تصفح جميع الخدمات والحلول ←' : 'View all services & scope →'}</span>
-                  </a>
-                </div>
+                <div style={{ margin: '4px 0', borderTop: '1px solid #F1F5F9' }} />
+
+                <a
+                  href="/services"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '8px 12px',
+                    borderRadius: 6,
+                    fontSize: 12.5,
+                    fontWeight: 600,
+                    color: tokens.colors.brandDark,
+                    textDecoration: 'none',
+                    transition: 'background 0.12s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLElement).style.background = '#F1F5F9';
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLElement).style.background = 'transparent';
+                  }}
+                >
+                  <span>{isRtl ? 'جميع الخدمات' : 'All Services'}</span>
+                  <span>{isRtl ? '←' : '→'}</span>
+                </a>
               </div>
             )}
           </div>
@@ -391,13 +353,13 @@ export function BldrNav({ lang = 'EN', onLanguageChange, onStartProject }: BldrN
             <a
               href="/products"
               style={{
-                fontSize: 15,
+                fontSize: 14.5,
                 fontWeight: 500,
                 color: activeDropdown === 'products' ? tokens.colors.brandDark : '#323742',
                 textDecoration: 'none',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: 6,
+                gap: 5,
                 padding: '8px 4px',
                 transition: 'color 0.15s ease',
               }}
@@ -417,88 +379,78 @@ export function BldrNav({ lang = 'EN', onLanguageChange, onStartProject }: BldrN
               </svg>
             </a>
 
-            {/* Products Dropdown Menu */}
+            {/* Minimal Products Dropdown */}
             {activeDropdown === 'products' && (
               <div
                 style={{
                   position: 'absolute',
                   top: '100%',
-                  [isRtl ? 'right' : 'left']: -40,
-                  width: 360,
-                  padding: '14px 12px 10px',
+                  [isRtl ? 'right' : 'left']: 0,
+                  width: 230,
+                  padding: '6px',
                   background: '#FFFFFF',
-                  borderRadius: 14,
+                  borderRadius: 12,
                   border: '1px solid rgba(20, 20, 22, 0.08)',
-                  boxShadow: '0 18px 40px rgba(0, 0, 0, 0.12)',
+                  boxShadow: '0 12px 30px rgba(0, 0, 0, 0.08)',
                   zIndex: 200,
-                  animation: 'fadeIn 0.18s ease-out',
+                  animation: 'fadeIn 0.15s ease-out',
                 }}
               >
-                <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: '#8A94A6', padding: '0 10px 8px', letterSpacing: '0.04em' }}>
-                  {isRtl ? 'كتالوج المنتجات والبرامج' : 'Product Categories'}
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                   {productsList.map((p) => (
                     <a
                       key={p.title}
                       href={p.href}
                       style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 2,
-                        padding: '9px 12px',
-                        borderRadius: 8,
+                        padding: '8px 12px',
+                        borderRadius: 6,
                         textDecoration: 'none',
-                        color: 'inherit',
-                        transition: 'background 0.12s ease',
+                        fontSize: 13.5,
+                        fontWeight: 500,
+                        color: '#1E293B',
+                        display: 'block',
+                        transition: 'all 0.12s ease',
                       }}
                       onMouseEnter={(e) => {
-                        (e.currentTarget as HTMLElement).style.background = '#F7F8FA';
+                        (e.currentTarget as HTMLElement).style.background = '#F1F5F9';
+                        (e.currentTarget as HTMLElement).style.color = '#0F172A';
                       }}
                       onMouseLeave={(e) => {
                         (e.currentTarget as HTMLElement).style.background = 'transparent';
+                        (e.currentTarget as HTMLElement).style.color = '#1E293B';
                       }}
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                        <span style={{ fontSize: 13.5, fontWeight: 600, color: '#1B2A4A' }}>
-                          {p.title}
-                        </span>
-                        <span
-                          style={{
-                            fontSize: 10,
-                            fontWeight: 700,
-                            padding: '2px 6px',
-                            borderRadius: 4,
-                            background: '#EAEFF8',
-                            color: '#2C5F9E',
-                          }}
-                        >
-                          {p.badge}
-                        </span>
-                      </div>
-                      <span style={{ fontSize: 12, color: '#6A788E', lineHeight: 1.35 }}>
-                        {p.desc}
-                      </span>
+                      {p.title}
                     </a>
                   ))}
                 </div>
 
-                <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid #EEF1F5', textAlign: 'center' }}>
-                  <a
-                    href="/products"
-                    style={{
-                      fontSize: 12.5,
-                      fontWeight: 600,
-                      color: tokens.colors.brandDark,
-                      textDecoration: 'none',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 4,
-                    }}
-                  >
-                    <span>{isRtl ? 'عرض الدليل الكامل للمنتجات ←' : 'Browse full product catalog →'}</span>
-                  </a>
-                </div>
+                <div style={{ margin: '4px 0', borderTop: '1px solid #F1F5F9' }} />
+
+                <a
+                  href="/products"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '8px 12px',
+                    borderRadius: 6,
+                    fontSize: 12.5,
+                    fontWeight: 600,
+                    color: tokens.colors.brandDark,
+                    textDecoration: 'none',
+                    transition: 'background 0.12s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLElement).style.background = '#F1F5F9';
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLElement).style.background = 'transparent';
+                  }}
+                >
+                  <span>{isRtl ? 'جميع المنتجات' : 'All Products'}</span>
+                  <span>{isRtl ? '←' : '→'}</span>
+                </a>
               </div>
             )}
           </div>
