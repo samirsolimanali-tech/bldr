@@ -259,28 +259,28 @@ export default function HomePage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14, position: 'relative', [isRtl ? 'paddingRight' : 'paddingLeft']: 24, [isRtl ? 'borderRight' : 'borderLeft']: '2px solid rgba(20,20,22,0.08)' }}>
               {[
                 {
-                  title: 'Sidekick',
+                  title: isRtl ? 'التسويق وبناء العلامة التجارية' : 'Marketing & Branding',
                   was: isRtl ? 'بديل: وكالة التسويق المنفصلة' : 'was: the marketing agency',
                   desc: isRtl ? 'بناء الهوية البصرية، إدارة الإعلانات الممولة، صناعة المحتوى، وإطلاق مسارات البيع.' : 'Branding, advertising, content, performance campaigns',
                   link: '/services',
                   cta: isRtl ? 'تصفح خدمات التسويق ←' : 'View Marketing Packages →',
                 },
                 {
-                  title: 'Tech House',
+                  title: isRtl ? 'تطوير البرمجيات والتكنولوجيا' : 'Software & Technology',
                   was: isRtl ? 'بديل: شركة البرمجيات الخارجية' : 'was: the software house',
                   desc: isRtl ? 'تطوير المنصات الرقمية، ربط بوابات الدفع المركزية، وبناء البنية التحتية السحابية.' : 'Software platforms, central payment orchestration, automated infrastructure',
                   link: '/services',
-                  cta: isRtl ? 'خدمات البرمجيات والدفع ←' : 'Tech House Services →',
+                  cta: isRtl ? 'خدمات البرمجيات والتكنولوجيا ←' : 'Software & Tech Services →',
                 },
                 {
-                  title: 'bldr Management',
+                  title: isRtl ? 'الاستراتيجية وإدارة الأعمال' : 'Business Strategy & Consulting',
                   was: isRtl ? 'بديل: المستشار الذي يرحل' : 'was: the consultant who left',
                   desc: isRtl ? 'الاستراتيجية، تطوير الأعمال، التسعير، والهيكلة المالية للمشاريع.' : 'Strategy, business development, partnerships & financial architecture',
                   link: '/services',
                   cta: isRtl ? 'الجلسات الاستشارية ←' : 'Consulting Sessions →',
                 },
                 {
-                  title: 'Career Hub',
+                  title: isRtl ? 'التدريب وتأهيل الفرق' : 'Team Training & Enablement',
                   was: isRtl ? 'بديل: الفريق غير المدرب' : 'was: your untrained team',
                   desc: isRtl ? 'التدريب العملي للشركات، ورش العمل التنفيذية، وتسليم الفرق للعمل المستقل.' : 'Professional training, workshops, operations and team handover',
                   link: '/products',
