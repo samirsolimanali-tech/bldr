@@ -53,8 +53,8 @@ export default function HomePage() {
         <section
           style={{
             position: 'relative',
-            padding: '84px 32px 96px',
-            minHeight: 560,
+            padding: '92px 36px 104px',
+            minHeight: 580,
             display: 'flex',
             alignItems: 'center',
             background: isDark
@@ -82,13 +82,13 @@ export default function HomePage() {
               zIndex: 2,
             }}
           >
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 650 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 28, maxWidth: 660 }}>
               <h1 style={{
                 margin: 0,
-                fontSize: 'clamp(34px, 4.8vw, 58px)',
-                lineHeight: 1.1,
+                fontSize: isRtl ? 'clamp(32px, 3.8vw, 50px)' : 'clamp(36px, 4.4vw, 56px)',
+                lineHeight: isRtl ? 1.28 : 1.14,
                 fontWeight: 600,
-                letterSpacing: '-0.04em',
+                letterSpacing: isRtl ? '-0.02em' : '-0.035em',
                 color: isDark ? '#FFFFFF' : '#141416',
                 textWrap: 'pretty',
                 textShadow: isDark ? '0 2px 14px rgba(0, 0, 0, 0.3)' : 'none',
@@ -100,11 +100,11 @@ export default function HomePage() {
 
               <p style={{
                 margin: 0,
-                maxWidth: 540,
-                fontSize: 16.5,
-                lineHeight: 1.68,
-                fontWeight: 300,
-                color: isDark ? 'rgba(240, 246, 255, 0.9)' : '#47454A',
+                maxWidth: 580,
+                fontSize: isRtl ? 17 : 17.5,
+                lineHeight: isRtl ? 1.76 : 1.66,
+                fontWeight: 400,
+                color: isDark ? 'rgba(240, 246, 255, 0.92)' : '#444852',
                 textShadow: isDark ? '0 1px 8px rgba(0, 0, 0, 0.25)' : 'none',
               }}>
                 {isRtl
@@ -112,20 +112,21 @@ export default function HomePage() {
                   : 'bldr operates specialist units and builds its own ventures. You work with the units you need and keep one point of contact for all of it — nobody hands the outcome to somebody else.'}
               </p>
 
-              <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
                 <button
                   type="button"
                   onClick={() => setIsContactOpen(true)}
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    height: 50,
-                    padding: '0 28px',
+                    height: 52,
+                    padding: '0 30px',
                     borderRadius: 999,
                     background: isDark ? '#FFFFFF' : '#141416',
                     color: isDark ? '#0F172A' : '#FFFFFF',
-                    fontSize: 15,
+                    fontSize: 15.5,
                     fontWeight: 600,
+                    letterSpacing: isRtl ? 0 : '-0.01em',
                     border: 'none',
                     cursor: 'pointer',
                     boxShadow: isDark ? '0 4px 18px rgba(0, 0, 0, 0.25)' : '0 4px 14px rgba(20,20,22,0.14)',
@@ -140,8 +141,8 @@ export default function HomePage() {
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    height: 50,
-                    padding: '0 24px',
+                    height: 52,
+                    padding: '0 26px',
                     borderRadius: 999,
                     background: isDark ? 'rgba(255, 255, 255, 0.12)' : '#FFFFFF',
                     border: isDark ? '1px solid rgba(255, 255, 255, 0.35)' : '1px solid rgba(20,20,22,0.12)',
@@ -161,7 +162,7 @@ export default function HomePage() {
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    height: 50,
+                    height: 52,
                     padding: '0 20px',
                     borderRadius: 999,
                     background: 'transparent',
