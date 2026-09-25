@@ -30,6 +30,7 @@ export interface ProductItem {
   syllabusAr: { title: string; desc: string }[];
   whatIncluded: string[];
   whatIncludedAr: string[];
+  providerWebsiteUrl: string;
 }
 
 export const PRODUCTS_CATALOG: ProductItem[] = [
@@ -85,6 +86,7 @@ export const PRODUCTS_CATALOG: ProductItem[] = [
       'مشروع تخرج واقعي يُضاف لمعرض أعمالك على GitHub',
       'شهادة إتمام معتمدة قابلة للتحقق الرقمي',
     ],
+    providerWebsiteUrl: '/providers/enroll?provider=StudyHub&providerCode=SH&order=SH-COURSE-4581&product=Full-Stack+Web+Engineering+Bootcamp&status=PAID',
   },
   {
     id: 'prod-2',
@@ -136,6 +138,7 @@ export const PRODUCTS_CATALOG: ProductItem[] = [
       'بث مباشر أسبوعي للإجابة على جميع الاستفسارات',
       'لوحة متابعة لولي الأمر وإشعارات واتساب أسبوعية',
     ],
+    providerWebsiteUrl: '/providers/enroll?provider=Apex+Classes&providerCode=AC&order=AC-REV-1188&product=Grade+12+Revision+Series&status=PAID',
   },
   {
     id: 'prod-3',
@@ -185,6 +188,7 @@ export const PRODUCTS_CATALOG: ProductItem[] = [
       'تقارير دورية تُرسل لولي الأمر كل أسبوعين عبر الواتساب',
       'أوسمة تفاعلية وشهادات تقدير شهرية للطلاب المتفوقين',
     ],
+    providerWebsiteUrl: '/providers/enroll?provider=منصة+الحصة+(EL+HESA)&providerCode=EH&order=EH-CONS-0455&product=Gamified+Learning+Pass&status=PAID',
   },
   {
     id: 'prod-4',
@@ -234,6 +238,7 @@ export const PRODUCTS_CATALOG: ProductItem[] = [
       'قوالب سيرة ذاتية جاهزة بصيغ Notion و Word و LaTeX',
       'تسجيل كامل لورشة العمل ومكتبة مصادر إضافية',
     ],
+    providerWebsiteUrl: '/providers/enroll?provider=Career+Hub&providerCode=CH&order=CH-WS-0031&product=CV+Optimization+Workshop&status=PAID',
   },
   {
     id: 'prod-5',
@@ -285,6 +290,7 @@ export const PRODUCTS_CATALOG: ProductItem[] = [
       '٣ امتحانات تجريبية كاملة مع شرح تفصيلي لكل إجابة',
       'ملخص مركز وشامل لأهم مصطلحات الاختبار للمراجعة السريعة',
     ],
+    providerWebsiteUrl: '/providers/enroll?provider=StudyHub+Tech&providerCode=SH&order=SH-BUNDLE-0212&product=AWS+Cloud+Prep+Lab&status=PAID',
   },
   {
     id: 'prod-6',
@@ -332,6 +338,7 @@ export const PRODUCTS_CATALOG: ProductItem[] = [
       'مكتبة Sidekick تضم أكثر من ٥٠ فكرة وسيناريو إعلاني جاهز',
       'تقييم وتعديل تفصيلي لـ ٣ فيديوهات تقوم بتصويرها في الورشة',
     ],
+    providerWebsiteUrl: '/providers/enroll?provider=Sidekick+Media&providerCode=SK&order=SK-PROD-8812&product=Digital+Creator+Studio+Masterclass&status=PAID',
   },
   {
     id: 'prod-7',
@@ -381,6 +388,7 @@ export const PRODUCTS_CATALOG: ProductItem[] = [
       'نموذج إكسيل مالي شامل وجاهز للتعديل المباشر لمشروعك',
       'نماذج عقود الموردين ونصوص التفاوض مع شركات التوصيل',
     ],
+    providerWebsiteUrl: '/providers/enroll?provider=bldr+Publishing&providerCode=BM&order=BM-CONS-1002&product=Egyptian+E-Commerce+Playbook&status=PAID',
   },
   {
     id: 'prod-8',
@@ -430,5 +438,6 @@ export const PRODUCTS_CATALOG: ProductItem[] = [
       'غداء عمل وبوفيه مفتوح مع استراحات القهوة طوال الفعالية',
       'صلاحية دخول لمنصة التواصل والتشبيك الرقمي بين الحضور',
     ],
+    providerWebsiteUrl: '/providers/enroll?provider=Tech+House&providerCode=TH&order=TH-INT-4019&product=FinTech+Founders+Summit&status=PAID',
   },
 ];

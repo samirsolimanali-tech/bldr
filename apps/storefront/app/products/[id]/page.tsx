@@ -1,19 +1,40 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useParams } from 'next/navigation';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { BldrNav, BldrFooter, ProjectContactModal, tokens, formatEGP } from '@bldr/ui';
 import { PRODUCTS_CATALOG, ProductItem } from '../data';
 
-export default function SingleProductPage() {
+function SingleProductContent() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const rawId = (params?.id as string) || 'prod-1';
   const product: ProductItem =
     PRODUCTS_CATALOG.find((p) => p.id === rawId || p.slug === rawId) || PRODUCTS_CATALOG[0];
 
+  const queryPaid = searchParams?.get('paid') === 'true';
+  const [isPaid, setIsPaid] = useState(false);
   const [lang, setLang] = useState<'EN' | 'AR'>('EN');
   const [isContactOpen, setIsContactOpen] = useState(false);
+
+  useEffect(() => {
+    if (queryPaid) {
+      setIsPaid(true);
+      try {
+        localStorage.setItem(`bldr_paid_${product.id}`, 'true');
+        localStorage.setItem(`bldr_paid_${product.paySlug}`, 'true');
+      } catch (e) {}
+    } else {
+      try {
+        const paidSlug = localStorage.getItem(`bldr_paid_${product.paySlug}`);
+        const paidId = localStorage.getItem(`bldr_paid_${product.id}`);
+        if (paidSlug === 'true' || paidId === 'true') {
+          setIsPaid(true);
+        }
+      } catch (e) {}
+    }
+  }, [queryPaid, product.id, product.paySlug]);
 
   const isRtl = lang === 'AR';
 
@@ -149,49 +170,148 @@ export default function SingleProductPage() {
               </div>
 
               {/* Action Buttons in Hero */}
-              <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', alignItems: 'center' }}>
-                {/* Primary CTA: Pay Now */}
-                <Link
-                  href={`/pay/${product.paySlug}`}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 8,
-                    height: 48,
-                    padding: '0 28px',
-                    borderRadius: 8,
-                    background: '#2E6F5E',
-                    color: '#FFFFFF',
-                    fontSize: 15,
-                    fontWeight: 700,
-                    textDecoration: 'none',
-                    boxShadow: '0 4px 14px rgba(46, 111, 94, 0.3)',
-                    transition: 'background 0.15s ease',
-                  }}
-                >
-                  <span>💳</span>
-                  <span>{isRtl ? 'ادفع الآن وحجز مقعدك فورياً' : 'Pay Now / Instant Enrollment'}</span>
-                </Link>
+              <div>
+                {/* Verified Paid Badge if user has completed payment */}
+                {isPaid && (
+                  <div
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      padding: '5px 14px',
+                      borderRadius: 20,
+                      background: '#DCFCE7',
+                      border: '1.5px solid #86EFAC',
+                      color: '#15803D',
+                      fontSize: 12.5,
+                      fontWeight: 700,
+                      marginBottom: 12,
+                    }}
+                  >
+                    <span>✓</span>
+                    <span>
+                      {isRtl
+                        ? 'تم تأكيد الدفع بنجاح · مقعدك محجوز كطالب معتمد'
+                        : 'Payment Verified · Paid Student Seat Confirmed'}
+                    </span>
+                  </div>
+                )}
 
-                {/* Secondary CTA: Contact Modal */}
-                <button
-                  type="button"
-                  onClick={() => setIsContactOpen(true)}
-                  style={{
-                    height: 48,
-                    padding: '0 22px',
-                    borderRadius: 8,
-                    background: '#FFFFFF',
-                    border: '1px solid #D3DAE4',
-                    color: '#12203C',
-                    fontSize: 14,
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease',
-                  }}
-                >
-                  {isRtl ? 'استفسار أو حجز للشركات ←' : 'Inquire / Team Booking →'}
-                </button>
+                <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', alignItems: 'center' }}>
+                  {/* Primary CTA: Changes to "Enroll Now" after payment */}
+                  {isPaid ? (
+                    <a
+                      id="btn-enroll-now-product"
+                      href={product.providerWebsiteUrl}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 10,
+                        height: 48,
+                        padding: '0 28px',
+                        borderRadius: 8,
+                        background: '#15803D',
+                        color: '#FFFFFF',
+                        fontSize: 15,
+                        fontWeight: 700,
+                        textDecoration: 'none',
+                        boxShadow: '0 4px 16px rgba(21, 128, 61, 0.35)',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      <span>🎓</span>
+                      <span>
+                        {isRtl
+                          ? 'سجل الآن / الانتقال لمنصة المزود ←'
+                          : 'Enroll Now / Continue to Provider Website →'}
+                      </span>
+                    </a>
+                  ) : (
+                    <Link
+                      id="btn-pay-now-product"
+                      href={`/pay/${product.paySlug}?productId=${product.id}`}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        height: 48,
+                        padding: '0 28px',
+                        borderRadius: 8,
+                        background: '#2E6F5E',
+                        color: '#FFFFFF',
+                        fontSize: 15,
+                        fontWeight: 700,
+                        textDecoration: 'none',
+                        boxShadow: '0 4px 14px rgba(46, 111, 94, 0.3)',
+                        transition: 'background 0.15s ease',
+                      }}
+                    >
+                      <span>💳</span>
+                      <span>
+                        {isRtl ? 'ادفع الآن وحجز مقعدك فورياً' : 'Pay Now / Instant Enrollment'}
+                      </span>
+                    </Link>
+                  )}
+
+                  {/* Secondary CTA: Contact Modal */}
+                  <button
+                    type="button"
+                    onClick={() => setIsContactOpen(true)}
+                    style={{
+                      height: 48,
+                      padding: '0 22px',
+                      borderRadius: 8,
+                      background: '#FFFFFF',
+                      border: '1px solid #D3DAE4',
+                      color: '#12203C',
+                      fontSize: 14,
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                    }}
+                  >
+                    {isRtl ? 'استفسار أو حجز للشركات ←' : 'Inquire / Team Booking →'}
+                  </button>
+
+                  {/* Demo Simulation Toggle */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = !isPaid;
+                      setIsPaid(next);
+                      try {
+                        localStorage.setItem(`bldr_paid_${product.id}`, next ? 'true' : 'false');
+                        localStorage.setItem(`bldr_paid_${product.paySlug}`, next ? 'true' : 'false');
+                      } catch (e) {}
+                    }}
+                    style={{
+                      height: 32,
+                      padding: '0 10px',
+                      borderRadius: 6,
+                      background: isPaid ? '#FEE2E2' : '#F0FDF4',
+                      border: `1px dashed ${isPaid ? '#FCA5A5' : '#86EFAC'}`,
+                      color: isPaid ? '#991B1B' : '#166534',
+                      fontSize: 11,
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 4,
+                    }}
+                    title="Toggle state for instant demonstration"
+                  >
+                    <span>⚡</span>
+                    <span>
+                      {isPaid
+                        ? isRtl
+                          ? 'إعادة تعيين للتجربة (Pay Now)'
+                          : 'Reset Demo to Pay Now'
+                        : isRtl
+                        ? 'محاكاة بعد الدفع (Enroll Now)'
+                        : 'Simulate Paid State (Enroll Now)'}
+                    </span>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -343,24 +463,35 @@ export default function SingleProductPage() {
                     ? `تخضع برامج ${product.provider} لمعايير جودة bldr الأكاديمية مع توفير بوابات دفع سريعة، شهادات معتمدة، ودعم مستمر للطلاب.`
                     : `${product.provider} operates on the bldr platform with verified credentials, high completion rates, and dedicated learner support.`}
                 </p>
-                <Link
-                  href={`/pay/${product.paySlug}`}
+                <a
+                  href={isPaid ? product.providerWebsiteUrl : `/pay/${product.paySlug}?productId=${product.id}`}
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    gap: 6,
                     width: '100%',
                     height: 44,
                     borderRadius: 8,
-                    background: '#141416',
+                    background: isPaid ? '#15803D' : '#141416',
                     color: '#FFFFFF',
                     fontSize: 13.5,
                     fontWeight: 700,
                     textDecoration: 'none',
+                    boxShadow: isPaid ? '0 2px 10px rgba(21, 128, 61, 0.3)' : 'none',
                   }}
                 >
-                  {isRtl ? 'حجز فوري عبر البوابة المركزية' : 'Pay Now via Central Gateway'}
-                </Link>
+                  <span>{isPaid ? '🎓' : '💳'}</span>
+                  <span>
+                    {isPaid
+                      ? isRtl
+                        ? 'سجل الآن في منصة المزود'
+                        : 'Enroll Now in Provider Portal'
+                      : isRtl
+                      ? 'حجز فوري عبر البوابة المركزية'
+                      : 'Pay Now via Central Gateway'}
+                  </span>
+                </a>
               </div>
             </div>
           </div>
@@ -375,5 +506,13 @@ export default function SingleProductPage() {
         lang={lang}
       />
     </div>
+  );
+}
+
+export default function SingleProductPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', background: '#F4F5F7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading product...</div>}>
+      <SingleProductContent />
+    </Suspense>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { BldrNav, BldrFooter, ProjectContactModal, tokens, formatEGP } from '@bldr/ui';
 import { PRODUCTS_CATALOG, ProductItem } from './data';
@@ -9,6 +9,22 @@ export default function ProductsPage() {
   const [lang, setLang] = useState<'EN' | 'AR'>('EN');
   const [selectedType, setSelectedType] = useState<string>('All');
   const [isContactOpen, setIsContactOpen] = useState(false);
+  const [paidMap, setPaidMap] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    try {
+      const map: Record<string, boolean> = {};
+      PRODUCTS_CATALOG.forEach((p) => {
+        if (
+          localStorage.getItem(`bldr_paid_${p.id}`) === 'true' ||
+          localStorage.getItem(`bldr_paid_${p.paySlug}`) === 'true'
+        ) {
+          map[p.id] = true;
+        }
+      });
+      setPaidMap(map);
+    } catch (e) {}
+  }, []);
 
   const isRtl = lang === 'AR';
 
@@ -282,28 +298,52 @@ export default function ProductsPage() {
 
                   {/* Dual Action Buttons */}
                   <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 10 }}>
-                    {/* Primary Button: Direct Pay Now */}
-                    <Link
-                      href={`/pay/${prod.paySlug}`}
-                      style={{
-                        height: 42,
-                        borderRadius: 8,
-                        background: '#2E6F5E',
-                        color: '#FFFFFF',
-                        fontSize: 13.5,
-                        fontWeight: 700,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: 6,
-                        textDecoration: 'none',
-                        boxShadow: '0 2px 8px rgba(46, 111, 94, 0.28)',
-                        transition: 'background 0.15s ease',
-                      }}
-                    >
-                      <span>💳</span>
-                      <span>{isRtl ? 'ادفع الآن' : 'Pay Now'}</span>
-                    </Link>
+                    {/* Primary Button: Changes to Enroll Now if Paid */}
+                    {paidMap[prod.id] ? (
+                      <a
+                        href={prod.providerWebsiteUrl}
+                        style={{
+                          height: 42,
+                          borderRadius: 8,
+                          background: '#15803D',
+                          color: '#FFFFFF',
+                          fontSize: 13,
+                          fontWeight: 700,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 6,
+                          textDecoration: 'none',
+                          boxShadow: '0 2px 10px rgba(21, 128, 61, 0.35)',
+                          transition: 'background 0.15s ease',
+                        }}
+                      >
+                        <span>🎓</span>
+                        <span>{isRtl ? 'سجل الآن' : 'Enroll Now'}</span>
+                      </a>
+                    ) : (
+                      <Link
+                        href={`/pay/${prod.paySlug}?productId=${prod.id}`}
+                        style={{
+                          height: 42,
+                          borderRadius: 8,
+                          background: '#2E6F5E',
+                          color: '#FFFFFF',
+                          fontSize: 13.5,
+                          fontWeight: 700,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 6,
+                          textDecoration: 'none',
+                          boxShadow: '0 2px 8px rgba(46, 111, 94, 0.28)',
+                          transition: 'background 0.15s ease',
+                        }}
+                      >
+                        <span>💳</span>
+                        <span>{isRtl ? 'ادفع الآن' : 'Pay Now'}</span>
+                      </Link>
+                    )}
 
                     {/* Secondary Button: Single Product Page */}
                     <Link

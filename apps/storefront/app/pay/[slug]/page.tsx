@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { tokens, formatEGP } from '@bldr/ui';
 
@@ -18,6 +18,7 @@ interface PaymentDetails {
   expiresInMinutes: number;
   supportEmail: string;
   supportPhone: string;
+  providerRedirectUrl?: string;
 }
 
 const SAMPLE_PAYMENTS: Record<string, PaymentDetails> = {
@@ -177,15 +178,22 @@ const SAMPLE_PAYMENTS: Record<string, PaymentDetails> = {
   },
 };
 
+function buildDetails(base: Omit<PaymentDetails, 'providerRedirectUrl'>): PaymentDetails {
+  return {
+    ...base,
+    providerRedirectUrl: `/providers/enroll?provider=${encodeURIComponent(base.ventureName)}&providerCode=${encodeURIComponent(base.ventureCode)}&order=${encodeURIComponent(base.orderNumber)}&product=${encodeURIComponent(base.description)}&status=PAID`,
+  };
+}
+
 function resolvePayment(slug: string): PaymentDetails {
   if (SAMPLE_PAYMENTS[slug]) {
-    return SAMPLE_PAYMENTS[slug];
+    return buildDetails(SAMPLE_PAYMENTS[slug]);
   }
 
   // Dynamic venture extraction from prefix
   const prefix = slug.slice(0, 2).toLowerCase();
   if (prefix === 'sk') {
-    return {
+    return buildDetails({
       slug,
       orderNumber: `SK-${slug.slice(3, 7).toUpperCase() || 'SVC-9901'}`,
       ventureName: 'Sidekick Studio',
@@ -198,10 +206,10 @@ function resolvePayment(slug: string): PaymentDetails {
       expiresInMinutes: 60,
       supportEmail: 'sidekick@bldr.example',
       supportPhone: '+20 10 9999 1111',
-    };
+    });
   }
   if (prefix === 'th') {
-    return {
+    return buildDetails({
       slug,
       orderNumber: `TH-${slug.slice(3, 7).toUpperCase() || 'ENG-7701'}`,
       ventureName: 'Tech House',
@@ -214,10 +222,10 @@ function resolvePayment(slug: string): PaymentDetails {
       expiresInMinutes: 60,
       supportEmail: 'tech@bldr.example',
       supportPhone: '+20 10 0000 0000',
-    };
+    });
   }
   if (prefix === 'bm') {
-    return {
+    return buildDetails({
       slug,
       orderNumber: `BM-${slug.slice(3, 7).toUpperCase() || 'ADV-1102'}`,
       ventureName: 'bldr Management',
@@ -230,10 +238,10 @@ function resolvePayment(slug: string): PaymentDetails {
       expiresInMinutes: 60,
       supportEmail: 'partners@bldr.example',
       supportPhone: '+20 10 0000 0000',
-    };
+    });
   }
   if (prefix === 'eh') {
-    return {
+    return buildDetails({
       slug,
       orderNumber: `EH-${slug.slice(3, 7).toUpperCase() || 'PAY-8921'}`,
       ventureName: 'EL HESA',
@@ -246,10 +254,10 @@ function resolvePayment(slug: string): PaymentDetails {
       expiresInMinutes: 45,
       supportEmail: 'support@elhesa.example',
       supportPhone: '+20 11 0000 0000',
-    };
+    });
   }
   if (prefix === 'ch') {
-    return {
+    return buildDetails({
       slug,
       orderNumber: `CH-${slug.slice(3, 7).toUpperCase() || 'WS-4012'}`,
       ventureName: 'Career Hub',
@@ -262,10 +270,10 @@ function resolvePayment(slug: string): PaymentDetails {
       expiresInMinutes: 60,
       supportEmail: 'support@careerhub.example',
       supportPhone: '+20 15 0000 0000',
-    };
+    });
   }
   if (prefix === 'ac') {
-    return {
+    return buildDetails({
       slug,
       orderNumber: `AC-${slug.slice(3, 7).toUpperCase() || 'ENR-9102'}`,
       ventureName: 'Apex Classes',
@@ -278,10 +286,10 @@ function resolvePayment(slug: string): PaymentDetails {
       expiresInMinutes: 60,
       supportEmail: 'support@apexclasses.example',
       supportPhone: '+20 12 0000 0000',
-    };
+    });
   }
 
-  return {
+  return buildDetails({
     slug,
     orderNumber: `SH-${slug.slice(3, 7).toUpperCase() || 'COURSE-4581'}`,
     ventureName: 'StudyHub',
@@ -294,12 +302,14 @@ function resolvePayment(slug: string): PaymentDetails {
     expiresInMinutes: 30,
     supportEmail: 'support@studyhub.example',
     supportPhone: '+20 10 0000 0000',
-  };
+  });
 }
 
-export default function CentralPaymentPage() {
+function CentralPaymentContent() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const rawSlug = (params?.slug as string) || 'sh-8k2m9q';
+  const productId = searchParams?.get('productId') || '';
   const payment = resolvePayment(rawSlug);
 
   const [lang, setLang] = useState<'EN' | 'AR'>('EN');
@@ -314,7 +324,15 @@ export default function CentralPaymentPage() {
     setTimeout(() => {
       setIsProcessing(false);
       setIsPaid(true);
-      setPaidTxnId(`txn_${Math.random().toString(36).substring(2, 9).toUpperCase()}`);
+      const txn = `txn_${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
+      setPaidTxnId(txn);
+      try {
+        localStorage.setItem(`bldr_paid_${rawSlug}`, 'true');
+        localStorage.setItem(`bldr_paid_order_${payment.orderNumber}`, 'true');
+        if (productId) {
+          localStorage.setItem(`bldr_paid_${productId}`, 'true');
+        }
+      } catch (e) {}
     }, 1200);
   };
 
@@ -469,53 +487,103 @@ export default function CentralPaymentPage() {
               style={{
                 background: '#F4F9F7',
                 border: '1.5px solid #2E6F5E',
-                borderRadius: 12,
-                padding: '32px 24px',
+                borderRadius: 14,
+                padding: '36px 24px',
                 textAlign: 'center',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: 14,
+                gap: 16,
               }}
             >
               <div
                 style={{
-                  width: 52,
-                  height: 52,
+                  width: 58,
+                  height: 58,
                   borderRadius: '50%',
                   background: '#2E6F5E',
                   color: '#FFFFFF',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: 24,
+                  fontSize: 28,
+                  boxShadow: '0 4px 16px rgba(46,111,94,0.3)',
                 }}
               >
                 ✓
               </div>
-              <h2 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: '#12203C' }}>
-                {isRtl ? 'تم الدفع بنجاح!' : 'Payment Successful!'}
-              </h2>
-              <p style={{ margin: 0, fontSize: 13.5, color: '#5A6A80', maxWidth: 440 }}>
+              <div>
+                <h2 style={{ margin: '0 0 6px', fontSize: 24, fontWeight: 800, color: '#12203C' }}>
+                  {isRtl ? 'تم الدفع بنجاح!' : 'Payment Successful!'}
+                </h2>
+                <div style={{ fontSize: 13.5, color: '#2E6F5E', fontWeight: 700 }}>
+                  {isRtl ? 'تم حجز مقعدك وتأكيد اشتراكك كطالب معتمد' : 'Your seat is reserved as a verified paid user'}
+                </div>
+              </div>
+
+              <p style={{ margin: 0, fontSize: 13.5, color: '#5A6A80', maxWidth: 460, lineHeight: 1.55 }}>
                 {isRtl
-                  ? `تم تأكيد العملية من خلال الويب هوك الخاص بـ ${payment.ventureName} وتم تحديث السجل المركزي.`
-                  : `Your transaction has been verified via signed PSP webhook. Order reference: ${payment.orderNumber}`}
+                  ? `تمت تسوية المعاملة عبر بوابة الدفع وتأكيد القيد مع ${payment.ventureName}. اضغط على زر "سجل الآن" أدناه للانتقال لموقع المزود وإكمال التسجيل.`
+                  : `Your payment was settled via signed webhook. Reference: ${payment.orderNumber}. Click "Enroll Now" below to redirect to the provider's platform and access your cohort.`}
               </p>
+
               <div style={{ fontFamily: tokens.fonts.mono, fontSize: 12, background: '#FFFFFF', padding: '6px 14px', borderRadius: 6, border: '1px solid #DDE3EC' }}>
                 Transaction ID: {paidTxnId}
               </div>
-              <Link
-                href="http://localhost:3002"
+
+              {/* The "Enroll Now" Primary Button */}
+              <a
+                id="btn-enroll-now-gateway"
+                href={payment.providerRedirectUrl}
                 style={{
-                  marginTop: 8,
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color: '#2E6F5E',
+                  width: '100%',
+                  height: 52,
+                  borderRadius: 10,
+                  background: '#15803D',
+                  color: '#FFFFFF',
                   textDecoration: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 10,
+                  fontSize: 16,
+                  fontWeight: 800,
+                  boxShadow: '0 4px 18px rgba(21, 128, 61, 0.35)',
+                  transition: 'background 0.15s ease',
+                  marginTop: 6,
                 }}
               >
-                {isRtl ? 'عرض المعاملة في لوحة التحكم المركزية ←' : 'Inspect transaction in Central Payment Hub →'}
-              </Link>
+                <span>🎓</span>
+                <span>{isRtl ? 'سجل الآن / الانتقال لمنصة المزود لمتابعة الالتحاق كطالب معتمد ←' : 'Enroll Now / Continue to Provider Website as Paid User →'}</span>
+              </a>
+
+              {/* Secondary Navigation Links */}
+              <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center', marginTop: 6 }}>
+                {productId && (
+                  <Link
+                    href={`/products/${productId}?paid=true`}
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 700,
+                      color: '#2E6F5E',
+                      textDecoration: 'none',
+                    }}
+                  >
+                    {isRtl ? '← العودة لصفحة المنتج (كطالب معتمد)' : '← Return to Product (Paid User)'}
+                  </Link>
+                )}
+                <Link
+                  href="http://localhost:3002"
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: '#8A94A6',
+                    textDecoration: 'none',
+                  }}
+                >
+                  {isRtl ? 'السجل المالي المركزي' : 'Central Payment Ledger →'}
+                </Link>
+              </div>
             </div>
           ) : (
             /* ─── Payment Form ─── */
@@ -719,5 +787,13 @@ export default function CentralPaymentPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CentralPaymentPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', background: '#E9EDF3', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading checkout...</div>}>
+      <CentralPaymentContent />
+    </Suspense>
   );
 }
