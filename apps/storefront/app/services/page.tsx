@@ -13,7 +13,7 @@ export default function ServicesPage() {
   const isRtl = lang === 'AR';
 
   const categories = isRtl
-    ? ['الكل', 'التسويق والإعلانات الممولة', 'الهوية البصرية والتصميم', 'الإنتاج المرئي والمحتوى', 'البرمجيات وبوابات الدفع', 'الاستشارات والاستراتيجية']
+    ? ['الكل', 'التسويق والإعلانات الممولة', 'الهوية البصرية والتصميم', 'الإنتاج المرئي والمحتوى', 'البرمجيات والحلول التقنية', 'الاستشارات والاستراتيجية']
     : ['All', 'Marketing & Ads', 'Brand & Creative', 'Media & Video', 'Software & Tech', 'Strategy & Advisory'];
 
   const filteredServices = selectedCategory === 'All' || selectedCategory === 'الكل'
@@ -56,8 +56,8 @@ export default function ServicesPage() {
             </h1>
             <p style={{ margin: 0, fontSize: 16.5, lineHeight: 1.65, fontWeight: 300, color: '#47454A' }}>
               {isRtl
-                ? 'اختر باقة الخدمة التي تناسب مشروعك: يمكنك الدفع فوراً عبر بوابة الدفع المركزية (كروت، فوري، محافظ) أو فتح صفحة تفاصيل الخدمة لمراجعة نطاق العمل.'
-                : 'Choose the service package that fits your objectives. Pay directly online through our Central Payment Gateway (Cards, Fawry, Wallets) or open any service landing page for full scope.'}
+                ? 'اختر باقة الخدمة التي تناسب مشروعك: استعرض نطاق العمل ومخرجات كل تخصص، وتواصل مع شركائنا للبدء مباشرة.'
+                : 'Choose the service package that fits your objectives. Review our full scope of deliverables, engineering timelines, and commercial packages.'}
             </p>
           </div>
 

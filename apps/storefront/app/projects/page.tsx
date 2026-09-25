@@ -8,7 +8,7 @@ import { BldrNav, BldrFooter, ProjectContactModal, tokens } from '@bldr/ui';
 interface CaseStudy {
   id: string;
   slug: string;
-  category: 'fintech' | 'edtech' | 'growth' | 'saas';
+  category: 'platforms' | 'edtech' | 'growth' | 'saas';
   categoryLabel: string;
   categoryLabelAr: string;
   title: string;
@@ -38,48 +38,48 @@ interface CaseStudy {
 
 const CASE_STUDIES: CaseStudy[] = [
   {
-    id: 'payhub-cairo',
-    slug: 'payhub-cairo',
-    category: 'fintech',
-    categoryLabel: 'Fintech & Payments',
-    categoryLabelAr: 'التكنولوجيا المالية والدفع',
-    title: 'Central Payment Hub & Merchant Reconciliation',
-    titleAr: 'بوابة الدفع المركزية ونظام تسوية التجار الآلي',
-    client: 'PayHub Cairo & Studio Ventures',
+    id: 'medconnect-portal',
+    slug: 'medconnect-portal',
+    category: 'platforms',
+    categoryLabel: 'Digital Platforms & Web Apps',
+    categoryLabelAr: 'المنصات الرقمية وتطبيقات الويب',
+    title: 'MedConnect Cloud Clinic & Telehealth Platform',
+    titleAr: 'منصة ميدكونيكت السحابية للرعاية الصحية والاستشارات الطبية',
+    client: 'MedConnect Regional Health',
     year: '2026',
-    tagline: 'Orchestrating Visa, Mastercard, Meeza, Fawry, and Mobile Wallets with sub-second settlement.',
-    taglineAr: 'بنية تحتية موحدة لاستقبال وتسوية مدفوعات البطاقات وميزة وفوري والمحافظ الإلكترونية.',
+    tagline: 'Delivering encrypted real-time patient booking, secure video telemetry, and multi-clinic doctor scheduling.',
+    taglineAr: 'منصة سحابية متكاملة لحجز المواعيد والاستشارات الطبية المرئية المشفرة وإدارة العيادات المتعددة.',
     metrics: [
-      { value: 'EGP 42M+', label: 'Volume Processed', labelAr: 'إجمالي مدفوعات مسواة' },
-      { value: '99.98%', label: 'Gateway Uptime', labelAr: 'جاهزية واستقرار النظام' },
-      { value: '< 450ms', label: 'API Response Time', labelAr: 'سرعة استجابة العمليات' },
-      { value: '0.0%', label: 'Reconciliation Drift', labelAr: 'تطابق محاسبي تام' },
+      { value: '38,000+', label: 'Patients Managed', labelAr: 'مريض مسجل ومنتظم' },
+      { value: '99.95%', label: 'Platform Availability', labelAr: 'استقرار وجاهزية النظام' },
+      { value: '< 600ms', label: 'Dashboard Load Time', labelAr: 'سرعة استجابة المنصة' },
+      { value: '120+', label: 'Doctors Onboarded', labelAr: 'طبيب استشاري معتمد' },
     ],
-    summary: 'A unified payments gateway and multi-vendor ledger engine designed for high-volume Egyptian digital commerce, eliminating manual reconciliations and payment drop-offs.',
-    summaryAr: 'بوابة دفع مركزية متكاملة وسجل مدفوعات متعدد البائعين مصمم للتجارة الرقمية في مصر، ينهي تماماً أخطاء التسويات اليدوية وتسرب المبيعات.',
-    challenge: 'High drop-off rates across fragmented local payment options (Fawry, cards, e-wallets), coupled with manual accounting spreadsheets that delayed payouts to educators and merchants by weeks.',
-    challengeAr: 'ارتفاع معدلات إلغاء الدفع بسبب تشتت وسائل الدفع المحلية والاعتماد على جداول حسابات يدوية تؤخر مستحقات المدرسين والتجار لأسابيع.',
-    solution: 'Built an enterprise payment abstraction layer using NestJS & PostgreSQL with automated webhooks, instant Meeza/Fawry verification, and a self-serve merchant payout hub.',
-    solutionAr: 'تطوير طبقة متطورة لمعالجة المدفوعات تعتمد على خوادم فائقة السرعة مع إشعارات فورية وربط تلقائي مع فوري وميزة، ولوحة تحكم لصرف المستحقات بضغطة زر.',
+    summary: 'A secure, HIPAA-aligned healthcare portal connecting patients with specialized clinicians for virtual consultations, electronic medical records (EMR), and unified multi-tenant scheduling.',
+    summaryAr: 'بوابة رعاية صحية آمنة متوافقة مع معايير حماية البيانات الطبية، تربط المرضى بالأطباء الاستشاريين للاستشارات المرئية وحجز العيادات وإدارة السجلات الطبية.',
+    challenge: 'Scattered booking processes over WhatsApp and slow legacy hospital software resulted in frequent double-bookings, long patient wait times, and high administrative burnout.',
+    challengeAr: 'الحجز اليدوي عبر واتساب والبرمجيات القديمة تسببت في تداخل المواعيد وطول فترات انتظار المرضى وضياع السجلات الطبية.',
+    solution: 'Engineered a modern web portal on Next.js 14 and NestJS featuring automated real-time calendar synchronization, encrypted WebRTC clinical consultations, and instant patient SMS reminders.',
+    solutionAr: 'تطوير منصة ويب متطورة فائقة السرعة مع مزامنة لحظية لتقويم المواعيد وغرف استشارات مرئية مشفرة وتنبيهات آلية بالرسائل النصية للمرضى.',
     deliverables: [
-      'Multi-gateway payment router with instant failover',
-      'PCI-DSS compliant card checkout with 3D Secure 2.0',
-      'Automated Fawry reference code generation & SMS alerts',
-      'Unified merchant ledger with instant split fee accounting',
+      'Multi-clinic calendar scheduling with instant conflict detection',
+      'Encrypted WebRTC telehealth consultation room',
+      'Electronic medical record (EMR) vault with role-based clinical access',
+      'Patient SMS & WhatsApp automated reminder pipeline',
     ],
     deliverablesAr: [
-      'موجّه دفع ذكي يحول المعاملات تلقائياً عند تعطل أي مزود',
-      'واجهة دفع آمنة متوافقة مع أعلى معايير الحماية المصرفية',
-      'إصدار فوري لأكواد فوري مع رسائل نصية قصيرة للعملاء',
-      'سجل مالي مركزي يقتطع عمولات الشركاء ويوزع الأرباح آلياً',
+      'نظام ذكي لجدولة المواعيد يمنع تكرار أو تداخل الحجوزات',
+      'غرف استشارات فيديو مشفرة تعمل بسلاسة دون الحاجة لتحميل تطبيقات',
+      'سجل طبي إلكتروني موحد مع مستويات وصول محكمة للأطباء والتمريض',
+      'نظام إشعارات وتذكيرات تلقائي للمرضى عبر الرسائل النصية وواتساب',
     ],
-    techStack: ['Next.js 14', 'NestJS API', 'PostgreSQL', 'Fawry Pay API', 'Meeza Digital', 'Docker', 'Redis'],
+    techStack: ['Next.js 14', 'NestJS API', 'PostgreSQL', 'WebRTC', 'TypeScript', 'Tailwind CSS', 'Docker'],
     testimonial: {
-      quote: 'bldr eliminated our payment reconciliations bottleneck entirely. Transactions that used to take days to verify now clear in milliseconds.',
-      quoteAr: 'قضت bldr على كابوس التسويات المحاسبية اليومية. العمليات التي كانت تستغرق أياماً أصبحت تُسوى في أجزاء من الثانية.',
-      author: 'K. Mansour',
-      role: 'Head of Operations',
-      roleAr: 'رئيس العمليات التشغيلية',
+      quote: 'bldr delivered an intuitive platform that our doctors actually enjoy using. Patient no-shows dropped by 45% within our first month.',
+      quoteAr: 'طورت bldr منصة سهلة ومريحة يستخدمها أطباؤنا يومياً بكل سلاسة. انخفضت نسبة تغيب المرضى عن المواعيد بنسبة ٤٥٪ خلال أول شهر.',
+      author: 'Dr. M. El-Sayed',
+      role: 'Chief Medical Officer',
+      roleAr: 'المدير الطبي العام',
     },
   },
   {
@@ -275,7 +275,7 @@ function ProjectsContent() {
   // Listen to URL query params
   useEffect(() => {
     const cat = searchParams.get('category');
-    if (cat && ['fintech', 'edtech', 'growth', 'saas'].includes(cat)) {
+    if (cat && ['platforms', 'edtech', 'growth', 'saas'].includes(cat)) {
       setActiveCategory(cat);
     }
   }, [searchParams]);
@@ -284,7 +284,7 @@ function ProjectsContent() {
 
   const filterTabs = [
     { id: 'all', label: isRtl ? 'جميع المشاريع' : 'All Work', count: CASE_STUDIES.length },
-    { id: 'fintech', label: isRtl ? 'التكنولوجيا المالية والدفع' : 'Fintech & Payments', count: 1 },
+    { id: 'platforms', label: isRtl ? 'المنصات الرقمية وتطبيقات الويب' : 'Digital Platforms', count: 1 },
     { id: 'edtech', label: isRtl ? 'التعليم والمنصات' : 'EdTech & Learning', count: 1 },
     { id: 'growth', label: isRtl ? 'الهوية والنمو التجاري' : 'Brand & Growth', count: 2 },
     { id: 'saas', label: isRtl ? 'الأنظمة والبرمجيات' : 'Software & SaaS', count: 1 },

@@ -147,8 +147,8 @@ export function BldrNav({ lang = 'EN', onLanguageChange, onStartProject }: BldrN
       title: isRtl ? 'الإنتاج المرئي والفيديو' : 'Media & Video Production',
     },
     {
-      slug: 'payment-integration',
-      title: isRtl ? 'بوابة الدفع المركزية' : 'Payment Gateway',
+      slug: 'web-platform-engineering',
+      title: isRtl ? 'تطبيقات ومنصات الويب' : 'Web & Platform Engineering',
     },
     {
       slug: 'consulting-session',
@@ -181,8 +181,8 @@ export function BldrNav({ lang = 'EN', onLanguageChange, onStartProject }: BldrN
 
   const projectsList = [
     {
-      href: '/projects?category=fintech',
-      title: isRtl ? 'بوابات الدفع والتكنولوجيا المالية' : 'Central Payment Hub & Fintech',
+      href: '/projects?category=platforms',
+      title: isRtl ? 'المنصات الرقمية وتطبيقات الويب' : 'Digital Platforms & Web Apps',
     },
     {
       href: '/projects?category=edtech',
@@ -837,7 +837,7 @@ export function ProjectContactModal({ isOpen, onClose, lang = 'EN' }: ProjectCon
                     <option value="Marketing & Growth (Sidekick)">Marketing & Ads (Sidekick)</option>
                     <option value="Full Brand Identity">Brand Identity & Design</option>
                     <option value="Software & Tech House">Software & Platforms (Tech House)</option>
-                    <option value="Payment Gateway Integration">Payment Central Hub Setup</option>
+                    <option value="Custom Web & Platform Engineering">Custom Web & Platform Engineering</option>
                     <option value="Consulting Session">Strategic Consulting Session</option>
                   </select>
                 </div>

@@ -133,12 +133,12 @@ export default function ApplyProviderPage() {
             <div style={{ background: '#FFFFFF', borderRadius: 16, border: '1px solid rgba(20,20,22,0.08)', padding: '28px 24px', boxShadow: '0 2px 10px rgba(20,20,22,0.03)' }}>
               <div style={{ fontSize: 32, marginBottom: 14 }}>⚡</div>
               <h3 style={{ fontSize: 18, fontWeight: 700, color: '#12203C', margin: '0 0 10px' }}>
-                {isRtl ? 'بوابة دفع مركزية فورية' : 'Central Payment Gateway'}
+                {isRtl ? 'تسوية مالية ومبيعات فورية' : 'Automated Sales & Instant Settlement'}
               </h3>
               <p style={{ fontSize: 14, color: '#5A6A80', lineHeight: 1.6, margin: 0, fontWeight: 300 }}>
                 {isRtl
-                  ? 'استقبل المدفوعات فوراً عبر بطاقات ميزة وفيزا وماستركارد، كود دفع فوري، ومحافظ فودافون وأورنج ووي دون أي تعقيدات تقنية.'
-                  : 'Accept Visa, Mastercard, Meeza, Fawry Kiosk, and Mobile Wallets instantly with zero PSP onboarding friction.'}
+                  ? 'استلم أرباحك فوراً عند بيع أي دورة أو خدمة مع تقارير مبيعات شفافة وتسويات مباشرة إلى حسابك البنكي أو محفظتك.'
+                  : 'Receive your earnings seamlessly with transparent sales analytics and automated direct payouts to your bank account or wallet.'}
               </p>
             </div>
 

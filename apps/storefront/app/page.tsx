@@ -108,7 +108,7 @@ export default function HomePage() {
                 textShadow: isDark ? '0 1px 8px rgba(0, 0, 0, 0.25)' : 'none',
               }}>
                 {isRtl
-                  ? 'تدير bldr وحدات متخصصة وتبني مشاريعها الخاصة. تعمل مع الوحدات التي تحتاجها في التسويق والبرمجيات وإدارة الدفع تحت نقطة اتصال واحدة ومسؤولية كاملة.'
+                  ? 'تدير bldr وحدات متخصصة وتبني مشاريعها الخاصة. تعمل مع الوحدات التي تحتاجها في التسويق والبرمجيات وبناء المنتجات تحت نقطة اتصال واحدة ومسؤولية كاملة.'
                   : 'bldr operates specialist units and builds its own ventures. You work with the units you need and keep one point of contact for all of it — nobody hands the outcome to somebody else.'}
               </p>
 
@@ -268,7 +268,7 @@ export default function HomePage() {
                 {
                   title: isRtl ? 'تطوير البرمجيات والتكنولوجيا' : 'Software & Technology',
                   was: isRtl ? 'بديل: شركة البرمجيات الخارجية' : 'was: the software house',
-                  desc: isRtl ? 'تطوير المنصات الرقمية، ربط بوابات الدفع المركزية، وبناء البنية التحتية السحابية.' : 'Software platforms, central payment orchestration, automated infrastructure',
+                  desc: isRtl ? 'تطوير المنصات الرقمية، هندسة الأنظمة السحابية، وبناء البنية التحتية البرمجية المؤتمتة.' : 'Custom software platforms, modern API architectures, automated cloud infrastructure',
                   link: '/services',
                   cta: isRtl ? 'خدمات البرمجيات والتكنولوجيا ←' : 'Software & Tech Services →',
                 },

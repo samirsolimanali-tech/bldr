@@ -228,8 +228,8 @@ export default function ServiceDetailPage() {
                 </h3>
                 <p style={{ fontSize: 14, color: '#47454A', lineHeight: 1.6, margin: '0 0 20px', fontWeight: 300 }}>
                   {isRtl
-                    ? 'نعمل كشريك استراتيجي مدمج، وليس مجرد مورد خارجي. وحدة Sidekick تضمن لك جودة الإعلانات والمحتوى، بينما تتولى بوابة الدفع المركزية استلام الأموال وتسويتها.'
-                    : 'We operate as an integrated venture partner. Specialist unit leads manage performance and design while the Central Payment Hub guarantees transparent settlement.'}
+                    ? 'نعمل كشريك استراتيجي مدمج، وليس مجرد مورد خارجي. تضمن فرقنا المتخصصة جودة الإعلانات والمحتوى وهندسة البرمجيات تحت قيادة موحدة ومسؤولية كاملة.'
+                    : 'We operate as an integrated venture partner. Specialist unit leads manage performance, design, and software engineering with a single line of accountability.'}
                 </p>
               </div>
 
