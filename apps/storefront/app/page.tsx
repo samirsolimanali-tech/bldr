@@ -59,10 +59,10 @@ export default function HomePage() {
             alignItems: 'center',
             background: isDark
               ? isRtl
-                ? "linear-gradient(270deg, #1C2B3F 0%, #1C2B3F 36%, rgba(28, 43, 63, 0.88) 52%, rgba(28, 43, 63, 0.38) 72%, rgba(28, 43, 63, 0.05) 100%), url('/images/hero-blueprint-blue.jpg') left center / cover no-repeat"
+                ? "linear-gradient(270deg, #1C2B3F 0%, #1C2B3F 36%, rgba(28, 43, 63, 0.88) 52%, rgba(28, 43, 63, 0.38) 72%, rgba(28, 43, 63, 0.05) 100%), url('/images/hero-blueprint-blue-rtl.jpg') left center / cover no-repeat"
                 : "linear-gradient(90deg, #1C2B3F 0%, #1C2B3F 36%, rgba(28, 43, 63, 0.88) 52%, rgba(28, 43, 63, 0.38) 72%, rgba(28, 43, 63, 0.05) 100%), url('/images/hero-blueprint-blue.jpg') right center / cover no-repeat"
               : isRtl
-                ? "linear-gradient(270deg, #F4F5F7 0%, #F4F5F7 36%, rgba(244, 245, 247, 0.88) 52%, rgba(244, 245, 247, 0.35) 72%, rgba(244, 245, 247, 0.05) 100%), url('/images/hero-blueprint-light.jpg') left center / cover no-repeat"
+                ? "linear-gradient(270deg, #F4F5F7 0%, #F4F5F7 36%, rgba(244, 245, 247, 0.88) 52%, rgba(244, 245, 247, 0.35) 72%, rgba(244, 245, 247, 0.05) 100%), url('/images/hero-blueprint-light-rtl.jpg') left center / cover no-repeat"
                 : "linear-gradient(90deg, #F4F5F7 0%, #F4F5F7 36%, rgba(244, 245, 247, 0.88) 52%, rgba(244, 245, 247, 0.35) 72%, rgba(244, 245, 247, 0.05) 100%), url('/images/hero-blueprint-light.jpg') right center / cover no-repeat",
             borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(20, 20, 22, 0.08)',
             transition: 'background 0.3s ease',
