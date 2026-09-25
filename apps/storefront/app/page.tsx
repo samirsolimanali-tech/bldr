@@ -139,112 +139,53 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Studio Visual Mosaic */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gridTemplateRows: '140px 140px 110px',
-              gap: 12,
-            }}>
-              <div style={{
-                gridColumn: 'span 2',
+            {/* Studio Hero Visual */}
+            <div
+              style={{
+                position: 'relative',
+                borderRadius: 24,
+                overflow: 'hidden',
+                boxShadow: '0 20px 50px -12px rgba(20, 20, 22, 0.12), 0 0 0 1px rgba(20, 20, 22, 0.06)',
                 background: '#FFFFFF',
-                borderRadius: 16,
-                border: '1px solid rgba(20,20,22,0.08)',
-                padding: 20,
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                boxShadow: '0 2px 8px rgba(20,20,22,0.04)',
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#FD9426' }}>
-                    {isRtl ? 'المشاريع والخدمات' : 'Ventures & Services'}
-                  </span>
-                  <span style={{ fontSize: 10.5, fontFamily: 'monospace', color: '#8A94A6' }}>Cairo Studio</span>
-                </div>
-                <div>
-                  <div style={{ fontSize: 20, fontWeight: 600, color: '#141416', letterSpacing: '-0.02em' }}>
-                    Sidekick · StudyHub · منصة الحصة
-                  </div>
-                  <div style={{ fontSize: 13, color: '#47454A', fontWeight: 300, marginTop: 4 }}>
-                    {isRtl ? 'تسويق، برمجيات، ودفع إلكتروني مركزي موحد' : 'Marketing, custom software & central payment hub'}
-                  </div>
-                </div>
-              </div>
-
-              <Link
-                href="/services"
-                style={{
-                  background: '#FFFFFF',
-                  borderRadius: 16,
-                  border: '1px solid rgba(20,20,22,0.08)',
-                  padding: 16,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  textDecoration: 'none',
-                  transition: 'transform 0.15s ease',
-                }}
-              >
-                <span style={{ fontSize: 11, fontWeight: 700, color: '#D10721' }}>
-                  {isRtl ? 'خدمات التسويق' : 'SERVICES'}
-                </span>
-                <span style={{ fontSize: 14, fontWeight: 600, color: '#141416' }}>
-                  {isRtl ? 'حملات النمو وهوية العلامة ←' : 'Sidekick Growth & Ads →'}
-                </span>
-              </Link>
-
-              <Link
-                href="/products"
-                style={{
-                  background: '#FFFFFF',
-                  borderRadius: 16,
-                  border: '1px solid rgba(20,20,22,0.08)',
-                  padding: 16,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  textDecoration: 'none',
-                  transition: 'transform 0.15s ease',
-                }}
-              >
-                <span style={{ fontSize: 11, fontWeight: 700, color: '#2E6F5E' }}>
-                  {isRtl ? 'الدورات والمنتجات' : 'PRODUCTS'}
-                </span>
-                <span style={{ fontSize: 14, fontWeight: 600, color: '#141416' }}>
-                  {isRtl ? 'دورات وورش عمل المدربين ←' : 'Provider Courses & Events →'}
-                </span>
-              </Link>
-
-              <div style={{
-                gridColumn: 'span 2',
-                background: '#141416',
-                color: '#FFFFFF',
-                borderRadius: 16,
-                padding: '16px 20px',
+                aspectRatio: '4 / 3',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'space-between',
-              }}>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 600 }}>{isRtl ? 'بوابة الدفع المركزية' : 'Central Payment Hub Admin'}</div>
-                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', fontWeight: 300 }}>{isRtl ? 'إدارة المبيعات والتسويات والروابط' : 'Super Admin & Finance Management'}</div>
-                </div>
-                <a
-                  href="http://localhost:3002"
-                  style={{
-                    padding: '6px 14px',
-                    borderRadius: 999,
-                    background: '#2E6F5E',
-                    color: '#FFFFFF',
-                    fontSize: 12,
-                    fontWeight: 700,
-                    textDecoration: 'none',
-                  }}
-                >
-                  {isRtl ? 'لوحة التحكم ←' : 'Open Hub →'}
-                </a>
+                justifyContent: 'center',
+              }}
+            >
+              <img
+                src="/images/bldr-hero.jpg"
+                alt="bldr Cairo Venture Studio"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  display: 'block',
+                }}
+              />
+
+              {/* Ambient Studio Badge */}
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: 16,
+                  [isRtl ? 'right' : 'left']: 16,
+                  background: 'rgba(255, 255, 255, 0.92)',
+                  backdropFilter: 'blur(12px)',
+                  WebkitBackdropFilter: 'blur(12px)',
+                  padding: '8px 16px',
+                  borderRadius: 999,
+                  border: '1px solid rgba(255, 255, 255, 0.6)',
+                  boxShadow: '0 4px 14px rgba(0, 0, 0, 0.08)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
+              >
+                <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#D10721' }} />
+                <span style={{ fontSize: 12.5, fontWeight: 600, color: '#141416', letterSpacing: '-0.01em' }}>
+                  {isRtl ? 'ستوديو وبوابة المشاريع · القاهرة' : 'Venture Studio & Platform · Cairo'}
+                </span>
               </div>
             </div>
           </div>
