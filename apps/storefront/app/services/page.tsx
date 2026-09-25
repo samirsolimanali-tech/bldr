@@ -41,22 +41,6 @@ export default function ServicesPage() {
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           {/* Header */}
           <div style={{ maxWidth: 760, marginBottom: 44 }}>
-            <div style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '4px 12px',
-              borderRadius: 999,
-              background: '#FFFFFF',
-              border: '1px solid rgba(20,20,22,0.08)',
-              fontSize: 12,
-              fontWeight: 600,
-              color: '#D10721',
-              marginBottom: 16,
-            }}>
-              <span>✦</span>
-              <span>{isRtl ? 'خدمات الاستوديو المتخصصة — Sidekick & Tech House' : 'Specialist Studio Services — Sidekick & Tech House'}</span>
-            </div>
 
             <h1 style={{
               margin: '0 0 16px',

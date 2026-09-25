@@ -64,22 +64,6 @@ export default function ServiceDetailPage() {
             alignItems: 'center',
           }}>
             <div>
-              <div style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                padding: '4px 12px',
-                borderRadius: 999,
-                background: 'rgba(209, 7, 33, 0.08)',
-                color: '#D10721',
-                fontSize: 12,
-                fontWeight: 700,
-                letterSpacing: '0.04em',
-                textTransform: 'uppercase',
-                marginBottom: 16,
-              }}>
-                {service.unit} · {isRtl ? service.categoryAr : service.category}
-              </div>
 
               <h1 style={{ margin: '0 0 16px', fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 800, color: '#12203C', lineHeight: 1.2, letterSpacing: '-0.03em' }}>
                 {isRtl ? service.titleAr : service.title}

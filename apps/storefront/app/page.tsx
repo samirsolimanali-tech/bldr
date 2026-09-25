@@ -83,29 +83,6 @@ export default function HomePage() {
             }}
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 650 }}>
-              
-              {/* Header Badges */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                <div style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 9,
-                  height: 32,
-                  padding: '0 14px',
-                  borderRadius: 999,
-                  background: isDark ? 'rgba(255, 255, 255, 0.14)' : '#FFFFFF',
-                  border: isDark ? '1px solid rgba(255, 255, 255, 0.28)' : '1px solid rgba(20,20,22,0.08)',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
-                  backdropFilter: 'blur(8px)',
-                  WebkitBackdropFilter: 'blur(8px)',
-                }}>
-                  <span style={{ display: 'block', width: 7, height: 7, borderRadius: '50%', background: 'linear-gradient(90deg, #D10721, #FD9426)' }} />
-                  <span style={{ fontSize: 12.5, fontWeight: 500, color: isDark ? '#FFFFFF' : '#47454A' }}>
-                    {isRtl ? 'القاهرة · ستوديو تأسيس وبناء الشركات، تأسس يوليو 2026' : 'Cairo · venture studio, founded July 2026'}
-                  </span>
-                </div>
-              </div>
-
               <h1 style={{
                 margin: 0,
                 fontSize: 'clamp(34px, 4.8vw, 58px)',
@@ -208,30 +185,7 @@ export default function HomePage() {
                 justifyContent: isRtl ? 'flex-start' : 'flex-end',
                 position: 'relative',
               }}
-            >
-              {/* Subtle Architectural Blueprint Badge */}
-              <div
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  padding: '8px 16px',
-                  borderRadius: 999,
-                  background: isDark ? 'rgba(15, 23, 42, 0.65)' : 'rgba(255, 255, 255, 0.85)',
-                  border: isDark ? '1px solid rgba(255, 255, 255, 0.18)' : '1px solid rgba(20, 20, 22, 0.1)',
-                  backdropFilter: 'blur(10px)',
-                  WebkitBackdropFilter: 'blur(10px)',
-                  color: isDark ? 'rgba(255, 255, 255, 0.85)' : '#47454A',
-                  fontSize: 12,
-                  fontWeight: 500,
-                  letterSpacing: '0.01em',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
-                }}
-              >
-                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#38BDF8' }} />
-                <span>{isRtl ? 'مخطط بنية المشاريع والنماذج الأولية' : 'Venture Architecture & Engineering Blueprint'}</span>
-              </div>
-            </div>
+            />
           </div>
         </section>
 

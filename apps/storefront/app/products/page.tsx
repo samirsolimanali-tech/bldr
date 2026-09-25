@@ -64,22 +64,6 @@ export default function ProductsPage() {
         <div style={{ maxWidth: 1240, margin: '0 auto' }}>
           {/* Header */}
           <div style={{ marginBottom: 36, textAlign: isRtl ? 'right' : 'left' }}>
-            <div style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '4px 12px',
-              borderRadius: 999,
-              background: 'rgba(46, 111, 94, 0.10)',
-              color: '#2E6F5E',
-              fontSize: 12,
-              fontWeight: 700,
-              letterSpacing: '0.04em',
-              textTransform: 'uppercase',
-              marginBottom: 12,
-            }}>
-              {isRtl ? 'دليل البرامج والمنتجات' : 'Provider Products & Catalog'}
-            </div>
             <h1 style={{
               fontSize: 'clamp(28px, 4vw, 42px)',
               fontWeight: 800,

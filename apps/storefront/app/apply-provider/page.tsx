@@ -53,24 +53,6 @@ export default function ApplyProviderPage() {
         <div style={{ maxWidth: 1160, margin: '0 auto' }}>
           {/* Hero Section */}
           <div style={{ textAlign: 'center', maxWidth: 820, margin: '0 auto 64px' }}>
-            <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                padding: '5px 14px',
-                borderRadius: 999,
-                background: 'rgba(46, 111, 94, 0.10)',
-                color: '#2E6F5E',
-                fontSize: 12.5,
-                fontWeight: 700,
-                letterSpacing: '0.04em',
-                textTransform: 'uppercase',
-                marginBottom: 16,
-              }}
-            >
-              {isRtl ? 'انضم كشريك ومزود معتمد' : 'Partner with bldr · Provider Network'}
-            </div>
 
             <h1
               style={{
