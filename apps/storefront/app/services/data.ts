@@ -4,7 +4,7 @@ export interface ServiceItem {
   unit: string;
   title: string;
   titleAr: string;
-  category: 'Marketing & Ads' | 'Brand & Creative' | 'Media & Video' | 'Software & Tech' | 'Strategy & Advisory';
+  category: 'Marketing & Ads' | 'Brand & Creative' | 'Media & Video' | 'Software & Tech' | 'Strategy & Advisory' | 'Corporate Training';
   categoryAr: string;
   shortDesc: string;
   shortDescAr: string;
@@ -178,5 +178,32 @@ export const SERVICES_CATALOG: ServiceItem[] = [
       'خصم قيمة الجلسة بالكامل (100%) من تكلفة أي مشروع لاحق',
     ],
     paySlug: 'bm-consult-sess',
+  },
+  {
+    slug: 'team-training-enablement',
+    code: 'TR',
+    unit: 'bldr Enablement',
+    title: 'Corporate Training & Team Enablement',
+    titleAr: 'التدريب المؤسسي وتأهيل وتمكين الفرق',
+    category: 'Corporate Training',
+    categoryAr: 'التدريب وتأهيل الفرق',
+    shortDesc: 'Hands-on executive workshops, operational agile playbooks, and technical skill transfers so your internal team can operate independently.',
+    shortDescAr: 'ورش عمل تنفيذية، ونماذج تشغيلية عملية، وتدريب تقني وتسويقي مكثف لتمكين وتأهيل كوادر فريقك للعمل باستقلالية تامة.',
+    priceEGP: 16000,
+    deliveryTime: '1 to 2 Weeks',
+    deliveryTimeAr: 'خلال أسبوع إلى أسبوعين',
+    deliverables: [
+      'Customized enterprise curriculum aligned with your industry',
+      'Hands-on technical & marketing Standard Operating Procedures (SOPs)',
+      'Live interactive simulation sessions and direct execution Q&A',
+      'Team competency audit, handover checklist & post-training support',
+    ],
+    deliverablesAr: [
+      'منهج تدريبي مؤسسي مخصص متوافق مع مجال شركتك',
+      'أدلة ونماذج تشغيل قياسية (SOPs) في التسويق والبرمجيات',
+      'جلسات محاكاة تفاعلية وتطبيق عملي مع استشارات مباشرة',
+      'تقرير تقييم جاهزية الفريق، وقائمة تسليم المهام ودعم ما بعد التدريب',
+    ],
+    paySlug: 'bm-team-training',
   },
 ];

@@ -262,39 +262,55 @@ export default function HomePage() {
                   title: isRtl ? 'التسويق وبناء العلامة التجارية' : 'Marketing & Branding',
                   was: isRtl ? 'بديل: وكالة التسويق المنفصلة' : 'was: the marketing agency',
                   desc: isRtl ? 'بناء الهوية البصرية، إدارة الإعلانات الممولة، صناعة المحتوى، وإطلاق مسارات البيع.' : 'Branding, advertising, content, performance campaigns',
-                  link: '/services',
-                  cta: isRtl ? 'تصفح خدمات التسويق ←' : 'View Marketing Packages →',
+                  link: '/services?category=Marketing+%26+Ads&service=performance-ads#performance-ads',
+                  cta: isRtl ? 'تصفح باقات وخدمات التسويق ←' : 'View Marketing Packages →',
                 },
                 {
                   title: isRtl ? 'تطوير البرمجيات والتكنولوجيا' : 'Software & Technology',
                   was: isRtl ? 'بديل: شركة البرمجيات الخارجية' : 'was: the software house',
                   desc: isRtl ? 'تطوير المنصات الرقمية، هندسة الأنظمة السحابية، وبناء البنية التحتية البرمجية المؤتمتة.' : 'Custom software platforms, modern API architectures, automated cloud infrastructure',
-                  link: '/services',
+                  link: '/services?category=Software+%26+Tech&service=web-platform-engineering#web-platform-engineering',
                   cta: isRtl ? 'خدمات البرمجيات والتكنولوجيا ←' : 'Software & Tech Services →',
                 },
                 {
                   title: isRtl ? 'الاستراتيجية وإدارة الأعمال' : 'Business Strategy & Consulting',
                   was: isRtl ? 'بديل: المستشار الذي يرحل' : 'was: the consultant who left',
                   desc: isRtl ? 'الاستراتيجية، تطوير الأعمال، التسعير، والهيكلة المالية للمشاريع.' : 'Strategy, business development, partnerships & financial architecture',
-                  link: '/services',
-                  cta: isRtl ? 'الجلسات الاستشارية ←' : 'Consulting Sessions →',
+                  link: '/services?category=Strategy+%26+Advisory&service=consulting-session#consulting-session',
+                  cta: isRtl ? 'الجلسات الاستشارية وتطوير الأعمال ←' : 'Consulting Sessions →',
                 },
                 {
                   title: isRtl ? 'التدريب وتأهيل الفرق' : 'Team Training & Enablement',
                   was: isRtl ? 'بديل: الفريق غير المدرب' : 'was: your untrained team',
                   desc: isRtl ? 'التدريب العملي للشركات، ورش العمل التنفيذية، وتسليم الفرق للعمل المستقل.' : 'Professional training, workshops, operations and team handover',
-                  link: '/products',
-                  cta: isRtl ? 'ورش العمل والدورات ←' : 'Workshops & Training →',
+                  link: '/services?category=Corporate+Training&service=team-training-enablement#team-training-enablement',
+                  cta: isRtl ? 'ورش العمل والتدريب المؤسسي ←' : 'Workshops & Training →',
                 },
               ].map((unit, i) => (
-                <div
+                <Link
                   key={i}
+                  href={unit.link}
                   style={{
+                    display: 'block',
                     background: '#FFFFFF',
                     border: '1px solid rgba(20,20,22,0.08)',
                     borderRadius: 14,
                     padding: '20px 24px',
                     boxShadow: '0 2px 8px rgba(20,20,22,0.04)',
+                    textDecoration: 'none',
+                    color: 'inherit',
+                    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                    cursor: 'pointer',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-3px)';
+                    e.currentTarget.style.boxShadow = '0 10px 28px rgba(20,20,22,0.08)';
+                    e.currentTarget.style.borderColor = 'rgba(44,95,158,0.3)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(20,20,22,0.04)';
+                    e.currentTarget.style.borderColor = 'rgba(20,20,22,0.08)';
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 16 }}>
@@ -302,12 +318,10 @@ export default function HomePage() {
                     <div style={{ fontSize: 12.5, fontWeight: 400, color: '#6B6970' }}>{unit.was}</div>
                   </div>
                   <div style={{ marginTop: 6, fontSize: 14.5, fontWeight: 300, lineHeight: 1.6, color: '#47454A' }}>{unit.desc}</div>
-                  <div style={{ marginTop: 12 }}>
-                    <Link href={unit.link} style={{ fontSize: 13, fontWeight: 600, color: '#2C5F9E', textDecoration: 'none' }}>
-                      {unit.cta}
-                    </Link>
+                  <div style={{ marginTop: 14, display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13.5, fontWeight: 600, color: '#2C5F9E' }}>
+                    <span>{unit.cta}</span>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>
