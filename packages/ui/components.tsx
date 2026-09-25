@@ -115,10 +115,10 @@ export interface BldrNavProps {
 
 export function BldrNav({ lang = 'EN', onLanguageChange, onStartProject }: BldrNavProps) {
   const isRtl = lang === 'AR';
-  const [activeDropdown, setActiveDropdown] = React.useState<'services' | 'products' | null>(null);
+  const [activeDropdown, setActiveDropdown] = React.useState<'services' | 'products' | 'projects' | null>(null);
   const dropdownTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
-  const handleMouseEnter = (menu: 'services' | 'products') => {
+  const handleMouseEnter = (menu: 'services' | 'products' | 'projects') => {
     if (dropdownTimeoutRef.current) clearTimeout(dropdownTimeoutRef.current);
     setActiveDropdown(menu);
   };
@@ -176,6 +176,25 @@ export function BldrNav({ lang = 'EN', onLanguageChange, onStartProject }: BldrN
     {
       href: '/products?type=Event',
       title: isRtl ? 'الفعاليات والتجمعات' : 'Events & Summits',
+    },
+  ];
+
+  const projectsList = [
+    {
+      href: '/projects?category=fintech',
+      title: isRtl ? 'بوابات الدفع والتكنولوجيا المالية' : 'Central Payment Hub & Fintech',
+    },
+    {
+      href: '/projects?category=edtech',
+      title: isRtl ? 'منصات التعليم وإدارة الطلاب' : 'EdTech LMS & Academies',
+    },
+    {
+      href: '/projects?category=growth',
+      title: isRtl ? 'نمو العلامات التجارية والتسويق' : 'D2C Commerce & Growth Engine',
+    },
+    {
+      href: '/projects?category=saas',
+      title: isRtl ? 'تطبيقات وأنظمة الأعمال السحابية' : 'Enterprise Workflow & SaaS',
     },
   ];
 
@@ -449,6 +468,117 @@ export function BldrNav({ lang = 'EN', onLanguageChange, onStartProject }: BldrN
                   }}
                 >
                   <span>{isRtl ? 'جميع المنتجات' : 'All Products'}</span>
+                  <span>{isRtl ? '←' : '→'}</span>
+                </a>
+              </div>
+            )}
+          </div>
+
+          {/* Projects / Our Work with Hover Dropdown */}
+          <div
+            style={{ position: 'relative' }}
+            onMouseEnter={() => handleMouseEnter('projects')}
+            onMouseLeave={handleMouseLeave}
+          >
+            <a
+              href="/projects"
+              style={{
+                fontSize: 14.5,
+                fontWeight: 500,
+                color: activeDropdown === 'projects' ? tokens.colors.brandDark : '#323742',
+                textDecoration: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
+                padding: '8px 4px',
+                transition: 'color 0.15s ease',
+              }}
+            >
+              <span>{isRtl ? 'مشاريعنا' : 'Projects'}</span>
+              <svg
+                width="10"
+                height="6"
+                viewBox="0 0 10 6"
+                fill="none"
+                style={{
+                  transition: 'transform 0.2s ease',
+                  transform: activeDropdown === 'projects' ? 'rotate(180deg)' : 'rotate(0deg)',
+                }}
+              >
+                <path d="M1 1L5 5L9 1" stroke="#6C7280" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </a>
+
+            {/* Minimal Projects Dropdown */}
+            {activeDropdown === 'projects' && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '100%',
+                  [isRtl ? 'right' : 'left']: 0,
+                  width: 250,
+                  padding: '6px',
+                  background: '#FFFFFF',
+                  borderRadius: 12,
+                  border: '1px solid rgba(20, 20, 22, 0.08)',
+                  boxShadow: '0 12px 30px rgba(0, 0, 0, 0.08)',
+                  zIndex: 200,
+                  animation: 'fadeIn 0.15s ease-out',
+                }}
+              >
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  {projectsList.map((p) => (
+                    <a
+                      key={p.title}
+                      href={p.href}
+                      style={{
+                        padding: '8px 12px',
+                        borderRadius: 6,
+                        textDecoration: 'none',
+                        fontSize: 13.5,
+                        fontWeight: 500,
+                        color: '#1E293B',
+                        display: 'block',
+                        transition: 'all 0.12s ease',
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLElement).style.background = '#F1F5F9';
+                        (e.currentTarget as HTMLElement).style.color = '#0F172A';
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLElement).style.background = 'transparent';
+                        (e.currentTarget as HTMLElement).style.color = '#1E293B';
+                      }}
+                    >
+                      {p.title}
+                    </a>
+                  ))}
+                </div>
+
+                <div style={{ margin: '4px 0', borderTop: '1px solid #F1F5F9' }} />
+
+                <a
+                  href="/projects"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '8px 12px',
+                    borderRadius: 6,
+                    fontSize: 12.5,
+                    fontWeight: 600,
+                    color: tokens.colors.brandDark,
+                    textDecoration: 'none',
+                    transition: 'background 0.12s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLElement).style.background = '#F1F5F9';
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLElement).style.background = 'transparent';
+                  }}
+                >
+                  <span>{isRtl ? 'استعراض كل المشاريع' : 'All Projects'}</span>
                   <span>{isRtl ? '←' : '→'}</span>
                 </a>
               </div>
@@ -757,9 +887,10 @@ export function ProjectContactModal({ isOpen, onClose, lang = 'EN' }: ProjectCon
 }
 
 // ─── Main Website Footer (BldrFooter.dc.html) ───────────────────────────────
-export function BldrFooter() {
+export function BldrFooter({ lang = 'EN' }: { lang?: 'EN' | 'AR' } = {}) {
+  const isRtl = lang === 'AR';
   return (
-    <footer style={{ background: tokens.colors.brandDark, color: '#FFFFFF', fontFamily: tokens.fonts.display }}>
+    <footer dir={isRtl ? 'rtl' : 'ltr'} style={{ background: tokens.colors.brandDark, color: '#FFFFFF', fontFamily: isRtl ? "'Readex Pro', sans-serif" : tokens.fonts.display }}>
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '64px 32px 34px' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '44px 40px', alignItems: 'flex-start' }}>
           
@@ -798,7 +929,7 @@ export function BldrFooter() {
             </div>
             <a href="/#built" style={{ fontSize: 14, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>How we&apos;re built</a>
             <a href="/#education" style={{ fontSize: 14, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>Education &amp; EdTech</a>
-            <a href="/#work" style={{ fontSize: 14, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>Our Work</a>
+            <a href="/projects" style={{ fontSize: 14, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>Our Work &amp; Projects</a>
             <a href="http://localhost:3002" style={{ fontSize: 14, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>Payment Hub</a>
           </div>
 
