@@ -9,6 +9,7 @@ import {
   MegaphoneIcon,
   SlidersIcon,
   BanknotesIcon,
+  BriefcaseIcon,
   ZapIcon,
   ArrowRightIcon,
 } from '@bldr/ui';
@@ -20,6 +21,7 @@ const NAV = [
   { href: '/leads', Icon: MegaphoneIcon, label: 'Leads & Quotes' },
   { href: '/commission', Icon: SlidersIcon, label: 'Commission Engine' },
   { href: '/payouts', Icon: BanknotesIcon, label: 'Payout Ledgers' },
+  { href: '/cms', Icon: BriefcaseIcon, label: 'Content & CMS' },
   { href: '/simulation', Icon: ZapIcon, label: 'Simulation Control' },
 ];
 
