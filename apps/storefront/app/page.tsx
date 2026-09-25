@@ -1,16 +1,34 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { BldrNav, BldrFooter, ProjectContactModal } from '@bldr/ui';
 
 export default function HomePage() {
   const [lang, setLang] = useState<'EN' | 'AR'>('EN');
   const [isContactOpen, setIsContactOpen] = useState(false);
-  const [blueprintMode, setBlueprintMode] = useState<'blue' | 'light'>('blue');
+  const [isDarkMode, setIsDarkMode] = useState(false); // Light is the main/default
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    setIsDarkMode(media.matches);
+
+    const listener = (e: MediaQueryListEvent) => {
+      setIsDarkMode(e.matches);
+    };
+
+    if (media.addEventListener) {
+      media.addEventListener('change', listener);
+      return () => media.removeEventListener('change', listener);
+    } else {
+      media.addListener(listener);
+      return () => media.removeListener(listener);
+    }
+  }, []);
 
   const isRtl = lang === 'AR';
-  const isBlue = blueprintMode === 'blue';
+  const isDark = isDarkMode;
 
   return (
     <div
@@ -39,14 +57,14 @@ export default function HomePage() {
             minHeight: 560,
             display: 'flex',
             alignItems: 'center',
-            background: isBlue
+            background: isDark
               ? isRtl
                 ? "linear-gradient(270deg, #1C2B3F 0%, #1C2B3F 36%, rgba(28, 43, 63, 0.88) 52%, rgba(28, 43, 63, 0.38) 72%, rgba(28, 43, 63, 0.05) 100%), url('/images/hero-blueprint-blue.jpg') left center / cover no-repeat"
                 : "linear-gradient(90deg, #1C2B3F 0%, #1C2B3F 36%, rgba(28, 43, 63, 0.88) 52%, rgba(28, 43, 63, 0.38) 72%, rgba(28, 43, 63, 0.05) 100%), url('/images/hero-blueprint-blue.jpg') right center / cover no-repeat"
               : isRtl
                 ? "linear-gradient(270deg, #F4F5F7 0%, #F4F5F7 36%, rgba(244, 245, 247, 0.88) 52%, rgba(244, 245, 247, 0.35) 72%, rgba(244, 245, 247, 0.05) 100%), url('/images/hero-blueprint-light.jpg') left center / cover no-repeat"
                 : "linear-gradient(90deg, #F4F5F7 0%, #F4F5F7 36%, rgba(244, 245, 247, 0.88) 52%, rgba(244, 245, 247, 0.35) 72%, rgba(244, 245, 247, 0.05) 100%), url('/images/hero-blueprint-light.jpg') right center / cover no-repeat",
-            borderBottom: isBlue ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(20, 20, 22, 0.08)',
+            borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(20, 20, 22, 0.08)',
             transition: 'background 0.3s ease',
             overflow: 'hidden',
           }}
@@ -66,7 +84,7 @@ export default function HomePage() {
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 650 }}>
               
-              {/* Header Badges with Blueprint Switcher */}
+              {/* Header Badges */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                 <div style={{
                   display: 'inline-flex',
@@ -75,42 +93,17 @@ export default function HomePage() {
                   height: 32,
                   padding: '0 14px',
                   borderRadius: 999,
-                  background: isBlue ? 'rgba(255, 255, 255, 0.14)' : '#FFFFFF',
-                  border: isBlue ? '1px solid rgba(255, 255, 255, 0.28)' : '1px solid rgba(20,20,22,0.08)',
+                  background: isDark ? 'rgba(255, 255, 255, 0.14)' : '#FFFFFF',
+                  border: isDark ? '1px solid rgba(255, 255, 255, 0.28)' : '1px solid rgba(20,20,22,0.08)',
                   boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
                   backdropFilter: 'blur(8px)',
                   WebkitBackdropFilter: 'blur(8px)',
                 }}>
                   <span style={{ display: 'block', width: 7, height: 7, borderRadius: '50%', background: 'linear-gradient(90deg, #D10721, #FD9426)' }} />
-                  <span style={{ fontSize: 12.5, fontWeight: 500, color: isBlue ? '#FFFFFF' : '#47454A' }}>
+                  <span style={{ fontSize: 12.5, fontWeight: 500, color: isDark ? '#FFFFFF' : '#47454A' }}>
                     {isRtl ? 'القاهرة · ستوديو تأسيس وبناء الشركات، تأسس يوليو 2026' : 'Cairo · venture studio, founded July 2026'}
                   </span>
                 </div>
-
-                {/* Blueprint Grid Style Toggle */}
-                <button
-                  type="button"
-                  onClick={() => setBlueprintMode(isBlue ? 'light' : 'blue')}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 6,
-                    height: 30,
-                    padding: '0 10px',
-                    borderRadius: 999,
-                    background: isBlue ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
-                    border: isBlue ? '1px dashed rgba(255, 255, 255, 0.35)' : '1px dashed rgba(20, 20, 22, 0.2)',
-                    color: isBlue ? '#93C5FD' : '#2563EB',
-                    fontSize: 11.5,
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    backdropFilter: 'blur(6px)',
-                  }}
-                  title="Toggle Blueprint Background Style"
-                >
-                  <span>📐</span>
-                  <span>{isBlue ? (isRtl ? 'خلفية المخطط (أزرق)' : 'Blueprint: Slate') : (isRtl ? 'خلفية المخطط (أبيض)' : 'Blueprint: Light')}</span>
-                </button>
               </div>
 
               <h1 style={{
@@ -119,9 +112,9 @@ export default function HomePage() {
                 lineHeight: 1.1,
                 fontWeight: 600,
                 letterSpacing: '-0.04em',
-                color: isBlue ? '#FFFFFF' : '#141416',
+                color: isDark ? '#FFFFFF' : '#141416',
                 textWrap: 'pretty',
-                textShadow: isBlue ? '0 2px 14px rgba(0, 0, 0, 0.3)' : 'none',
+                textShadow: isDark ? '0 2px 14px rgba(0, 0, 0, 0.3)' : 'none',
               }}>
                 {isRtl
                   ? 'نبني المنتج الرقمي، العلامة التجارية، والفريق الذي يديرها.'
@@ -134,8 +127,8 @@ export default function HomePage() {
                 fontSize: 16.5,
                 lineHeight: 1.68,
                 fontWeight: 300,
-                color: isBlue ? 'rgba(240, 246, 255, 0.9)' : '#47454A',
-                textShadow: isBlue ? '0 1px 8px rgba(0, 0, 0, 0.25)' : 'none',
+                color: isDark ? 'rgba(240, 246, 255, 0.9)' : '#47454A',
+                textShadow: isDark ? '0 1px 8px rgba(0, 0, 0, 0.25)' : 'none',
               }}>
                 {isRtl
                   ? 'تدير bldr وحدات متخصصة وتبني مشاريعها الخاصة. تعمل مع الوحدات التي تحتاجها في التسويق والبرمجيات وإدارة الدفع تحت نقطة اتصال واحدة ومسؤولية كاملة.'
@@ -152,13 +145,13 @@ export default function HomePage() {
                     height: 50,
                     padding: '0 28px',
                     borderRadius: 999,
-                    background: isBlue ? '#FFFFFF' : '#141416',
-                    color: isBlue ? '#0F172A' : '#FFFFFF',
+                    background: isDark ? '#FFFFFF' : '#141416',
+                    color: isDark ? '#0F172A' : '#FFFFFF',
                     fontSize: 15,
                     fontWeight: 600,
                     border: 'none',
                     cursor: 'pointer',
-                    boxShadow: isBlue ? '0 4px 18px rgba(0, 0, 0, 0.25)' : '0 4px 14px rgba(20,20,22,0.14)',
+                    boxShadow: isDark ? '0 4px 18px rgba(0, 0, 0, 0.25)' : '0 4px 14px rgba(20,20,22,0.14)',
                     fontFamily: 'inherit',
                     transition: 'transform 0.15s ease',
                   }}
@@ -173,9 +166,9 @@ export default function HomePage() {
                     height: 50,
                     padding: '0 24px',
                     borderRadius: 999,
-                    background: isBlue ? 'rgba(255, 255, 255, 0.12)' : '#FFFFFF',
-                    border: isBlue ? '1px solid rgba(255, 255, 255, 0.35)' : '1px solid rgba(20,20,22,0.12)',
-                    color: isBlue ? '#FFFFFF' : '#141416',
+                    background: isDark ? 'rgba(255, 255, 255, 0.12)' : '#FFFFFF',
+                    border: isDark ? '1px solid rgba(255, 255, 255, 0.35)' : '1px solid rgba(20,20,22,0.12)',
+                    color: isDark ? '#FFFFFF' : '#141416',
                     fontSize: 15,
                     fontWeight: 500,
                     textDecoration: 'none',
@@ -195,7 +188,7 @@ export default function HomePage() {
                     padding: '0 20px',
                     borderRadius: 999,
                     background: 'transparent',
-                    color: isBlue ? 'rgba(240, 246, 255, 0.88)' : '#5A6A80',
+                    color: isDark ? 'rgba(240, 246, 255, 0.88)' : '#5A6A80',
                     fontSize: 14.5,
                     fontWeight: 500,
                     textDecoration: 'none',
@@ -224,11 +217,11 @@ export default function HomePage() {
                   gap: 8,
                   padding: '8px 16px',
                   borderRadius: 999,
-                  background: isBlue ? 'rgba(15, 23, 42, 0.65)' : 'rgba(255, 255, 255, 0.85)',
-                  border: isBlue ? '1px solid rgba(255, 255, 255, 0.18)' : '1px solid rgba(20, 20, 22, 0.1)',
+                  background: isDark ? 'rgba(15, 23, 42, 0.65)' : 'rgba(255, 255, 255, 0.85)',
+                  border: isDark ? '1px solid rgba(255, 255, 255, 0.18)' : '1px solid rgba(20, 20, 22, 0.1)',
                   backdropFilter: 'blur(10px)',
                   WebkitBackdropFilter: 'blur(10px)',
-                  color: isBlue ? 'rgba(255, 255, 255, 0.85)' : '#47454A',
+                  color: isDark ? 'rgba(255, 255, 255, 0.85)' : '#47454A',
                   fontSize: 12,
                   fontWeight: 500,
                   letterSpacing: '0.01em',
