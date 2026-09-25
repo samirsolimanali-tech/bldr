@@ -7,8 +7,10 @@ import { BldrNav, BldrFooter, ProjectContactModal } from '@bldr/ui';
 export default function HomePage() {
   const [lang, setLang] = useState<'EN' | 'AR'>('EN');
   const [isContactOpen, setIsContactOpen] = useState(false);
+  const [blueprintMode, setBlueprintMode] = useState<'blue' | 'light'>('blue');
 
   const isRtl = lang === 'AR';
+  const isBlue = blueprintMode === 'blue';
 
   return (
     <div
@@ -29,26 +31,66 @@ export default function HomePage() {
       />
 
       <main style={{ flex: 1 }}>
-        {/* ─── Hero Section ──────────────────────────────────────── */}
-        <section style={{ padding: '72px 32px 84px', background: '#F4F5F7' }}>
+        {/* ─── Hero Section with Blueprint Sketch Background ──────────────────────── */}
+        <section
+          style={{
+            position: 'relative',
+            padding: '72px 32px 84px',
+            background: isBlue
+              ? "linear-gradient(rgba(36, 56, 86, 0.82), rgba(25, 41, 64, 0.88)), url('/images/hero-blueprint-blue.jpg') center/cover no-repeat"
+              : "linear-gradient(rgba(244, 245, 247, 0.84), rgba(244, 245, 247, 0.90)), url('/images/hero-blueprint-light.jpg') center/cover no-repeat",
+            borderBottom: isBlue ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(20, 20, 22, 0.08)',
+            transition: 'background 0.3s ease',
+          }}
+        >
           <div style={{ maxWidth: 1280, margin: '0 auto', display: 'grid', gridTemplateColumns: 'minmax(0, 1.15fr) minmax(0, 0.85fr)', gap: 54, alignItems: 'center' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-              <div style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 9,
-                alignSelf: 'flex-start',
-                height: 32,
-                padding: '0 14px',
-                borderRadius: 999,
-                background: '#FFFFFF',
-                border: '1px solid rgba(20,20,22,0.08)',
-                boxShadow: '0 2px 6px rgba(20,20,22,0.04)',
-              }}>
-                <span style={{ display: 'block', width: 7, height: 7, borderRadius: '50%', background: 'linear-gradient(90deg, #D10721, #FD9426)' }} />
-                <span style={{ fontSize: 12.5, fontWeight: 500, color: '#47454A' }}>
-                  {isRtl ? 'القاهرة · ستوديو تأسيس وبناء الشركات، تأسس يوليو 2026' : 'Cairo · venture studio, founded July 2026'}
-                </span>
+              
+              {/* Header Badges with Blueprint Switcher */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                <div style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 9,
+                  height: 32,
+                  padding: '0 14px',
+                  borderRadius: 999,
+                  background: isBlue ? 'rgba(255, 255, 255, 0.14)' : '#FFFFFF',
+                  border: isBlue ? '1px solid rgba(255, 255, 255, 0.28)' : '1px solid rgba(20,20,22,0.08)',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
+                  backdropFilter: 'blur(8px)',
+                  WebkitBackdropFilter: 'blur(8px)',
+                }}>
+                  <span style={{ display: 'block', width: 7, height: 7, borderRadius: '50%', background: 'linear-gradient(90deg, #D10721, #FD9426)' }} />
+                  <span style={{ fontSize: 12.5, fontWeight: 500, color: isBlue ? '#FFFFFF' : '#47454A' }}>
+                    {isRtl ? 'القاهرة · ستوديو تأسيس وبناء الشركات، تأسس يوليو 2026' : 'Cairo · venture studio, founded July 2026'}
+                  </span>
+                </div>
+
+                {/* Blueprint Grid Style Toggle */}
+                <button
+                  type="button"
+                  onClick={() => setBlueprintMode(isBlue ? 'light' : 'blue')}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    height: 30,
+                    padding: '0 10px',
+                    borderRadius: 999,
+                    background: isBlue ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+                    border: isBlue ? '1px dashed rgba(255, 255, 255, 0.35)' : '1px dashed rgba(20, 20, 22, 0.2)',
+                    color: isBlue ? '#93C5FD' : '#2563EB',
+                    fontSize: 11.5,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    backdropFilter: 'blur(6px)',
+                  }}
+                  title="Toggle Blueprint Background Style"
+                >
+                  <span>📐</span>
+                  <span>{isBlue ? (isRtl ? 'خلفية المخطط (أزرق)' : 'Blueprint: Slate') : (isRtl ? 'خلفية المخطط (أبيض)' : 'Blueprint: Light')}</span>
+                </button>
               </div>
 
               <h1 style={{
@@ -57,8 +99,9 @@ export default function HomePage() {
                 lineHeight: 1.1,
                 fontWeight: 600,
                 letterSpacing: '-0.04em',
-                color: '#141416',
+                color: isBlue ? '#FFFFFF' : '#141416',
                 textWrap: 'pretty',
+                textShadow: isBlue ? '0 2px 14px rgba(0, 0, 0, 0.3)' : 'none',
               }}>
                 {isRtl
                   ? 'نبني المنتج الرقمي، العلامة التجارية، والفريق الذي يديرها.'
@@ -71,7 +114,8 @@ export default function HomePage() {
                 fontSize: 16.5,
                 lineHeight: 1.68,
                 fontWeight: 300,
-                color: '#47454A',
+                color: isBlue ? 'rgba(240, 246, 255, 0.9)' : '#47454A',
+                textShadow: isBlue ? '0 1px 8px rgba(0, 0, 0, 0.25)' : 'none',
               }}>
                 {isRtl
                   ? 'تدير bldr وحدات متخصصة وتبني مشاريعها الخاصة. تعمل مع الوحدات التي تحتاجها في التسويق والبرمجيات وإدارة الدفع تحت نقطة اتصال واحدة ومسؤولية كاملة.'
@@ -88,14 +132,15 @@ export default function HomePage() {
                     height: 50,
                     padding: '0 28px',
                     borderRadius: 999,
-                    background: '#141416',
-                    color: '#FFFFFF',
+                    background: isBlue ? '#FFFFFF' : '#141416',
+                    color: isBlue ? '#0F172A' : '#FFFFFF',
                     fontSize: 15,
-                    fontWeight: 500,
+                    fontWeight: 600,
                     border: 'none',
                     cursor: 'pointer',
-                    boxShadow: '0 4px 14px rgba(20,20,22,0.14)',
+                    boxShadow: isBlue ? '0 4px 18px rgba(0, 0, 0, 0.25)' : '0 4px 14px rgba(20,20,22,0.14)',
                     fontFamily: 'inherit',
+                    transition: 'transform 0.15s ease',
                   }}
                 >
                   {isRtl ? 'ابدأ مشروعك معنا ←' : 'Start a project →'}
@@ -108,13 +153,15 @@ export default function HomePage() {
                     height: 50,
                     padding: '0 24px',
                     borderRadius: 999,
-                    background: '#FFFFFF',
-                    border: '1px solid rgba(20,20,22,0.12)',
-                    color: '#141416',
+                    background: isBlue ? 'rgba(255, 255, 255, 0.12)' : '#FFFFFF',
+                    border: isBlue ? '1px solid rgba(255, 255, 255, 0.35)' : '1px solid rgba(20,20,22,0.12)',
+                    color: isBlue ? '#FFFFFF' : '#141416',
                     fontSize: 15,
                     fontWeight: 500,
                     textDecoration: 'none',
-                    boxShadow: '0 2px 6px rgba(20,20,22,0.04)',
+                    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.06)',
+                    backdropFilter: 'blur(8px)',
+                    WebkitBackdropFilter: 'blur(8px)',
                   }}
                 >
                   {isRtl ? 'استكشف الخدمات والتسويق' : 'Explore Services & Marketing'}
@@ -128,7 +175,7 @@ export default function HomePage() {
                     padding: '0 20px',
                     borderRadius: 999,
                     background: 'transparent',
-                    color: '#5A6A80',
+                    color: isBlue ? 'rgba(240, 246, 255, 0.88)' : '#5A6A80',
                     fontSize: 14.5,
                     fontWeight: 500,
                     textDecoration: 'none',
@@ -145,7 +192,9 @@ export default function HomePage() {
                 position: 'relative',
                 borderRadius: 24,
                 overflow: 'hidden',
-                boxShadow: '0 20px 50px -12px rgba(20, 20, 22, 0.12), 0 0 0 1px rgba(20, 20, 22, 0.06)',
+                boxShadow: isBlue
+                  ? '0 25px 60px -15px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.2)'
+                  : '0 20px 50px -12px rgba(20, 20, 22, 0.12), 0 0 0 1px rgba(20, 20, 22, 0.06)',
                 background: '#FFFFFF',
                 aspectRatio: '4 / 3',
                 display: 'flex',
@@ -170,13 +219,13 @@ export default function HomePage() {
                   position: 'absolute',
                   bottom: 16,
                   [isRtl ? 'right' : 'left']: 16,
-                  background: 'rgba(255, 255, 255, 0.92)',
+                  background: 'rgba(255, 255, 255, 0.94)',
                   backdropFilter: 'blur(12px)',
                   WebkitBackdropFilter: 'blur(12px)',
                   padding: '8px 16px',
                   borderRadius: 999,
                   border: '1px solid rgba(255, 255, 255, 0.6)',
-                  boxShadow: '0 4px 14px rgba(0, 0, 0, 0.08)',
+                  boxShadow: '0 4px 14px rgba(0, 0, 0, 0.1)',
                   display: 'flex',
                   alignItems: 'center',
                   gap: 8,
