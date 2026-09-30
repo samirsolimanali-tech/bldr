@@ -317,3 +317,37 @@ export interface ExecutiveOverviewKPIs {
   refundRateDelta: string;
   periodLabel: string;
 }
+
+// ─── Enrollment Code & Physical Activation ───────────────────────────────────
+
+export enum EnrollmentCodeStatus {
+  UNUSED = 'UNUSED',
+  USED = 'USED',
+  EXPIRED = 'EXPIRED',
+  VOID = 'VOID',
+}
+
+export enum EnrollmentCodeSource {
+  PHYSICAL_STORE = 'PHYSICAL_STORE',
+  CENTER = 'CENTER',
+  TUTOR = 'TUTOR',
+  BATCH_DISTRIBUTION = 'BATCH_DISTRIBUTION',
+  OTHER = 'OTHER',
+}
+
+export interface EnrollmentCode {
+  id: string;
+  code: string;
+  serial?: string;
+  ventureId: string;
+  productId?: string;
+  productName: string;
+  status: EnrollmentCodeStatus | 'UNUSED' | 'USED' | 'EXPIRED' | 'VOID';
+  source: EnrollmentCodeSource | 'PHYSICAL_STORE' | 'CENTER' | 'TUTOR' | 'BATCH_DISTRIBUTION' | 'OTHER';
+  redeemedAt?: string | null;
+  redeemedByEmail?: string | null;
+  redeemedByName?: string | null;
+  orderId?: string | null;
+  notes?: string | null;
+  createdAt: string;
+}

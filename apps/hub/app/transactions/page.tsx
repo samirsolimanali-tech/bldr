@@ -5,7 +5,24 @@ import Link from 'next/link';
 import HubSidebar from '../../components/HubSidebar';
 import HubTopBar, { matchVenture } from '../../components/HubTopBar';
 
-const TRANSACTIONS = [
+export interface TransactionItem {
+  id: string;
+  venture: string;
+  student: string;
+  email: string;
+  product: string;
+  amount: number;
+  method: string;
+  gateway: string;
+  status: string;
+  date: string;
+  ref: string;
+  type?: string;
+  codeRedeemed?: string;
+  sourceChannel?: string;
+}
+
+const TRANSACTIONS: TransactionItem[] = [
   { id: 'txn_01J8F4KQ2M', venture: 'StudyHub', student: 'Ahmed Ali', email: 'ahmed@example.com', product: 'Math Course — Term 1', amount: 750, method: 'Card (Visa •••• 4242)', gateway: 'PSP-A (Hosted)', status: 'Completed', date: '2026-09-14 14:32', ref: 'SH-COURSE-4581' },
   { id: 'txn_01J8EX1TD5', venture: 'StudyHub', student: 'Sarah Mansour', email: 'sarah.m@gmail.com', product: 'Physics Bundle — Term 1', amount: 900, method: 'Mobile Wallet (Vodafone)', gateway: 'PSP-A (Hosted)', status: 'Pending', date: '2026-09-12 23:58', ref: 'SH-COURSE-4402' },
   { id: 'txn_01J8F4KP9X', venture: 'Apex Classes', student: 'Khaled Omar', email: 'khaled.omar@gmail.com', product: 'CFA Level 1 FastTrack', amount: 6500, method: 'Card (Mastercard •••• 1182)', gateway: 'PSP-A (Hosted)', status: 'Completed', date: '2026-09-14 11:20', ref: 'AC-CFA-8812' },
@@ -19,13 +36,13 @@ function StatusBadge({ s }: { s: string }) {
 }
 
 export default function TransactionsPage() {
-  const [txnList, setTxnList] = useState(TRANSACTIONS);
+  const [txnList, setTxnList] = useState<TransactionItem[]>(TRANSACTIONS);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [methodFilter, setMethodFilter] = useState('All');
   const [env, setEnv] = useState<'Sandbox' | 'Production'>('Production');
   const [selectedVenture, setSelectedVenture] = useState('All');
-  const [selected, setSelected] = useState<typeof TRANSACTIONS[0] | null>(null);
+  const [selected, setSelected] = useState<TransactionItem | null>(null);
 
   React.useEffect(() => {
     try {
@@ -50,17 +67,17 @@ export default function TransactionsPage() {
     return () => window.removeEventListener('bldr:venture-changed', handleVentureChanged);
   }, []);
 
-  const methods = ['All', 'Card', 'Mobile Wallet', 'Fawry Pay', 'Meeza'];
+  const methods = ['All', 'Card', 'Mobile Wallet', 'Fawry Pay', 'Meeza', 'Activation Code'];
 
   const filtered = txnList.filter(t => {
-    const ms = search === '' || t.student.toLowerCase().includes(search.toLowerCase()) || t.id.toLowerCase().includes(search.toLowerCase()) || t.venture.toLowerCase().includes(search.toLowerCase()) || t.ref.toLowerCase().includes(search.toLowerCase());
+    const ms = search === '' || t.student.toLowerCase().includes(search.toLowerCase()) || t.id.toLowerCase().includes(search.toLowerCase()) || t.venture.toLowerCase().includes(search.toLowerCase()) || t.ref.toLowerCase().includes(search.toLowerCase()) || (t.codeRedeemed && t.codeRedeemed.toLowerCase().includes(search.toLowerCase()));
     const ss = statusFilter === 'All' || t.status === statusFilter;
-    const mf = methodFilter === 'All' || t.method.includes(methodFilter);
+    const mf = methodFilter === 'All' || (methodFilter === 'Activation Code' ? (t.method.includes('Activation Code') || t.type === 'CODE_REDEMPTION') : t.method.includes(methodFilter));
     const matchesVenture = matchVenture(t.venture, selectedVenture);
     return ms && ss && mf && matchesVenture;
   });
 
-  const total = filtered.reduce((s, t) => t.status !== 'Refunded' && t.status !== 'Failed' ? s + t.amount : s, 0);
+  const total = filtered.reduce((s, t) => t.status !== 'Refunded' && t.status !== 'Failed' ? s + (t.amount || 0) : s, 0);
 
   return (
     <div style={{ display: 'flex', width: '100vw', height: '100vh', background: '#F5F7FA', overflow: 'hidden' }}>
@@ -78,12 +95,13 @@ export default function TransactionsPage() {
 
         <div className="hub-content">
           {/* Summary */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14, marginBottom: 24 }}>
             {[
               { label: 'Total Transactions', val: txnList.length },
               { label: 'Completed', val: txnList.filter(t => t.status === 'Completed').length },
-              { label: 'Pending', val: txnList.filter(t => t.status === 'Pending').length },
-              { label: 'Total Value', val: `EGP ${txnList.filter(t => t.status === 'Completed').reduce((s, t) => s + t.amount, 0).toLocaleString()}` },
+              { label: 'Code Redemptions', val: txnList.filter(t => t.type === 'CODE_REDEMPTION' || t.method?.includes('Activation Code')).length },
+              { label: 'Pending Payout', val: txnList.filter(t => t.status === 'Pending').length },
+              { label: 'Settlement Revenue', val: `EGP ${txnList.filter(t => t.status === 'Completed').reduce((s, t) => s + (t.amount || 0), 0).toLocaleString()}` },
             ].map(s => (
               <div key={s.label} className="hub-kpi">
                 <div className="hub-kpi-value">{s.val}</div>
@@ -133,7 +151,18 @@ export default function TransactionsPage() {
                         <div style={{ fontSize: 11, color: 'var(--hub-text-3)' }}>{t.email}</div>
                       </td>
                       <td style={{ color: 'var(--hub-text-2)', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.product}</td>
-                      <td style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>EGP {t.amount.toLocaleString()}</td>
+                      <td style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+                        {t.type === 'CODE_REDEMPTION' || t.amount === 0 ? (
+                          <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <span style={{ color: '#059669' }}>EGP 0.00</span>
+                            <span style={{ fontSize: 9.5, fontWeight: 700, background: '#DCFCE7', color: '#166534', padding: '1px 4px', borderRadius: 3, width: 'fit-content' }}>
+                              CODE REDEEMED
+                            </span>
+                          </div>
+                        ) : (
+                          `EGP ${t.amount.toLocaleString()}`
+                        )}
+                      </td>
                       <td><span className="hub-badge neutral">{t.method}</span></td>
                       <td><span className="hub-badge accent">{t.gateway}</span></td>
                       <td><StatusBadge s={t.status} /></td>
@@ -172,13 +201,14 @@ export default function TransactionsPage() {
                 ['Student Name', selected.student],
                 ['Student Email', selected.email],
                 ['Product', selected.product],
-                ['Amount', `EGP ${selected.amount.toLocaleString()}`],
+                ['Amount', selected.type === 'CODE_REDEMPTION' || selected.amount === 0 ? 'EGP 0.00 (Code Redemption)' : `EGP ${selected.amount.toLocaleString()}`],
                 ['Payment Method', selected.method],
                 ['Gateway', selected.gateway],
+                ...((selected as any).codeRedeemed ? [['Redeemed Code', (selected as any).codeRedeemed], ['Channel Source', (selected as any).sourceChannel || 'CENTER']] : []),
                 ['Status', selected.status],
                 ['Date', selected.date],
-              ].map(([label, value], i) => (
-                <div key={label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '11px 0', borderBottom: i < 10 ? '1px solid var(--hub-border)' : 'none' }}>
+              ].map(([label, value], i, arr) => (
+                <div key={label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '11px 0', borderBottom: i < arr.length - 1 ? '1px solid var(--hub-border)' : 'none' }}>
                   <span style={{ fontSize: 13, color: 'var(--hub-text-3)' }}>{label}</span>
                   <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--hub-text)' }}>{value}</span>
                 </div>

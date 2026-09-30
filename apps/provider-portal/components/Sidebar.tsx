@@ -12,6 +12,7 @@ import {
   CheckoutIcon,
   ApiIcon,
   SettingsIcon,
+  TicketIcon,
 } from './Icons';
 
 import { resolveVentureForEmail } from '../lib/venture';
@@ -25,14 +26,15 @@ interface NavItem {
 }
 
 const NAV: NavItem[] = [
-  { href: '/dashboard',     Icon: DashboardIcon,    label: 'Overview',          group: 'Main' },
-  { href: '/transactions',  Icon: TransactionsIcon, label: 'Transactions',      group: 'Financials' },
-  { href: '/students',      Icon: UsersIcon,        label: 'Paid Users',        group: 'Financials' },
-  { href: '/payouts',       Icon: PayoutIcon,       label: 'Payouts',           group: 'Financials' },
-  { href: '/payment-links', Icon: LinkIcon,         label: 'Payment Links',     group: 'Tools' },
-  { href: '/payment-pages', Icon: CheckoutIcon,     label: 'Master Checkout',   group: 'Tools' },
-  { href: '/apis',          Icon: ApiIcon,          label: 'Bldr APIs',         group: 'Tools' },
-  { href: '/options',       Icon: SettingsIcon,     label: 'Bldr Options',      group: 'Settings' },
+  { href: '/dashboard',        Icon: DashboardIcon,    label: 'Overview',          group: 'Main' },
+  { href: '/transactions',     Icon: TransactionsIcon, label: 'Transactions',      group: 'Financials' },
+  { href: '/students',         Icon: UsersIcon,        label: 'Paid Users',        group: 'Financials' },
+  { href: '/payouts',          Icon: PayoutIcon,       label: 'Payouts',           group: 'Financials' },
+  { href: '/payment-links',    Icon: LinkIcon,         label: 'Payment Links',     group: 'Tools' },
+  { href: '/payment-pages',    Icon: CheckoutIcon,     label: 'Master Checkout',   group: 'Tools' },
+  { href: '/activation-codes', Icon: TicketIcon,       label: 'Activation Codes',  group: 'Tools' },
+  { href: '/apis',             Icon: ApiIcon,          label: 'Bldr APIs',         group: 'Tools' },
+  { href: '/options',          Icon: SettingsIcon,     label: 'Bldr Options',      group: 'Settings' },
 ];
 
 const GROUPS = ['Main', 'Financials', 'Tools', 'Settings'];

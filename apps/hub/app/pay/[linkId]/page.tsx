@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
+import { validateAndRedeemEnrollmentCode, getVentureCodes } from '../../../lib/enrollment-codes';
 
 /* ─── Baseline Venture Registry ───────────────────────────────── */
 const VENTURE_REGISTRY: Record<string, any> = {
@@ -15,6 +16,7 @@ const VENTURE_REGISTRY: Record<string, any> = {
     checkoutLayout: 'top-left',
     cardWalletGateway: 'geidea',
     fawryEnabled: true,
+    codeActivationEnabled: true,
     logoUrl: '',
   },
   studyhub: {
@@ -27,6 +29,7 @@ const VENTURE_REGISTRY: Record<string, any> = {
     checkoutLayout: 'top-left',
     cardWalletGateway: 'geidea',
     fawryEnabled: true,
+    codeActivationEnabled: true,
     logoUrl: '',
   },
   apex: {
@@ -39,6 +42,7 @@ const VENTURE_REGISTRY: Record<string, any> = {
     checkoutLayout: 'top-center',
     cardWalletGateway: 'paymob',
     fawryEnabled: false,
+    codeActivationEnabled: true,
     logoUrl: '',
   },
   'el-hesa': {
@@ -51,6 +55,7 @@ const VENTURE_REGISTRY: Record<string, any> = {
     checkoutLayout: 'split-hero',
     cardWalletGateway: 'geidea',
     fawryEnabled: true,
+    codeActivationEnabled: false,
     logoUrl: '',
   },
   'career-hub': {
@@ -63,6 +68,7 @@ const VENTURE_REGISTRY: Record<string, any> = {
     checkoutLayout: 'top-left',
     cardWalletGateway: 'geidea',
     fawryEnabled: false,
+    codeActivationEnabled: false,
     logoUrl: '',
   },
 };
@@ -119,6 +125,14 @@ export default function CentralPaymentPage() {
   // Completion State
   const [isProcessing, setIsProcessing] = useState(false);
   const [completedTxnId, setCompletedTxnId] = useState('');
+
+  // Activation Code State
+  const [checkoutMode, setCheckoutMode] = useState<'pay_online' | 'activate_code'>('pay_online');
+  const [activationCodeInput, setActivationCodeInput] = useState('');
+  const [activationError, setActivationError] = useState<string | null>(null);
+  const [activationSuccess, setActivationSuccess] = useState<any | null>(null);
+  const [isRedeeming, setIsRedeeming] = useState(false);
+  const [availableSampleCodes, setAvailableSampleCodes] = useState<any[]>([]);
 
   // Fetch Public Session if available
   useEffect(() => {
@@ -186,6 +200,19 @@ export default function CentralPaymentPage() {
       ? sessionData.fawryEnabled
       : brandConfig.fawryEnabled !== false;
 
+  const codeActivationEnabled: boolean =
+    searchParams?.get('code_activation') !== null
+      ? searchParams.get('code_activation') === '1'
+      : brandConfig.codeActivationEnabled !== false;
+
+  // Load sample codes for convenience in dev/testing
+  useEffect(() => {
+    try {
+      const list = getVentureCodes(resolvedBrandCode);
+      setAvailableSampleCodes(list.filter(c => c.status === 'UNUSED').slice(0, 3));
+    } catch (e) {}
+  }, [resolvedBrandCode]);
+
   const activeBrandName = brandConfig.displayName || brandConfig.name;
   const activeLegalName = brandConfig.legalName;
   const brandPrimaryColor = brandConfig.primaryColor || '#D10721';
@@ -207,6 +234,42 @@ export default function CentralPaymentPage() {
       setCopiedCode(true);
       setTimeout(() => setCopiedCode(false), 2000);
     }
+  };
+
+  // Handle Code Redemption Submission
+  const handleRedeemCode = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!activationCodeInput.trim()) {
+      setActivationError(isRtl ? 'يرجى إدخال كود التفعيل أو الرقم التسلسلي.' : 'Please enter your activation code or serial.');
+      return;
+    }
+    setActivationError('');
+    setIsRedeeming(true);
+
+    setTimeout(() => {
+      const res = validateAndRedeemEnrollmentCode(
+        resolvedBrandCode,
+        activationCodeInput,
+        {
+          name: customerName,
+          email: customerEmail,
+          phone: customerPhone,
+          orderRef: activeOrderRef,
+          productTitle: activeProduct,
+          ventureName: activeBrandName,
+        }
+      );
+
+      setIsRedeeming(false);
+
+      if (!res.success) {
+        setActivationError(res.message);
+      } else {
+        setActivationSuccess(res);
+        setCompletedTxnId(res.transaction?.id || `TXN_CODE_${Date.now()}`);
+        setStep('success');
+      }
+    }, 500);
   };
 
   // Process and finalize payment
@@ -752,215 +815,557 @@ export default function CentralPaymentPage() {
                 </div>
               </div>
 
-              {/* 3 Payment Options Selector */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <span style={{ fontSize: 13, fontWeight: 800, color: '#12203C' }}>
-                  {isRtl ? 'اختر طريقة الدفع للمتابعة إلى صفحة الدفع المخصصة:' : 'Choose how to pay to proceed to the payment page:'}
-                </span>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  {/* Option 1: Card */}
+              {/* Top-Level Checkout Mode Selector (Gated by codeActivationEnabled) */}
+              {codeActivationEnabled && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 4 }}>
+                  <span style={{ fontSize: 12.5, fontWeight: 800, color: '#12203C' }}>
+                    {isRtl ? 'اختر كيفية الانضمام:' : 'Choose how you want to enroll:'}
+                  </span>
                   <div
-                    onClick={() => setSelectedMethod('card')}
                     style={{
-                      border: selectedMethod === 'card' ? `2px solid ${brandPrimaryColor}` : '1px solid #E3E8EF',
-                      background: selectedMethod === 'card' ? '#FAFCFB' : '#FFFFFF',
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr',
+                      gap: 8,
+                      background: '#F1F5F9',
+                      padding: 4,
                       borderRadius: 10,
-                      padding: '14px 16px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 14,
-                      cursor: 'pointer',
-                      transition: 'all 0.15s ease',
                     }}
                   >
-                    <span
-                      style={{
-                        width: 18,
-                        height: 18,
-                        borderRadius: '50%',
-                        border: selectedMethod === 'card' ? `5px solid ${brandPrimaryColor}` : '2px solid #C9D2DE',
-                        background: '#FFFFFF',
-                        flex: 'none',
+                    <button
+                      type="button"
+                      id="tab-pay-online"
+                      onClick={() => {
+                        setCheckoutMode('pay_online');
+                        setActivationError(null);
                       }}
-                    />
-                    <div style={{ width: 34, height: 24, borderRadius: 4, background: '#E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: '#334155' }}>
-                      CARD
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span style={{ fontSize: 13.5, fontWeight: 800, color: '#12203C' }}>
-                          {isRtl ? 'بطاقة بنكية (فيزا، ماستركارد، ميزة)' : 'Credit / Debit Card (Visa, Mastercard, Meeza)'}
-                        </span>
-                        <span style={{ fontSize: 10, fontWeight: 700, color: '#2C5F9E', background: '#E8EEF7', borderRadius: 4, padding: '1px 6px' }}>
-                          via {gatewayLabel}
-                        </span>
-                      </div>
-                      <span style={{ fontSize: 11.5, color: '#5A6A80' }}>
-                        {isRtl
-                          ? `دفع فوري آمن ومباشر مدعوم ببروتوكول 3D-Secure عبر بوابة ${gatewayLabel}`
-                          : `Directs to 3D-Secure card checkout powered by ${gatewayLabel}`}
-                      </span>
-                    </div>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: brandPrimaryColor }}>
-                      Select →
-                    </span>
-                  </div>
-
-                  {/* Option 2: Mobile Wallet */}
-                  <div
-                    onClick={() => setSelectedMethod('wallet')}
-                    style={{
-                      border: selectedMethod === 'wallet' ? `2px solid ${brandPrimaryColor}` : '1px solid #E3E8EF',
-                      background: selectedMethod === 'wallet' ? '#FAFCFB' : '#FFFFFF',
-                      borderRadius: 10,
-                      padding: '14px 16px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 14,
-                      cursor: 'pointer',
-                      transition: 'all 0.15s ease',
-                    }}
-                  >
-                    <span
                       style={{
-                        width: 18,
-                        height: 18,
-                        borderRadius: '50%',
-                        border: selectedMethod === 'wallet' ? `5px solid ${brandPrimaryColor}` : '2px solid #C9D2DE',
-                        background: '#FFFFFF',
-                        flex: 'none',
-                      }}
-                    />
-                    <div style={{ width: 44, height: 24, borderRadius: 4, background: '#E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: '#334155' }}>
-                      WALLET
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span style={{ fontSize: 13.5, fontWeight: 800, color: '#12203C' }}>
-                          {isRtl ? 'محفظة إلكترونية (فودافون كاش، أورنج، اتصالات، وي)' : 'Mobile Wallet (Vodafone, Orange, Etisalat, WE)'}
-                        </span>
-                        <span style={{ fontSize: 10, fontWeight: 700, color: '#2C5F9E', background: '#E8EEF7', borderRadius: 4, padding: '1px 6px' }}>
-                          via {gatewayLabel}
-                        </span>
-                      </div>
-                      <span style={{ fontSize: 11.5, color: '#5A6A80' }}>
-                        {isRtl
-                          ? `الانتقال لصفحة تأكيد دفع المحفظة وإرسال إشعار الخصم على هاتفك`
-                          : `Directs to mobile wallet payment page to enter phone and confirm`}
-                      </span>
-                    </div>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: brandPrimaryColor }}>
-                      Select →
-                    </span>
-                  </div>
-
-                  {/* Option 3: Fawry Cash Reference Code (if enabled for this brand) */}
-                  {fawryEnabled && (
-                    <div
-                      onClick={() => setSelectedMethod('kiosk')}
-                      style={{
-                        border: selectedMethod === 'kiosk' ? '2px solid #FF6B00' : '1px solid #E3E8EF',
-                        background: selectedMethod === 'kiosk' ? '#FFF9F5' : '#FFFFFF',
-                        borderRadius: 10,
-                        padding: '14px 16px',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: 14,
+                        justifyContent: 'center',
+                        gap: 8,
+                        padding: '11px 12px',
+                        borderRadius: 8,
+                        background: checkoutMode === 'pay_online' ? '#FFFFFF' : 'transparent',
+                        border: checkoutMode === 'pay_online' ? '1px solid #CBD5E1' : '1px solid transparent',
+                        boxShadow: checkoutMode === 'pay_online' ? '0 2px 5px rgba(0,0,0,0.06)' : 'none',
+                        fontWeight: checkoutMode === 'pay_online' ? 800 : 600,
+                        fontSize: 13,
+                        color: checkoutMode === 'pay_online' ? '#0F172A' : '#64748B',
                         cursor: 'pointer',
                         transition: 'all 0.15s ease',
                       }}
                     >
+                      <span style={{ fontSize: 15 }}>💳</span>
+                      <span>{isRtl ? 'دفع إلكتروني' : 'Pay Online'}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      id="tab-activate-code"
+                      onClick={() => {
+                        setCheckoutMode('activate_code');
+                        setActivationError(null);
+                      }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 6,
+                        padding: '11px 12px',
+                        borderRadius: 8,
+                        background: checkoutMode === 'activate_code' ? '#FFFFFF' : 'transparent',
+                        border: checkoutMode === 'activate_code' ? `1px solid ${brandPrimaryColor}` : '1px solid transparent',
+                        boxShadow: checkoutMode === 'activate_code' ? '0 2px 5px rgba(0,0,0,0.06)' : 'none',
+                        fontWeight: checkoutMode === 'activate_code' ? 800 : 600,
+                        fontSize: 13,
+                        color: checkoutMode === 'activate_code' ? brandPrimaryColor : '#64748B',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      <span style={{ fontSize: 15 }}>🎟️</span>
+                      <span>{isRtl ? 'تفعيل كود' : 'Activate a Code'}</span>
                       <span
                         style={{
-                          width: 18,
-                          height: 18,
-                          borderRadius: '50%',
-                          border: selectedMethod === 'kiosk' ? '5px solid #FF6B00' : '2px solid #C9D2DE',
-                          background: '#FFFFFF',
-                          flex: 'none',
+                          fontSize: 9.5,
+                          fontWeight: 700,
+                          background: '#DCFCE7',
+                          color: '#166534',
+                          padding: '1px 5px',
+                          borderRadius: 4,
                         }}
-                      />
-                      <div style={{ width: 44, height: 24, borderRadius: 4, background: '#FFEDD5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: '#C2410C' }}>
-                        FAWRY
-                      </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <span style={{ fontSize: 13.5, fontWeight: 800, color: '#12203C' }}>
-                            {isRtl ? 'كود دفع فوري كاش (سداد نقدي في المنافذ)' : 'Fawry Reference Code (Pay Cash at Kiosk)'}
-                          </span>
-                          <span style={{ fontSize: 10, fontWeight: 700, color: '#FF6B00', background: '#FFF0E6', borderRadius: 4, padding: '1px 6px' }}>
-                            via Fawry Pay
-                          </span>
-                        </div>
-                        <span style={{ fontSize: 11.5, color: '#5A6A80' }}>
-                          {isRtl
-                            ? 'إصدار رقم مرجعي فوري صالح لمدة ٤٨ ساعة للسداد في أي كشك أو تاجر'
-                            : 'Generates a Fawry kiosk reference code valid for 48 hours'}
-                        </span>
-                      </div>
-                      <span style={{ fontSize: 11, fontWeight: 700, color: '#FF6B00' }}>
-                        Select →
+                      >
+                        {isRtl ? 'مطبوع' : 'Offline'}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* ═══════════════════════════════════════════════════════════
+                  SUB-FLOW 1: ACTIVATE A CODE (OFFLINE / PHYSICAL SERIAL)
+                 ═══════════════════════════════════════════════════════════ */}
+              {checkoutMode === 'activate_code' ? (
+                <form onSubmit={handleRedeemCode} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                  {/* Context notice */}
+                  <div
+                    style={{
+                      background: '#F0FDF4',
+                      border: '1px solid #BBF7D0',
+                      borderRadius: 10,
+                      padding: '12px 14px',
+                      display: 'flex',
+                      gap: 12,
+                      alignItems: 'flex-start',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: '50%',
+                        background: '#DCFCE7',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: 16,
+                        flexShrink: 0,
+                      }}
+                    >
+                      🎟️
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 3, flex: 1 }}>
+                      <span style={{ fontSize: 13, fontWeight: 800, color: '#166534' }}>
+                        {isRtl ? 'هل اشتريت الكود من مركز تعليمي أو مكتبة؟' : 'Bought your seat at a center, tutor, or store?'}
+                      </span>
+                      <span style={{ fontSize: 11.5, color: '#15803D', lineHeight: 1.45 }}>
+                        {isRtl
+                          ? 'أدخل الكود أو الرقم التسلسلي المطبوع على بطاقتك لتفعيل وصولك الفوري للمقرر الدراسي دون الحاجة لأي دفع إلكتروني.'
+                          : 'Enter your physical redemption code or voucher serial below to unlock immediate course access with zero online fees.'}
                       </span>
                     </div>
+                  </div>
+
+                  {/* Code Input */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <label
+                      htmlFor="enrollment-code-input"
+                      style={{
+                        fontSize: 12,
+                        fontWeight: 800,
+                        color: '#12203C',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <span>{isRtl ? 'كود التفعيل / السريال' : 'Activation Code / Serial Number'}</span>
+                      <span style={{ fontSize: 11, fontWeight: 600, color: '#64748B' }}>
+                        {isRtl ? 'مخصص لـ' : 'Scoped to'}: {activeBrandName}
+                      </span>
+                    </label>
+
+                    <div style={{ position: 'relative' }}>
+                      <input
+                        id="enrollment-code-input"
+                        type="text"
+                        value={activationCodeInput}
+                        onChange={e => {
+                          setActivationCodeInput(e.target.value.toUpperCase());
+                          if (activationError) setActivationError(null);
+                        }}
+                        placeholder={resolvedBrandCode === 'studyhub' ? 'e.g. SH-2026-F982' : resolvedBrandCode === 'apex' ? 'e.g. APEX-2026-CFA1' : 'e.g. BLDR-8819-K1'}
+                        style={{
+                          width: '100%',
+                          height: 46,
+                          border: activationError ? '2px solid #EF4444' : `2px solid ${brandPrimaryColor}`,
+                          borderRadius: 9,
+                          padding: '0 14px',
+                          fontSize: 15,
+                          fontFamily: 'IBM Plex Mono, monospace',
+                          fontWeight: 700,
+                          letterSpacing: '0.06em',
+                          textTransform: 'uppercase',
+                          color: '#0F172A',
+                          background: '#FFFFFF',
+                          outline: 'none',
+                          boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                        }}
+                      />
+                      {activationCodeInput && (
+                        <button
+                          type="button"
+                          onClick={() => setActivationCodeInput('')}
+                          style={{
+                            position: 'absolute',
+                            right: isRtl ? undefined : 12,
+                            left: isRtl ? 12 : undefined,
+                            top: 13,
+                            background: '#E2E8F0',
+                            border: 'none',
+                            borderRadius: '50%',
+                            width: 20,
+                            height: 20,
+                            fontSize: 11,
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: '#64748B',
+                          }}
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Quick test sample pills */}
+                    {availableSampleCodes.length > 0 && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginTop: 4 }}>
+                        <span style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>
+                          {isRtl ? 'رموز تجريبية متاحة:' : 'Sample test codes:'}
+                        </span>
+                        {availableSampleCodes.slice(0, 3).map(sample => (
+                          <button
+                            key={sample}
+                            type="button"
+                            onClick={() => {
+                              setActivationCodeInput(sample);
+                              setActivationError(null);
+                            }}
+                            style={{
+                              background: '#F1F5F9',
+                              border: '1px dashed #CBD5E1',
+                              borderRadius: 4,
+                              padding: '2px 8px',
+                              fontSize: 11,
+                              fontFamily: 'IBM Plex Mono, monospace',
+                              fontWeight: 700,
+                              color: '#334155',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            {sample}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Student Details for Enrollment Record */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                      <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: '#8A94A6' }}>
+                        {isRtl ? 'اسم الطالب' : 'Student Full Name'}
+                      </span>
+                      <input
+                        type="text"
+                        value={customerName}
+                        onChange={e => setCustomerName(e.target.value)}
+                        placeholder="e.g. Omar Khaled"
+                        style={{ height: 38, border: '1px solid #E3E8EF', borderRadius: 8, padding: '0 12px', fontSize: 12.5, outline: 'none' }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                      <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: '#8A94A6' }}>
+                        {isRtl ? 'البريد الإلكتروني للوصول' : 'Student Email (for LMS access)'}
+                      </span>
+                      <input
+                        type="email"
+                        value={customerEmail}
+                        onChange={e => setCustomerEmail(e.target.value)}
+                        placeholder="student@example.com"
+                        style={{ height: 38, border: '1px solid #E3E8EF', borderRadius: 8, padding: '0 12px', fontSize: 12.5, outline: 'none' }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Error banner */}
+                  {activationError && (
+                    <div
+                      id="activation-error-alert"
+                      style={{
+                        background: '#FEF2F2',
+                        border: '1px solid #FCA5A5',
+                        borderRadius: 8,
+                        padding: '10px 14px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 10,
+                        color: '#991B1B',
+                        fontSize: 12,
+                      }}
+                    >
+                      <span style={{ fontSize: 16 }}>⚠️</span>
+                      <span style={{ flex: 1, fontWeight: 600 }}>{activationError}</span>
+                    </div>
                   )}
-                </div>
-              </div>
 
-              {/* Customer Contact Information */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-                  <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: '#8A94A6' }}>
-                    {isRtl ? 'البريد الإلكتروني للإيصال' : 'Email Address (for receipt)'}
-                  </span>
-                  <input
-                    type="email"
-                    value={customerEmail}
-                    onChange={e => setCustomerEmail(e.target.value)}
-                    style={{ height: 38, border: '1px solid #E3E8EF', borderRadius: 8, padding: '0 12px', fontSize: 12.5, outline: 'none' }}
-                  />
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-                  <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: '#8A94A6' }}>
-                    {isRtl ? 'رقم الهاتف المحمول' : 'Mobile Phone Number'}
-                  </span>
-                  <input
-                    type="tel"
-                    value={customerPhone}
-                    onChange={e => setCustomerPhone(e.target.value)}
-                    style={{ height: 38, border: '1px solid #E3E8EF', borderRadius: 8, padding: '0 12px', fontSize: 12.5, outline: 'none' }}
-                  />
-                </div>
-              </div>
+                  {/* Submit Activation Button */}
+                  <button
+                    type="submit"
+                    id="btn-redeem-code"
+                    disabled={isRedeeming}
+                    style={{
+                      height: 48,
+                      borderRadius: 9,
+                      background: brandPrimaryColor,
+                      color: '#FFFFFF',
+                      border: 'none',
+                      fontSize: 14.5,
+                      fontWeight: 800,
+                      cursor: isRedeeming ? 'wait' : 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 8,
+                      boxShadow: `0 4px 14px ${brandPrimaryColor}40`,
+                      transition: 'opacity 0.15s ease',
+                      marginTop: 4,
+                    }}
+                  >
+                    {isRedeeming ? (
+                      <span>{isRtl ? 'جاري التحقق من الكود...' : 'Verifying and Activating...'}</span>
+                    ) : (
+                      <>
+                        <span>{isRtl ? 'تأكيد وتفعيل المقرر الدراسي الآن' : 'Verify & Activate Enrollment'}</span>
+                        <span>→</span>
+                      </>
+                    )}
+                  </button>
 
-              {/* Step 1 Submit: Direct to chosen method checkout page */}
-              <button
-                type="button"
-                onClick={() => setStep(selectedMethod)}
-                style={{
-                  height: 48,
-                  borderRadius: 9,
-                  background: brandPrimaryColor,
-                  color: '#FFFFFF',
-                  border: 'none',
-                  fontSize: 14.5,
-                  fontWeight: 800,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 8,
-                  boxShadow: `0 4px 14px ${brandPrimaryColor}40`,
-                  transition: 'opacity 0.15s ease',
-                  marginTop: 6,
-                }}
-              >
-                <span>
-                  {isRtl
-                    ? `المتابعة إلى صفحة ${selectedMethod === 'card' ? 'الدفع بالبطاقة' : selectedMethod === 'wallet' ? 'دفع المحفظة' : 'كود فوري'} ←`
-                    : `Continue to ${selectedMethod === 'card' ? 'Card Checkout' : selectedMethod === 'wallet' ? 'Wallet Payment' : 'Fawry Code Page'} →`}
-                </span>
-              </button>
+                  {/* Switch back link */}
+                  <div style={{ textAlign: 'center' }}>
+                    <button
+                      type="button"
+                      onClick={() => setCheckoutMode('pay_online')}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#64748B',
+                        fontSize: 12,
+                        textDecoration: 'underline',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {isRtl ? 'أو الدفع إلكترونياً بالبطاقة / المحفظة' : 'Or pay online via Card, Wallet, or Fawry instead'}
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                /* ═══════════════════════════════════════════════════════════
+                    SUB-FLOW 2: PAY ONLINE (EXISTING GATEWAY FLOW - UNCHANGED)
+                   ═══════════════════════════════════════════════════════════ */
+                <>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    <span style={{ fontSize: 13, fontWeight: 800, color: '#12203C' }}>
+                      {isRtl ? 'اختر طريقة الدفع للمتابعة إلى صفحة الدفع المخصصة:' : 'Choose how to pay to proceed to the payment page:'}
+                    </span>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      {/* Option 1: Card */}
+                      <div
+                        onClick={() => setSelectedMethod('card')}
+                        style={{
+                          border: selectedMethod === 'card' ? `2px solid ${brandPrimaryColor}` : '1px solid #E3E8EF',
+                          background: selectedMethod === 'card' ? '#FAFCFB' : '#FFFFFF',
+                          borderRadius: 10,
+                          padding: '14px 16px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 14,
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease',
+                        }}
+                      >
+                        <span
+                          style={{
+                            width: 18,
+                            height: 18,
+                            borderRadius: '50%',
+                            border: selectedMethod === 'card' ? `5px solid ${brandPrimaryColor}` : '2px solid #C9D2DE',
+                            background: '#FFFFFF',
+                            flex: 'none',
+                          }}
+                        />
+                        <div style={{ width: 34, height: 24, borderRadius: 4, background: '#E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: '#334155' }}>
+                          CARD
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <span style={{ fontSize: 13.5, fontWeight: 800, color: '#12203C' }}>
+                              {isRtl ? 'بطاقة بنكية (فيزا، ماستركارد، ميزة)' : 'Credit / Debit Card (Visa, Mastercard, Meeza)'}
+                            </span>
+                            <span style={{ fontSize: 10, fontWeight: 700, color: '#2C5F9E', background: '#E8EEF7', borderRadius: 4, padding: '1px 6px' }}>
+                              via {gatewayLabel}
+                            </span>
+                          </div>
+                          <span style={{ fontSize: 11.5, color: '#5A6A80' }}>
+                            {isRtl
+                              ? `دفع فوري آمن ومباشر مدعوم ببروتوكول 3D-Secure عبر بوابة ${gatewayLabel}`
+                              : `Directs to 3D-Secure card checkout powered by ${gatewayLabel}`}
+                          </span>
+                        </div>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: brandPrimaryColor }}>
+                          Select →
+                        </span>
+                      </div>
+
+                      {/* Option 2: Mobile Wallet */}
+                      <div
+                        onClick={() => setSelectedMethod('wallet')}
+                        style={{
+                          border: selectedMethod === 'wallet' ? `2px solid ${brandPrimaryColor}` : '1px solid #E3E8EF',
+                          background: selectedMethod === 'wallet' ? '#FAFCFB' : '#FFFFFF',
+                          borderRadius: 10,
+                          padding: '14px 16px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 14,
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease',
+                        }}
+                      >
+                        <span
+                          style={{
+                            width: 18,
+                            height: 18,
+                            borderRadius: '50%',
+                            border: selectedMethod === 'wallet' ? `5px solid ${brandPrimaryColor}` : '2px solid #C9D2DE',
+                            background: '#FFFFFF',
+                            flex: 'none',
+                          }}
+                        />
+                        <div style={{ width: 44, height: 24, borderRadius: 4, background: '#E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: '#334155' }}>
+                          WALLET
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <span style={{ fontSize: 13.5, fontWeight: 800, color: '#12203C' }}>
+                              {isRtl ? 'محفظة إلكترونية (فودافون كاش، أورنج، اتصالات، وي)' : 'Mobile Wallet (Vodafone, Orange, Etisalat, WE)'}
+                            </span>
+                            <span style={{ fontSize: 10, fontWeight: 700, color: '#2C5F9E', background: '#E8EEF7', borderRadius: 4, padding: '1px 6px' }}>
+                              via {gatewayLabel}
+                            </span>
+                          </div>
+                          <span style={{ fontSize: 11.5, color: '#5A6A80' }}>
+                            {isRtl
+                              ? `الانتقال لصفحة تأكيد دفع المحفظة وإرسال إشعار الخصم على هاتفك`
+                              : `Directs to mobile wallet payment page to enter phone and confirm`}
+                          </span>
+                        </div>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: brandPrimaryColor }}>
+                          Select →
+                        </span>
+                      </div>
+
+                      {/* Option 3: Fawry Cash Reference Code (if enabled for this brand) */}
+                      {fawryEnabled && (
+                        <div
+                          onClick={() => setSelectedMethod('kiosk')}
+                          style={{
+                            border: selectedMethod === 'kiosk' ? '2px solid #FF6B00' : '1px solid #E3E8EF',
+                            background: selectedMethod === 'kiosk' ? '#FFF9F5' : '#FFFFFF',
+                            borderRadius: 10,
+                            padding: '14px 16px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 14,
+                            cursor: 'pointer',
+                            transition: 'all 0.15s ease',
+                          }}
+                        >
+                          <span
+                            style={{
+                              width: 18,
+                              height: 18,
+                              borderRadius: '50%',
+                              border: selectedMethod === 'kiosk' ? '5px solid #FF6B00' : '2px solid #C9D2DE',
+                              background: '#FFFFFF',
+                              flex: 'none',
+                            }}
+                          />
+                          <div style={{ width: 44, height: 24, borderRadius: 4, background: '#FFEDD5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: '#C2410C' }}>
+                            FAWRY
+                          </div>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                              <span style={{ fontSize: 13.5, fontWeight: 800, color: '#12203C' }}>
+                                {isRtl ? 'كود دفع فوري كاش (سداد نقدي في المنافذ)' : 'Fawry Reference Code (Pay Cash at Kiosk)'}
+                              </span>
+                              <span style={{ fontSize: 10, fontWeight: 700, color: '#FF6B00', background: '#FFF0E6', borderRadius: 4, padding: '1px 6px' }}>
+                                via Fawry Pay
+                              </span>
+                            </div>
+                            <span style={{ fontSize: 11.5, color: '#5A6A80' }}>
+                              {isRtl
+                                ? 'إصدار رقم مرجعي فوري صالح لمدة ٤٨ ساعة للسداد في أي كشك أو تاجر'
+                                : 'Generates a Fawry kiosk reference code valid for 48 hours'}
+                            </span>
+                          </div>
+                          <span style={{ fontSize: 11, fontWeight: 700, color: '#FF6B00' }}>
+                            Select →
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Customer Contact Information */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                      <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: '#8A94A6' }}>
+                        {isRtl ? 'البريد الإلكتروني للإيصال' : 'Email Address (for receipt)'}
+                      </span>
+                      <input
+                        type="email"
+                        value={customerEmail}
+                        onChange={e => setCustomerEmail(e.target.value)}
+                        style={{ height: 38, border: '1px solid #E3E8EF', borderRadius: 8, padding: '0 12px', fontSize: 12.5, outline: 'none' }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                      <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: '#8A94A6' }}>
+                        {isRtl ? 'رقم الهاتف المحمول' : 'Mobile Phone Number'}
+                      </span>
+                      <input
+                        type="tel"
+                        value={customerPhone}
+                        onChange={e => setCustomerPhone(e.target.value)}
+                        style={{ height: 38, border: '1px solid #E3E8EF', borderRadius: 8, padding: '0 12px', fontSize: 12.5, outline: 'none' }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Step 1 Submit: Direct to chosen method checkout page */}
+                  <button
+                    type="button"
+                    onClick={() => setStep(selectedMethod)}
+                    style={{
+                      height: 48,
+                      borderRadius: 9,
+                      background: brandPrimaryColor,
+                      color: '#FFFFFF',
+                      border: 'none',
+                      fontSize: 14.5,
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 8,
+                      boxShadow: `0 4px 14px ${brandPrimaryColor}40`,
+                      transition: 'opacity 0.15s ease',
+                      marginTop: 6,
+                    }}
+                  >
+                    <span>
+                      {isRtl
+                        ? `المتابعة إلى صفحة ${selectedMethod === 'card' ? 'الدفع بالبطاقة' : selectedMethod === 'wallet' ? 'دفع المحفظة' : 'كود فوري'} ←`
+                        : `Continue to ${selectedMethod === 'card' ? 'Card Checkout' : selectedMethod === 'wallet' ? 'Wallet Payment' : 'Fawry Code Page'} →`}
+                    </span>
+                  </button>
+                </>
+              )}
             </div>
           )}
 
@@ -1333,10 +1738,14 @@ export default function CentralPaymentPage() {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 <span style={{ fontSize: 20, fontWeight: 800, color: '#12203C' }}>
-                  {isRtl ? 'تم تأكيد وإتمام عملية الدفع بنجاح!' : 'Payment Completed & Verified!'}
+                  {activationSuccess
+                    ? (isRtl ? 'تم تفعيل كود المقعد الدراسي بنجاح!' : 'Enrollment Activated & Verified!')
+                    : (isRtl ? 'تم تأكيد وإتمام عملية الدفع بنجاح!' : 'Payment Completed & Verified!')}
                 </span>
                 <span style={{ fontSize: 12.5, color: '#5A6A80' }}>
-                  {isRtl ? `تم تسجيل العملية وإرسال إشعار تأكيد إلى ${customerEmail}` : `Transaction recorded in Central Payment Hub. Receipt sent to ${customerEmail}`}
+                  {activationSuccess
+                    ? (isRtl ? `تم تسجيل كود المقعد وتأكيد قيد ${customerName} في المنصة` : `Physical seat code redeemed. Enrollment confirmed for ${customerName}`)
+                    : (isRtl ? `تم تسجيل العملية وإرسال إشعار تأكيد إلى ${customerEmail}` : `Transaction recorded in Central Payment Hub. Receipt sent to ${customerEmail}`)}
                 </span>
               </div>
 
@@ -1363,16 +1772,42 @@ export default function CentralPaymentPage() {
                   <span style={{ color: '#8A94A6' }}>Venture / Brand:</span>
                   <span style={{ fontWeight: 700, color: '#12203C' }}>{activeBrandName}</span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: '#8A94A6' }}>Gateway Used:</span>
-                  <span style={{ fontWeight: 700, color: '#2C5F9E' }}>
-                    {selectedMethod === 'kiosk' ? 'Fawry Pay' : gatewayLabel}
-                  </span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: '#8A94A6' }}>Amount Paid:</span>
-                  <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontWeight: 800, color: '#15803D' }}>{activeAmount}</span>
-                </div>
+
+                {activationSuccess ? (
+                  <>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: '#8A94A6' }}>Redeemed Code:</span>
+                      <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontWeight: 800, color: '#0369A1' }}>
+                        {activationSuccess.code?.code}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: '#8A94A6' }}>Offline Source:</span>
+                      <span style={{ fontWeight: 700, color: '#059669', background: '#ECFDF5', padding: '1px 6px', borderRadius: 4 }}>
+                        {activationSuccess.code?.source || 'CENTER'}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: '#8A94A6' }}>Gateway Fee:</span>
+                      <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontWeight: 700, color: '#059669' }}>
+                        EGP 0.00 (Zero Fee / Non-Gateway)
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: '#8A94A6' }}>Gateway Used:</span>
+                      <span style={{ fontWeight: 700, color: '#2C5F9E' }}>
+                        {selectedMethod === 'kiosk' ? 'Fawry Pay' : gatewayLabel}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: '#8A94A6' }}>Amount Paid:</span>
+                      <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontWeight: 800, color: '#15803D' }}>{activeAmount}</span>
+                    </div>
+                  </>
+                )}
               </div>
 
               {/* Navigation Actions */}

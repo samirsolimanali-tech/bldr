@@ -139,6 +139,10 @@ model Provider {
   // bldr storefront pilot: true (Fawry enabled alongside Geidea).
   fawryEnabled        Boolean @default(false)
 
+  // Physical / Offline Code Activation: Gating toggle for whether students see
+  // "Activate a Code / Serial" choice on the hosted checkout page.
+  codeActivationEnabled Boolean @default(true)
+
   // ─── Platform Fee Configuration ──────────────────────────────────────────
   // Applied at settlement time. Finance Ops can edit per-brand. Never hardcoded.
   platformFeeModel    PlatformFeeModel @default(PERCENTAGE)
@@ -182,6 +186,7 @@ model Provider {
   trackingEvents     TrackingEvent[]
   checkoutSessions   CheckoutSession[]
   settlementStatements SettlementStatement[]
+  enrollmentCodes    EnrollmentCode[]
 }
 
 /// @alias VentureUser — a bldr team member scoped to one specific brand.
@@ -416,4 +421,44 @@ model Payout {
 
   provider Provider @relation(fields: [providerId], references: [id])
   orders   Order[]
+}
+
+// ─── Enrollment Codes & Offline Seat Activation ──────────────────────────────
+
+enum EnrollmentCodeStatus {
+  UNUSED
+  USED
+  EXPIRED
+  VOID
+}
+
+enum EnrollmentCodeSource {
+  PHYSICAL_STORE
+  CENTER
+  TUTOR
+  BATCH_DISTRIBUTION
+  OTHER
+}
+
+model EnrollmentCode {
+  id                  String               @id @default(cuid())
+  code                String
+  serial              String?
+  ventureId           String
+  productId           String?
+  productName         String
+  status              EnrollmentCodeStatus @default(UNUSED)
+  source              EnrollmentCodeSource @default(CENTER)
+  redeemedAt          DateTime?
+  redeemedByEmail     String?
+  redeemedByName      String?
+  orderId             String?
+  notes               String?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
+  provider            Provider             @relation(fields: [ventureId], references: [id], onDelete: Cascade)
+
+  @@unique([ventureId, code])
+  @@index([ventureId, status])
 }

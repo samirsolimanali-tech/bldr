@@ -5,8 +5,15 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import HubSidebar from '../../../components/HubSidebar';
 import HubTopBar from '../../../components/HubTopBar';
+import {
+  getVentureCodes,
+  generateBatchCodes,
+  bulkImportCodes,
+  updateCodeStatus,
+  EnrollmentCode,
+} from '../../../lib/enrollment-codes';
 
-type TabType = 'profile' | 'domains' | 'urls' | 'methods' | 'limits' | 'keys';
+type TabType = 'profile' | 'domains' | 'urls' | 'methods' | 'codes' | 'limits' | 'keys';
 
 const VENTURE_REGISTRY: Record<string, any> = {
   bldr: {
@@ -24,6 +31,7 @@ const VENTURE_REGISTRY: Record<string, any> = {
     integrationMode: 'NATIVE',
     cardWalletGateway: 'geidea',
     fawryEnabled: true,
+    codeActivationEnabled: true,
     platformFeeModel: 'PERCENTAGE',
     platformFeePct: '3.00',
     platformFeeFlat: '0',
@@ -61,6 +69,7 @@ const VENTURE_REGISTRY: Record<string, any> = {
     integrationMode: 'BOLT_ON',
     cardWalletGateway: 'geidea',
     fawryEnabled: true,
+    codeActivationEnabled: true,
     platformFeeModel: 'PERCENTAGE',
     platformFeePct: '3.00',
     platformFeeFlat: '500',
@@ -98,6 +107,7 @@ const VENTURE_REGISTRY: Record<string, any> = {
     integrationMode: 'BOLT_ON',
     cardWalletGateway: 'paymob',
     fawryEnabled: false,
+    codeActivationEnabled: true,
     platformFeeModel: 'COMBINED',
     platformFeePct: '2.50',
     platformFeeFlat: '300',
@@ -134,6 +144,7 @@ const VENTURE_REGISTRY: Record<string, any> = {
     integrationMode: 'BOLT_ON',
     cardWalletGateway: 'geidea',
     fawryEnabled: true,
+    codeActivationEnabled: false,
     platformFeeModel: 'PERCENTAGE',
     platformFeePct: '3.50',
     platformFeeFlat: '0',
@@ -170,6 +181,7 @@ const VENTURE_REGISTRY: Record<string, any> = {
     integrationMode: 'BOLT_ON',
     cardWalletGateway: 'geidea',
     fawryEnabled: false,
+    codeActivationEnabled: false,
     platformFeeModel: 'FLAT_PER_TXN',
     platformFeePct: '0.00',
     platformFeeFlat: '1500',
@@ -289,6 +301,31 @@ export default function VentureConfigPage() {
 
   const [cardWalletGateway, setCardWalletGateway] = useState<'geidea' | 'paymob'>('geidea');
   const [fawryEnabled, setFawryEnabled] = useState(true);
+  const [codeActivationEnabled, setCodeActivationEnabled] = useState(true);
+
+  // Activation Codes Management State
+  const [ventureCodes, setVentureCodes] = useState<EnrollmentCode[]>([]);
+  const [codeSearch, setCodeSearch] = useState('');
+  const [codeStatusFilter, setCodeStatusFilter] = useState('ALL');
+  const [codeSourceFilter, setCodeSourceFilter] = useState('ALL');
+  const [showGenModal, setShowGenModal] = useState(false);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [genCount, setGenCount] = useState(10);
+  const [genPrefix, setGenPrefix] = useState('');
+  const [genProduct, setGenProduct] = useState('');
+  const [genSource, setGenSource] = useState<'CENTER' | 'TUTOR' | 'PHYSICAL_STORE' | 'BATCH_DISTRIBUTION'>('CENTER');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [csvText, setCsvText] = useState('');
+  const [csvProduct, setCsvProduct] = useState('');
+  const [csvSource, setCsvSource] = useState<'CENTER' | 'TUTOR' | 'PHYSICAL_STORE' | 'BATCH_DISTRIBUTION'>('CENTER');
+  const [csvResult, setCsvResult] = useState<{ imported: number; duplicates: number } | null>(null);
+  const [copiedCodeFeedback, setCopiedCodeFeedback] = useState<string | null>(null);
+
+  const refreshCodes = (vCode?: string) => {
+    const target = (vCode || ventureCode).toLowerCase();
+    const list = getVentureCodes(target);
+    setVentureCodes(list);
+  };
 
   const [returnUrl, setReturnUrl] = useState('http://localhost:3000/orders/{ORDER_ID}/success');
   const [cancelUrl, setCancelUrl] = useState('http://localhost:3000/products');
@@ -333,6 +370,11 @@ export default function VentureConfigPage() {
         setIntegrationMode(p.integrationMode || config.integrationMode);
         setCardWalletGateway(p.cardWalletGateway || config.cardWalletGateway);
         setFawryEnabled(p.fawryEnabled ?? config.fawryEnabled);
+        setCodeActivationEnabled(p.codeActivationEnabled ?? config.codeActivationEnabled ?? true);
+        refreshCodes(config.code);
+        setGenPrefix(config.code.toUpperCase());
+        setGenProduct(p.displayName || config.displayName);
+        setCsvProduct(p.displayName || config.displayName);
         setPlatformFeeModel(p.platformFeeModel || config.platformFeeModel);
         setPlatformFeePct(p.platformFeePct || config.platformFeePct);
         setPlatformFeeFlat(p.platformFeeFlat || config.platformFeeFlat);
@@ -369,6 +411,11 @@ export default function VentureConfigPage() {
     setIntegrationMode(config.integrationMode);
     setCardWalletGateway(config.cardWalletGateway);
     setFawryEnabled(config.fawryEnabled);
+    setCodeActivationEnabled(config.codeActivationEnabled ?? true);
+    refreshCodes(config.code);
+    setGenPrefix(config.code.toUpperCase());
+    setGenProduct(config.displayName);
+    setCsvProduct(config.displayName);
     setPlatformFeeModel(config.platformFeeModel);
     setPlatformFeePct(config.platformFeePct);
     setPlatformFeeFlat(config.platformFeeFlat);
@@ -397,6 +444,84 @@ export default function VentureConfigPage() {
     setTimeout(() => setCopiedKey(null), 2000);
   };
 
+  const handleCopyCode = (code: string) => {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(code);
+      setCopiedCodeFeedback(code);
+      setTimeout(() => setCopiedCodeFeedback(null), 2000);
+    }
+  };
+
+  // Actions for codes
+  const handleGenerateBatch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsGenerating(true);
+    setTimeout(() => {
+      generateBatchCodes({
+        ventureId: ventureCode,
+        count: Number(genCount) || 5,
+        productId: `${ventureCode}-course`,
+        productName: genProduct || displayName,
+        source: genSource,
+        prefix: genPrefix.trim().toUpperCase() || undefined,
+      });
+      setIsGenerating(false);
+      setShowGenModal(false);
+      refreshCodes();
+    }, 400);
+  };
+
+  const handleBulkUpload = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!csvText.trim()) return;
+
+    const res = bulkImportCodes(
+      ventureCode,
+      csvText,
+      csvProduct || displayName,
+      csvSource,
+      `${ventureCode}-course`
+    );
+    setCsvResult(res);
+    refreshCodes();
+    setTimeout(() => {
+      setShowUploadModal(false);
+      setCsvResult(null);
+      setCsvText('');
+    }, 1500);
+  };
+
+  const handleToggleCodeStatus = (code: string, currentStatus: string) => {
+    const nextStatus = currentStatus === 'VOID' ? 'UNUSED' : 'VOID';
+    updateCodeStatus(code, nextStatus as any);
+    refreshCodes();
+  };
+
+  const handleExportCodesCSV = () => {
+    const headers = ['Code', 'Serial', 'Course/Product', 'Status', 'Source', 'Created At', 'Redeemed By', 'Redeemed Email', 'Redeemed At'];
+    const rows = ventureCodes.map(c => [
+      c.code,
+      c.serial || '',
+      c.productName || c.productId,
+      c.status,
+      c.source || '',
+      c.createdAt,
+      c.redeemedByName || '',
+      c.redeemedByEmail || '',
+      c.redeemedAt || '',
+    ]);
+
+    const csvStr = [headers.join(','), ...rows.map(r => r.map(x => `"${x}"`).join(','))].join('\n');
+    const blob = new Blob([csvStr], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${ventureCode}_activation_codes_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handleSave = () => {
     try {
       const dataToSave = {
@@ -412,6 +537,7 @@ export default function VentureConfigPage() {
         integrationMode,
         cardWalletGateway,
         fawryEnabled,
+        codeActivationEnabled,
         platformFeeModel,
         platformFeePct,
         platformFeeFlat,
@@ -450,6 +576,8 @@ export default function VentureConfigPage() {
     setLogoUrl(config.logoUrl || '');
     setCardWalletGateway(config.cardWalletGateway);
     setFawryEnabled(config.fawryEnabled);
+    setCodeActivationEnabled(config.codeActivationEnabled ?? true);
+    refreshCodes(config.code);
     setPlatformFeeModel(config.platformFeeModel);
     setPlatformFeePct(config.platformFeePct);
     setPlatformFeeFlat(config.platformFeeFlat);
@@ -505,6 +633,7 @@ export default function VentureConfigPage() {
               { id: 'domains', label: 'Domains & apps' },
               { id: 'urls', label: 'URLs & webhooks' },
               { id: 'methods', label: 'Payment methods' },
+              { id: 'codes', label: 'Activation codes' },
               { id: 'limits', label: 'Limits' },
               { id: 'keys', label: 'API keys' },
             ].map(t => {
@@ -1200,6 +1329,19 @@ export default function VentureConfigPage() {
                         <span style={{ fontSize: 12, color: '#64748B' }}>Cohort Access — Term 1</span>
                         <strong style={{ fontSize: 13, color: '#0F172A' }}>750.00 EGP</strong>
                       </div>
+
+                      {/* Top-Level Choice (Pay Online vs Activate Code) */}
+                      {codeActivationEnabled && (
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, background: '#F1F5F9', padding: 3, borderRadius: 6, marginTop: 4 }}>
+                          <div style={{ background: '#FFFFFF', padding: '4px', borderRadius: 4, textAlign: 'center', fontSize: 10, fontWeight: 700, color: '#0F172A', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+                            💳 Pay Online
+                          </div>
+                          <div style={{ padding: '4px', textAlign: 'center', fontSize: 10, fontWeight: 600, color: primaryColor }}>
+                            🎟️ Activate Code
+                          </div>
+                        </div>
+                      )}
+
                       <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
                         <div style={{ flex: 1, padding: '8px 6px', borderRadius: 6, border: `2px solid ${primaryColor}`, background: '#F8FAFC', textAlign: 'center', fontSize: 10.5, fontWeight: 700, color: primaryColor }}>
                           1. Card
@@ -1436,7 +1578,447 @@ export default function VentureConfigPage() {
                     </button>
                   </div>
                 </div>
+
+                {/* Physical / Offline Activation Code Rail Toggle */}
+                <div style={{ borderTop: '1px solid #EEF1F5', paddingTop: 14 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <strong style={{ fontSize: 13, color: '#1B2A4A' }}>Physical / Offline Activation Codes</strong>
+                        <span style={{ fontSize: 10, fontWeight: 700, background: '#DCFCE7', color: '#166534', padding: '1px 6px', borderRadius: 4 }}>
+                          Offline Rail
+                        </span>
+                      </div>
+                      <p style={{ margin: '2px 0 0', fontSize: 11.5, color: '#64748B' }}>
+                        Shows top-level choice on hosted checkout between &ldquo;Pay Online&rdquo; and &ldquo;Activate a Code&rdquo;. Enables students with scratch cards or center serials to enroll instantly with zero gateway fees.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      id="toggle-code-activation"
+                      onClick={() => setCodeActivationEnabled(!codeActivationEnabled)}
+                      style={{
+                        padding: '6px 14px',
+                        borderRadius: 6,
+                        border: 'none',
+                        background: codeActivationEnabled ? '#059669' : '#CBD5E1',
+                        color: '#fff',
+                        fontWeight: 700,
+                        fontSize: 11.5,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {codeActivationEnabled ? 'Enabled' : 'Disabled'}
+                    </button>
+                  </div>
+                </div>
               </div>
+            </div>
+          )}
+
+          {/* ═══════════════════════════════════════════════════════════════
+              TAB 4B: Activation Codes Management
+             ═══════════════════════════════════════════════════════════════ */}
+          {activeTab === 'codes' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 1080 }}>
+              {/* Header card with actions */}
+              <div style={{ background: '#fff', border: '1px solid #E3E8EF', borderRadius: 10, padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 15, fontWeight: 800, color: '#1B2A4A' }}>
+                        Activation Codes &amp; Physical Serials
+                      </span>
+                      <span style={{ fontSize: 10, fontWeight: 700, background: '#E6EFEB', color: '#2E6F5E', padding: '2px 6px', borderRadius: 4 }}>
+                        {topBarId} CODES
+                      </span>
+                    </div>
+                    <p style={{ margin: '3px 0 0', fontSize: 12, color: '#64748B' }}>
+                      Pre-loaded serials and vouchers for physical stores, centers, and private tutors. Redeemed at checkout with zero gateway fees.
+                    </p>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button
+                      type="button"
+                      onClick={handleExportCodesCSV}
+                      style={{
+                        height: 34,
+                        padding: '0 12px',
+                        borderRadius: 6,
+                        background: '#FFFFFF',
+                        border: '1px solid #CBD5E1',
+                        fontSize: 12,
+                        fontWeight: 600,
+                        color: '#334155',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                      }}
+                    >
+                      <span>📥</span> Export CSV
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setShowUploadModal(true)}
+                      style={{
+                        height: 34,
+                        padding: '0 12px',
+                        borderRadius: 6,
+                        background: '#FFFFFF',
+                        border: '1px solid #CBD5E1',
+                        fontSize: 12,
+                        fontWeight: 600,
+                        color: '#334155',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                      }}
+                    >
+                      <span>📄</span> Bulk Import
+                    </button>
+
+                    <button
+                      type="button"
+                      id="btn-gen-batch-hub"
+                      onClick={() => setShowGenModal(true)}
+                      style={{
+                        height: 34,
+                        padding: '0 14px',
+                        borderRadius: 6,
+                        background: '#2E6F5E',
+                        border: 'none',
+                        fontSize: 12,
+                        fontWeight: 700,
+                        color: '#FFFFFF',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                      }}
+                    >
+                      <span>➕</span> Generate Batch
+                    </button>
+                  </div>
+                </div>
+
+                {/* 4 Summary KPI Cards */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+                  <div style={{ background: '#FAFBFD', border: '1px solid #E3E8EF', borderRadius: 8, padding: '12px 14px' }}>
+                    <span style={{ fontSize: 10.5, fontWeight: 700, color: '#8A94A6', textTransform: 'uppercase' }}>Total Issued</span>
+                    <div style={{ fontSize: 22, fontWeight: 800, color: '#1B2A4A', fontFamily: 'IBM Plex Mono, monospace', marginTop: 2 }}>
+                      {ventureCodes.length}
+                    </div>
+                  </div>
+                  <div style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 8, padding: '12px 14px' }}>
+                    <span style={{ fontSize: 10.5, fontWeight: 700, color: '#166534', textTransform: 'uppercase' }}>Unused / Available</span>
+                    <div style={{ fontSize: 22, fontWeight: 800, color: '#15803D', fontFamily: 'IBM Plex Mono, monospace', marginTop: 2 }}>
+                      {ventureCodes.filter(c => c.status === 'UNUSED').length}
+                    </div>
+                  </div>
+                  <div style={{ background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 8, padding: '12px 14px' }}>
+                    <span style={{ fontSize: 10.5, fontWeight: 700, color: '#1E40AF', textTransform: 'uppercase' }}>Redeemed &amp; Enrolled</span>
+                    <div style={{ fontSize: 22, fontWeight: 800, color: '#2563EB', fontFamily: 'IBM Plex Mono, monospace', marginTop: 2 }}>
+                      {ventureCodes.filter(c => c.status === 'USED').length}
+                    </div>
+                  </div>
+                  <div style={{ background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 8, padding: '12px 14px' }}>
+                    <span style={{ fontSize: 10.5, fontWeight: 700, color: '#991B1B', textTransform: 'uppercase' }}>Voided / Expired</span>
+                    <div style={{ fontSize: 22, fontWeight: 800, color: '#DC2626', fontFamily: 'IBM Plex Mono, monospace', marginTop: 2 }}>
+                      {ventureCodes.filter(c => c.status === 'VOID' || c.status === 'EXPIRED').length}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Filters */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#FAFBFD', padding: '10px 12px', borderRadius: 8, border: '1px solid #E3E8EF' }}>
+                  <div style={{ position: 'relative', flex: 1 }}>
+                    <input
+                      type="text"
+                      placeholder="Search code, serial, student, product..."
+                      value={codeSearch}
+                      onChange={e => setCodeSearch(e.target.value)}
+                      style={{
+                        width: '100%',
+                        height: 32,
+                        padding: '0 10px',
+                        borderRadius: 6,
+                        border: '1px solid #CBD5E1',
+                        fontSize: 12,
+                        outline: 'none',
+                        background: '#FFFFFF',
+                      }}
+                    />
+                  </div>
+
+                  <select
+                    value={codeStatusFilter}
+                    onChange={e => setCodeStatusFilter(e.target.value)}
+                    style={{ height: 32, padding: '0 8px', borderRadius: 6, border: '1px solid #CBD5E1', fontSize: 11.5, background: '#FFFFFF' }}
+                  >
+                    <option value="ALL">All Statuses</option>
+                    <option value="UNUSED">Unused</option>
+                    <option value="USED">Redeemed</option>
+                    <option value="VOID">Voided</option>
+                    <option value="EXPIRED">Expired</option>
+                  </select>
+
+                  <select
+                    value={codeSourceFilter}
+                    onChange={e => setCodeSourceFilter(e.target.value)}
+                    style={{ height: 32, padding: '0 8px', borderRadius: 6, border: '1px solid #CBD5E1', fontSize: 11.5, background: '#FFFFFF' }}
+                  >
+                    <option value="ALL">All Sources</option>
+                    <option value="CENTER">Center</option>
+                    <option value="TUTOR">Tutor</option>
+                    <option value="PHYSICAL_STORE">Physical Store</option>
+                    <option value="BATCH_DISTRIBUTION">Batch Event</option>
+                  </select>
+                </div>
+
+                {/* Table */}
+                <div style={{ border: '1px solid #E3E8EF', borderRadius: 8, overflow: 'hidden' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: 12 }}>
+                    <thead>
+                      <tr style={{ background: '#FAFBFD', borderBottom: '1px solid #E3E8EF', color: '#64748B' }}>
+                        <th style={{ padding: '10px 14px', fontWeight: 700, fontSize: 11 }}>CODE / SERIAL</th>
+                        <th style={{ padding: '10px 14px', fontWeight: 700, fontSize: 11 }}>COURSE</th>
+                        <th style={{ padding: '10px 14px', fontWeight: 700, fontSize: 11 }}>CHANNEL</th>
+                        <th style={{ padding: '10px 14px', fontWeight: 700, fontSize: 11 }}>STATUS</th>
+                        <th style={{ padding: '10px 14px', fontWeight: 700, fontSize: 11 }}>REDEMPTION</th>
+                        <th style={{ padding: '10px 14px', fontWeight: 700, fontSize: 11, textAlign: 'right' }}>ACTIONS</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {ventureCodes
+                        .filter(c => {
+                          const matchesS =
+                            !codeSearch ||
+                            c.code.toLowerCase().includes(codeSearch.toLowerCase()) ||
+                            (c.serial && c.serial.toLowerCase().includes(codeSearch.toLowerCase())) ||
+                            (c.redeemedByName && c.redeemedByName.toLowerCase().includes(codeSearch.toLowerCase())) ||
+                            (c.productName && c.productName.toLowerCase().includes(codeSearch.toLowerCase()));
+                          const matchesStat = codeStatusFilter === 'ALL' || c.status === codeStatusFilter;
+                          const matchesSrc = codeSourceFilter === 'ALL' || c.source === codeSourceFilter;
+                          return matchesS && matchesStat && matchesSrc;
+                        })
+                        .map(item => {
+                          const isUnused = item.status === 'UNUSED';
+                          const isUsed = item.status === 'USED';
+                          const isVoid = item.status === 'VOID';
+
+                          return (
+                            <tr key={item.id} style={{ borderBottom: '1px solid #EEF1F5' }}>
+                              <td style={{ padding: '10px 14px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                  <span
+                                    style={{
+                                      fontFamily: 'IBM Plex Mono, monospace',
+                                      fontWeight: 700,
+                                      fontSize: 12.5,
+                                      color: isVoid ? '#94A3B8' : '#0F172A',
+                                      textDecoration: isVoid ? 'line-through' : 'none',
+                                    }}
+                                  >
+                                    {item.code}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleCopyCode(item.code)}
+                                    title="Copy Code"
+                                    style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 11, color: copiedCodeFeedback === item.code ? '#16A34A' : '#94A3B8' }}
+                                  >
+                                    {copiedCodeFeedback === item.code ? '✓' : '📋'}
+                                  </button>
+                                </div>
+                                {item.serial && (
+                                  <div style={{ fontSize: 10, color: '#94A3B8', fontFamily: 'IBM Plex Mono, monospace' }}>
+                                    {item.serial}
+                                  </div>
+                                )}
+                              </td>
+
+                              <td style={{ padding: '10px 14px', color: '#1B2A4A', fontWeight: 600 }}>
+                                {item.productName || item.productId}
+                              </td>
+
+                              <td style={{ padding: '10px 14px' }}>
+                                <span style={{ fontSize: 10.5, fontWeight: 700, background: '#F1F5F9', color: '#475569', padding: '2px 6px', borderRadius: 4 }}>
+                                  {item.source || 'CENTER'}
+                                </span>
+                              </td>
+
+                              <td style={{ padding: '10px 14px' }}>
+                                {isUnused && (
+                                  <span style={{ fontSize: 10.5, fontWeight: 700, padding: '2px 6px', borderRadius: 4, background: '#DCFCE7', color: '#15803D' }}>
+                                    UNUSED
+                                  </span>
+                                )}
+                                {isUsed && (
+                                  <span style={{ fontSize: 10.5, fontWeight: 700, padding: '2px 6px', borderRadius: 4, background: '#DBEAFE', color: '#1D4ED8' }}>
+                                    REDEEMED
+                                  </span>
+                                )}
+                                {isVoid && (
+                                  <span style={{ fontSize: 10.5, fontWeight: 700, padding: '2px 6px', borderRadius: 4, background: '#FEE2E2', color: '#B91C1C' }}>
+                                    VOID
+                                  </span>
+                                )}
+                              </td>
+
+                              <td style={{ padding: '10px 14px' }}>
+                                {isUsed ? (
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                    <span style={{ fontWeight: 700, color: '#0F172A', fontSize: 11.5 }}>
+                                      {item.redeemedByName || 'Student'}
+                                    </span>
+                                    <span style={{ fontSize: 10.5, color: '#64748B' }}>
+                                      {item.redeemedByEmail} • {item.redeemedAt?.slice(0, 10)}
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <span style={{ fontSize: 11, color: '#94A3B8' }}>—</span>
+                                )}
+                              </td>
+
+                              <td style={{ padding: '10px 14px', textAlign: 'right' }}>
+                                {isUnused && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleToggleCodeStatus(item.code, item.status)}
+                                    style={{
+                                      background: 'transparent',
+                                      border: '1px solid #FECACA',
+                                      color: '#DC2626',
+                                      borderRadius: 4,
+                                      padding: '2px 8px',
+                                      fontSize: 11,
+                                      fontWeight: 600,
+                                      cursor: 'pointer',
+                                    }}
+                                  >
+                                    Void
+                                  </button>
+                                )}
+                                {isVoid && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleToggleCodeStatus(item.code, item.status)}
+                                    style={{
+                                      background: 'transparent',
+                                      border: '1px solid #CBD5E1',
+                                      color: '#475569',
+                                      borderRadius: 4,
+                                      padding: '2px 8px',
+                                      fontSize: 11,
+                                      fontWeight: 600,
+                                      cursor: 'pointer',
+                                    }}
+                                  >
+                                    Restore
+                                  </button>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Generate Modal */}
+              {showGenModal && (
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
+                  <div style={{ background: '#fff', borderRadius: 12, width: 440, padding: 22, boxShadow: '0 20px 25px -5px rgba(0,0,0,0.2)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+                      <strong style={{ fontSize: 15, color: '#0F172A' }}>Generate Activation Codes</strong>
+                      <button type="button" onClick={() => setShowGenModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16 }}>✕</button>
+                    </div>
+
+                    <form onSubmit={handleGenerateBatch} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      <div>
+                        <label style={{ fontSize: 11.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 4 }}>Quantity</label>
+                        <input type="number" min="1" max="200" value={genCount} onChange={e => setGenCount(Number(e.target.value))} style={{ width: '100%', height: 34, border: '1px solid #CBD5E1', borderRadius: 6, padding: '0 10px', fontSize: 12.5 }} />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: 11.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 4 }}>Prefix</label>
+                        <input type="text" value={genPrefix} onChange={e => setGenPrefix(e.target.value.toUpperCase())} style={{ width: '100%', height: 34, border: '1px solid #CBD5E1', borderRadius: 6, padding: '0 10px', fontSize: 12.5, fontFamily: 'IBM Plex Mono, monospace' }} />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: 11.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 4 }}>Course Name</label>
+                        <input type="text" value={genProduct} onChange={e => setGenProduct(e.target.value)} style={{ width: '100%', height: 34, border: '1px solid #CBD5E1', borderRadius: 6, padding: '0 10px', fontSize: 12.5 }} />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: 11.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 4 }}>Offline Channel Source</label>
+                        <select value={genSource} onChange={e => setGenSource(e.target.value as any)} style={{ width: '100%', height: 34, border: '1px solid #CBD5E1', borderRadius: 6, padding: '0 10px', fontSize: 12.5 }}>
+                          <option value="CENTER">Center / Learning Academy</option>
+                          <option value="TUTOR">Private Tutor</option>
+                          <option value="PHYSICAL_STORE">Physical Store / Bookstore</option>
+                          <option value="BATCH_DISTRIBUTION">General Event / Conference</option>
+                        </select>
+                      </div>
+
+                      <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                        <button type="button" onClick={() => setShowGenModal(false)} style={{ flex: 1, height: 36, border: '1px solid #CBD5E1', borderRadius: 6, background: '#fff', fontSize: 12, cursor: 'pointer' }}>Cancel</button>
+                        <button type="submit" disabled={isGenerating} style={{ flex: 1, height: 36, border: 'none', borderRadius: 6, background: '#2E6F5E', color: '#fff', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
+                          {isGenerating ? 'Generating...' : `Generate ${genCount} Codes`}
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
+
+              {/* Bulk Upload Modal */}
+              {showUploadModal && (
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
+                  <div style={{ background: '#fff', borderRadius: 12, width: 480, padding: 22, boxShadow: '0 20px 25px -5px rgba(0,0,0,0.2)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+                      <strong style={{ fontSize: 15, color: '#0F172A' }}>Bulk Import Activation Codes (CSV)</strong>
+                      <button type="button" onClick={() => setShowUploadModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16 }}>✕</button>
+                    </div>
+
+                    <form onSubmit={handleBulkUpload} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      <div>
+                        <label style={{ fontSize: 11.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 4 }}>Paste Codes (One per line)</label>
+                        <textarea rows={5} value={csvText} onChange={e => setCsvText(e.target.value)} placeholder={`SH-2026-F101\nSH-2026-F102\nSH-2026-F103`} style={{ width: '100%', border: '1px solid #CBD5E1', borderRadius: 6, padding: 8, fontSize: 12, fontFamily: 'IBM Plex Mono, monospace' }} />
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                        <div>
+                          <label style={{ fontSize: 11.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 4 }}>Course Name</label>
+                          <input type="text" value={csvProduct} onChange={e => setCsvProduct(e.target.value)} style={{ width: '100%', height: 34, border: '1px solid #CBD5E1', borderRadius: 6, padding: '0 10px', fontSize: 12 }} />
+                        </div>
+                        <div>
+                          <label style={{ fontSize: 11.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 4 }}>Channel Source</label>
+                          <select value={csvSource} onChange={e => setCsvSource(e.target.value as any)} style={{ width: '100%', height: 34, border: '1px solid #CBD5E1', borderRadius: 6, padding: '0 10px', fontSize: 12 }}>
+                            <option value="CENTER">Center</option>
+                            <option value="TUTOR">Tutor</option>
+                            <option value="PHYSICAL_STORE">Physical Store</option>
+                            <option value="BATCH_DISTRIBUTION">Batch Event</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {csvResult && (
+                        <div style={{ background: '#DCFCE7', border: '1px solid #86EFAC', borderRadius: 6, padding: 8, fontSize: 12, color: '#166534', fontWeight: 600 }}>
+                          Imported {csvResult.imported} codes ({csvResult.duplicates} duplicates skipped).
+                        </div>
+                      )}
+
+                      <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                        <button type="button" onClick={() => setShowUploadModal(false)} style={{ flex: 1, height: 36, border: '1px solid #CBD5E1', borderRadius: 6, background: '#fff', fontSize: 12, cursor: 'pointer' }}>Cancel</button>
+                        <button type="submit" style={{ flex: 1, height: 36, border: 'none', borderRadius: 6, background: '#2E6F5E', color: '#fff', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
+                          Import Codes
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
