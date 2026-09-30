@@ -1,882 +1,1299 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import HubSidebar from '../../components/HubSidebar';
 import HubTopBar from '../../components/HubTopBar';
-
-const VENTURES = ['StudyHub Egypt', 'TechBridge Cairo', 'EL HESA Academy', 'Sidekick Studio', 'Apex Classes'];
-const GATEWAYS = ['Fawry Pay', 'Paymob (Accept)', 'Geidea'];
-
-interface PaymentPage {
-  id: string;
-  venture: string;
-  name: string;
-  slug: string;
-  heading: string;
-  headingAr: string;
-  amount: number;
-  currency: string;
-  gateway: 'Fawry Pay' | 'Paymob (Accept)' | 'Geidea';
-  methods: {
-    fawry: boolean;
-    wallet: boolean;
-    card: boolean;
-  };
-  color: string;
-  logo: string;
-  successMsg: string;
-  enrolledStudents: number;
-  totalVolume: number;
-}
-
-const INITIAL_PAGES: PaymentPage[] = [
-  {
-    id: 'pg-001',
-    venture: 'StudyHub Egypt',
-    name: 'Full-Stack Bootcamp Sept Cohort',
-    slug: 'studyhub/fs-bootcamp',
-    heading: 'Enroll in Full-Stack Engineering Bootcamp',
-    headingAr: 'الانضمام لمعسكر هندسة البرمجيات وتطوير الويب',
-    amount: 4800,
-    currency: 'EGP',
-    gateway: 'Fawry Pay',
-    methods: { fawry: true, wallet: true, card: true },
-    color: '#0EA5E9',
-    logo: 'SH',
-    successMsg: 'تم تأكيد حجز مقعدك بنجاح! تفقد بريدك الإلكتروني لبيانات الدخول.',
-    enrolledStudents: 142,
-    totalVolume: 681600,
-  },
-  {
-    id: 'pg-002',
-    venture: 'TechBridge Cairo',
-    name: 'React & Next.js Professional Workshop',
-    slug: 'techbridge/react-workshop',
-    heading: 'Reserve Your Spot — React & Next.js Workshop',
-    headingAr: 'حجز مقعدك في ورشة عمل React & Next.js المتقدمة',
-    amount: 1850,
-    currency: 'EGP',
-    gateway: 'Paymob (Accept)',
-    methods: { fawry: true, wallet: true, card: true },
-    color: '#7C3AED',
-    logo: 'TB',
-    successMsg: 'تم التسجيل في الورشة! تم إرسال رابط الحضور والمواعيد عبر واتساب.',
-    enrolledStudents: 98,
-    totalVolume: 181300,
-  },
-  {
-    id: 'pg-003',
-    venture: 'EL HESA Academy',
-    name: 'Executive MBA Registration',
-    slug: 'elhesa/executive-mba',
-    heading: 'Join the Executive MBA Cohort 2026',
-    headingAr: 'التسجيل في برنامج ماجستير إدارة الأعمال التنفيذي',
-    amount: 8500,
-    currency: 'EGP',
-    gateway: 'Geidea',
-    methods: { fawry: true, wallet: true, card: true },
-    color: '#D10721',
-    logo: 'EH',
-    successMsg: 'تم استلام الرسوم وتأكيد قيدك بالدفعة الجديدة.',
-    enrolledStudents: 64,
-    totalVolume: 544000,
-  },
-];
+import {
+  CheckoutTemplateBlueprint,
+  BrandCheckoutConfig,
+  CheckoutLayoutType,
+  CheckoutBannerStyle,
+} from '@bldr/shared-types';
+import {
+  getMasterBlueprints,
+  saveMasterBlueprints,
+  getBrandCheckoutConfigs,
+  saveBrandCheckoutConfig,
+} from '../../lib/checkout-studio';
 
 export default function HubPaymentPages() {
-  const [pages, setPages] = useState<PaymentPage[]>(INITIAL_PAGES);
-  const [showBuilder, setShowBuilder] = useState(false);
-  const [previewPage, setPreviewPage] = useState<PaymentPage | null>(null);
+  const [activeTab, setActiveTab] = useState<'MONITOR' | 'ARCHITECT'>('MONITOR');
+  const [blueprints, setBlueprints] = useState<CheckoutTemplateBlueprint[]>([]);
+  const [brandConfigs, setBrandConfigs] = useState<BrandCheckoutConfig[]>([]);
+  const [selectedVenture, setSelectedVenture] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [previewBrand, setPreviewBrand] = useState<BrandCheckoutConfig | null>(null);
 
-  // Preview interactive checkout states
-  const [activeMethod, setActiveMethod] = useState<'FAWRY' | 'WALLET' | 'CARD'>('FAWRY');
-  const [studentName, setStudentName] = useState('أحمد حسن (Ahmed Hassan)');
-  const [studentEmail, setStudentEmail] = useState('ahmed.hassan@gmail.com');
-  const [studentPhone, setStudentPhone] = useState('01012345678');
-  const [walletPhone, setWalletPhone] = useState('01012345678');
-  const [fawryCode, setFawryCode] = useState('788-9921-4820');
-  const [checkoutStep, setCheckoutStep] = useState<'SELECT' | 'REDIRECT' | 'CONFIRMED'>('SELECT');
+  // Master Template Architect / Editor State
+  const [editingBlueprint, setEditingBlueprint] = useState<CheckoutTemplateBlueprint | null>(null);
+  const [isNewBlueprint, setIsNewBlueprint] = useState(false);
+  const [saveSuccessMsg, setSaveSuccessMsg] = useState('');
+
+  // Interactive Live Preview State (for student checkout simulator)
+  const [activeRail, setActiveRail] = useState<'FAWRY' | 'WALLET' | 'CARD' | 'CODE'>('FAWRY');
+  const [fawryRefCode, setFawryRefCode] = useState('788-9921-4820');
+  const [activationCodeInput, setActivationCodeInput] = useState('');
+  const [codeRedeemed, setCodeRedeemed] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
 
-  // New Page Builder Form
-  const [form, setForm] = useState({
-    venture: 'StudyHub Egypt',
-    name: '',
-    slug: '',
-    heading: '',
-    amount: '2500',
-    gateway: 'Fawry Pay' as PaymentPage['gateway'],
-    color: '#0EA5E9',
-    fawry: true,
-    wallet: true,
-    card: true,
+  // Load state on mount and listen to storage sync events
+  useEffect(() => {
+    setBlueprints(getMasterBlueprints());
+    setBrandConfigs(getBrandCheckoutConfigs());
+
+    const handleBlueprintsUpdated = () => {
+      setBlueprints(getMasterBlueprints());
+    };
+    const handleConfigsUpdated = () => {
+      setBrandConfigs(getBrandCheckoutConfigs());
+    };
+
+    window.addEventListener('bldr:blueprints-updated', handleBlueprintsUpdated);
+    window.addEventListener('bldr:checkout-config-updated', handleConfigsUpdated);
+    window.addEventListener('storage', handleConfigsUpdated);
+
+    return () => {
+      window.removeEventListener('bldr:blueprints-updated', handleBlueprintsUpdated);
+      window.removeEventListener('bldr:checkout-config-updated', handleConfigsUpdated);
+      window.removeEventListener('storage', handleConfigsUpdated);
+    };
+  }, []);
+
+  // Filtered active brand checkouts
+  const filteredBrands = brandConfigs.filter((brand) => {
+    const matchesVenture = selectedVenture === 'all' || brand.ventureId === selectedVenture;
+    const matchesSearch =
+      searchQuery === '' ||
+      brand.brandName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      brand.ventureName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      brand.connectedGateway.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesVenture && matchesSearch;
   });
 
-  const handleCreate = (e: React.FormEvent) => {
-    e.preventDefault();
-    const newP: PaymentPage = {
-      id: `pg-${Date.now().toString().slice(-4)}`,
-      venture: form.venture,
-      name: form.name || 'New Egyptian Checkout Page',
-      slug: form.slug || `${form.venture.toLowerCase().replace(/[^a-z0-9]/g, '')}/checkout`,
-      heading: form.heading || 'Complete Your Enrollment',
-      headingAr: 'إكمال التسجيل وسداد الرسوم',
-      amount: parseFloat(form.amount) || 1500,
-      currency: 'EGP',
-      gateway: form.gateway,
-      methods: { fawry: form.fawry, wallet: form.wallet, card: form.card },
-      color: form.color,
-      logo: form.venture.slice(0, 2).toUpperCase(),
-      successMsg: 'تم سداد الرسوم وتأكيد اشتراكك بنجاح!',
-      enrolledStudents: 0,
-      totalVolume: 0,
+  // Aggregated platform telemetry
+  const totalVolume = brandConfigs.reduce((acc, b) => acc + b.totalVolumeEgp, 0);
+  const totalStudents = brandConfigs.reduce((acc, b) => acc + b.conversions24h, 0);
+  const activeCount = brandConfigs.filter((b) => b.status === 'ACTIVE').length;
+
+  const handleOpenPreview = (brand: BrandCheckoutConfig) => {
+    setPreviewBrand(brand);
+    setActiveRail('FAWRY');
+    setCodeRedeemed(false);
+    setActivationCodeInput('');
+    setFawryRefCode(`788-${Math.floor(1000 + Math.random() * 9000)}-${Math.floor(1000 + Math.random() * 9000)}`);
+  };
+
+  const handleToggleBrandStatus = (ventureId: string) => {
+    const target = brandConfigs.find((b) => b.ventureId === ventureId);
+    if (!target) return;
+    const updated: BrandCheckoutConfig = {
+      ...target,
+      status: target.status === 'ACTIVE' ? 'PAUSED' : 'ACTIVE',
     };
-    setPages([newP, ...pages]);
-    setShowBuilder(false);
+    saveBrandCheckoutConfig(updated);
+    setBrandConfigs(getBrandCheckoutConfigs());
   };
 
-  const openPreview = (page: PaymentPage) => {
-    setPreviewPage(page);
-    setActiveMethod('FAWRY');
-    setCheckoutStep('SELECT');
-    setFawryCode(`788-${Math.floor(1000 + Math.random() * 9000)}-${Math.floor(1000 + Math.random() * 9000)}`);
+  const handleStartNewBlueprint = () => {
+    const newBp: CheckoutTemplateBlueprint = {
+      id: `tpl-${Date.now().toString().slice(-4)}`,
+      name: 'Custom Egyptian Academy Layout',
+      nameAr: 'تصميم مخصص للأكاديميات المصرية',
+      description: 'Platform master layout standard with custom Egyptian payment routing and adaptive container architecture.',
+      badge: 'New Standard',
+      layout: 'split-hero',
+      headerStyle: 'gradient',
+      defaultAccentColor: '#10B981',
+      allowedPaymentRails: {
+        fawry: true,
+        wallet: true,
+        card: true,
+        activationCode: true,
+      },
+      securitySeals: ['PCI-DSS SAQ-A', 'CBE Dual Escrow', 'TLS 1.3 256-Bit'],
+      version: 'v2.6',
+      isPublished: true,
+      author: 'Platform Financial Super Admin',
+      updatedAt: new Date().toISOString(),
+    };
+    setEditingBlueprint(newBp);
+    setIsNewBlueprint(true);
   };
 
-  const copyFawryCode = () => {
-    navigator.clipboard.writeText(fawryCode);
+  const handleSaveBlueprint = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingBlueprint) return;
+
+    let updated: CheckoutTemplateBlueprint[];
+    if (isNewBlueprint) {
+      updated = [editingBlueprint, ...blueprints];
+    } else {
+      updated = blueprints.map((b) => (b.id === editingBlueprint.id ? editingBlueprint : b));
+    }
+
+    saveMasterBlueprints(updated);
+    setBlueprints(updated);
+    setEditingBlueprint(null);
+    setSaveSuccessMsg(isNewBlueprint ? 'New Master Template blueprint published to Brand Portals!' : 'Blueprint saved & updated across all brand portals.');
+    setTimeout(() => setSaveSuccessMsg(''), 4000);
+  };
+
+  const copyFawry = () => {
+    navigator.clipboard.writeText(fawryRefCode.replace(/-/g, ''));
     setCopiedCode(true);
     setTimeout(() => setCopiedCode(false), 2000);
   };
 
   return (
-    <div style={{ display: 'flex', width: '100vw', height: '100vh', background: '#F5F7FA', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#0A0F1D', color: '#F8FAFC' }}>
       <HubSidebar />
-      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', height: '100vh', overflowY: 'auto' }}>
-        <HubTopBar
-          title="Payment Pages Builder"
-          crumb="Pages / Builder"
-        />
 
-        <div style={{ padding: '16px 24px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div>
-            <span style={{ fontSize: 16, fontWeight: 800, color: '#12203C' }}>Hosted Payment Pages Builder</span>
-            <div style={{ fontSize: 12, color: '#8A94A6' }}>Branded checkout pages with Egyptian payment rails: Fawry Code, Mobile Wallets & Cards</div>
-          </div>
-          <button
-            onClick={() => setShowBuilder(true)}
-            style={{
-              padding: '8px 16px',
-              borderRadius: 7,
-              background: '#2E6F5E',
-              color: '#fff',
-              fontSize: 12.5,
-              fontWeight: 700,
-              border: 'none',
-              cursor: 'pointer',
-            }}
-          >
-            + Create Payment Page
-          </button>
-        </div>
+      <div style={{ flex: 1, marginLeft: 240, display: 'flex', flexDirection: 'column' }}>
+        <HubTopBar title="Master Checkout Studio & Active Pages Monitor" crumb="Governance" />
 
-        <div className="hub-content" style={{ padding: '16px 24px 24px' }}>
-          {/* Summary KPIs */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
-            {[
-              { label: 'Published Pages', val: pages.length, icon: '◈' },
-              { label: 'Market Location', val: 'Egypt (مصر)', icon: '◎' },
-              { label: 'Active Payment Rails', val: 'Fawry · Wallets · Cards', icon: '✦' },
-              { label: 'Processed Volume', val: `EGP ${(pages.reduce((acc, p) => acc + p.totalVolume, 0) / 1000).toLocaleString()}K`, icon: '▲' },
-            ].map((kpi) => (
-              <div key={kpi.label} className="hub-card" style={{ padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 14 }}>
-                <span style={{ fontSize: 24 }}>{kpi.icon}</span>
-                <div>
-                  <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--hub-text)' }}>{kpi.val}</div>
-                  <div style={{ fontSize: 12, color: 'var(--hub-text-3)' }}>{kpi.label}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Payment Pages Cards Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
-            {pages.map((page) => (
-              <div
-                key={page.id}
-                className="hub-card"
-                style={{
-                  borderRadius: 16,
-                  overflow: 'hidden',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  border: '1px solid var(--hub-border)',
-                  boxShadow: '0 4px 18px rgba(0,0,0,0.06)',
-                }}
-              >
-                {/* Venture Branded Header */}
-                <div style={{ background: page.color, padding: '22px 20px', textAlign: 'center', color: 'white', position: 'relative' }}>
-                  <div
-                    style={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: '50%',
-                      background: 'rgba(255,255,255,0.22)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: 16,
-                      fontWeight: 800,
-                      margin: '0 auto 10px',
-                      border: '1.5px solid rgba(255,255,255,0.3)',
-                    }}
-                  >
-                    {page.logo}
-                  </div>
-                  <div style={{ fontSize: 15, fontWeight: 800, lineHeight: 1.3, marginBottom: 4 }}>
-                    {page.heading}
-                  </div>
-                  <div style={{ fontSize: 12, opacity: 0.85, fontWeight: 500 }}>
-                    {page.headingAr}
-                  </div>
-                  <div
-                    style={{
-                      display: 'inline-block',
-                      marginTop: 10,
-                      background: 'rgba(255,255,255,0.2)',
-                      padding: '3px 12px',
-                      borderRadius: 999,
-                      fontSize: 12,
-                      fontWeight: 700,
-                    }}
-                  >
-                    {page.currency} {page.amount.toLocaleString()}
-                  </div>
-                </div>
-
-                {/* Body: Gateway badge & Student Input Preview */}
-                <div style={{ padding: '20px', flex: 1, display: 'flex', flexDirection: 'column', gap: 14 }}>
-                  {/* Gateway routing badge */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--hub-bg)', padding: '8px 12px', borderRadius: 8, border: '1px solid var(--hub-border)' }}>
-                    <span style={{ fontSize: 11, color: 'var(--hub-text-3)', fontWeight: 600 }}>Connected Gateway</span>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--hub-accent)' }}>
-                      {page.gateway}
-                    </span>
-                  </div>
-
-                  {/* Student Inputs Mockup */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    <div>
-                      <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--hub-text-2)', marginBottom: 4 }}>
-                        Student Full Name (اسم الطالب رباعي)
-                      </div>
-                      <div style={{ height: 32, background: 'var(--hub-bg)', borderRadius: 6, border: '1px solid var(--hub-border)', display: 'flex', alignItems: 'center', padding: '0 10px', fontSize: 12, color: 'var(--hub-text-3)' }}>
-                        أحمد حسن — Ahmed Hassan
-                      </div>
-                    </div>
-                    <div>
-                      <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--hub-text-2)', marginBottom: 4 }}>
-                        Egyptian Mobile / WhatsApp (رقم الموبايل)
-                      </div>
-                      <div style={{ height: 32, background: 'var(--hub-bg)', borderRadius: 6, border: '1px solid var(--hub-border)', display: 'flex', alignItems: 'center', padding: '0 10px', fontSize: 12, color: 'var(--hub-text-3)' }}>
-                        +20 10 1234 5678
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Payment Method Selector Cards */}
-                  <div>
-                    <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--hub-text-3)', marginBottom: 6 }}>
-                      Select Payment Method (طريقة الدفع)
-                    </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
-                      <div style={{ border: '1.5px solid var(--hub-accent)', borderRadius: 8, padding: '8px 4px', textAlign: 'center', background: 'rgba(99, 102, 241, 0.08)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 2 }}>
-                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                        </div>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--hub-accent)' }}>كود فوري</div>
-                        <div style={{ fontSize: 9, color: 'var(--hub-text-3)' }}>Fawry Code</div>
-                      </div>
-                      <div style={{ border: '1px solid var(--hub-border)', borderRadius: 8, padding: '8px 4px', textAlign: 'center', background: 'var(--hub-bg)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 2 }}>
-                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-                        </div>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--hub-text)' }}>محفظة كاش</div>
-                        <div style={{ fontSize: 9, color: 'var(--hub-text-3)' }}>Wallets</div>
-                      </div>
-                      <div style={{ border: '1px solid var(--hub-border)', borderRadius: 8, padding: '8px 4px', textAlign: 'center', background: 'var(--hub-bg)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 2 }}>
-                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                        </div>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--hub-text)' }}>بطاقة بنكية</div>
-                        <div style={{ fontSize: 9, color: 'var(--hub-text-3)' }}>Meeza / Card</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Live Pay CTA */}
-                  <button
-                    onClick={() => openPreview(page)}
-                    style={{
-                      height: 38,
-                      background: page.color,
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: 8,
-                      fontSize: 13,
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: 6,
-                    }}
-                  >
-                    <span>سداد {page.currency} {page.amount.toLocaleString()}</span>
-                    <span>→</span>
-                  </button>
-                </div>
-
-                {/* Card Footer */}
-                <div style={{ padding: '14px 20px', borderTop: '1px solid var(--hub-border)', background: 'var(--hub-bg)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--hub-text)' }}>{page.name}</div>
-                    <div style={{ fontSize: 11, color: 'var(--hub-text-3)' }}>
-                      {page.venture} · {page.enrolledStudents} students enrolled
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', gap: 6 }}>
-                    <button
-                      className="hub-btn hub-btn-primary hub-btn-sm"
-                      onClick={() => openPreview(page)}
-                      style={{ background: 'var(--hub-accent)', color: 'white' }}
-                    >
-                      Live Preview
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* ─── LIVE CHECKOUT PREVIEW MODAL ─── */}
-      {previewPage && (
-        <div className="hub-modal-backdrop" onClick={() => setPreviewPage(null)}>
-          <div
-            style={{
-              background: '#FFFFFF',
-              borderRadius: 20,
-              overflow: 'hidden',
-              width: '100%',
-              maxWidth: 480,
-              boxShadow: '0 25px 70px rgba(0,0,0,0.3)',
-              border: '1px solid var(--hub-border)',
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Top Official Provider Bar */}
-            <div
-              style={{
-                background: '#FFFFFF',
-                borderBottom: '1px solid #E2E8F0',
-                padding: '12px 20px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
+        {/* Top Control Bar & Telemetry Strip */}
+        <div style={{ padding: '24px 32px 16px 32px', borderBottom: '1px solid rgba(255, 255, 255, 0.07)' }}>
+          {/* Header & Tabs */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+            <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div
-                  style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 8,
-                    background: previewPage.color,
-                    color: 'white',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: 900,
-                    fontSize: 14,
-                  }}
-                >
-                  {previewPage.logo}
-                </div>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ fontSize: 14, fontWeight: 800, color: '#0F172A' }}>
-                      {previewPage.venture}
-                    </span>
-                    <span
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 3,
-                        fontSize: 10,
-                        fontWeight: 700,
-                        padding: '1px 6px',
-                        background: '#ECFDF5',
-                        color: '#065F46',
-                        borderRadius: 999,
-                        border: '1px solid #A7F3D0',
-                      }}
-                    >
-                      <span>✓</span>
-                      <span>مقدم معتمد</span>
-                    </span>
-                  </div>
-                  <div style={{ fontSize: 10.5, color: '#64748B' }}>
-                    المنصة الرسمية المعتمدة لتحصيل المصروفات
-                  </div>
-                </div>
-              </div>
-              <button
-                onClick={() => setPreviewPage(null)}
-                style={{ background: '#F1F5F9', border: 'none', width: 26, height: 26, borderRadius: '50%', color: '#64748B', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Modal Header Banner */}
-            <div style={{ background: previewPage.color, padding: '20px 24px', color: 'white', position: 'relative' }}>
-              <div>
-                <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 2 }}>{previewPage.heading}</div>
-                <div style={{ fontSize: 12, opacity: 0.9 }}>{previewPage.headingAr}</div>
-              </div>
-
-              {/* Amount bar */}
-              <div style={{ marginTop: 12, background: 'rgba(0,0,0,0.18)', borderRadius: 10, padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 11.5, opacity: 0.9 }}>المبلغ المطلوب (Tuition Fee)</span>
-                <span style={{ fontSize: 20, fontWeight: 900 }}>
-                  {previewPage.currency} {previewPage.amount.toLocaleString()}
+                <h1 style={{ fontSize: 22, fontWeight: 800, color: '#FFFFFF', margin: 0, letterSpacing: '-0.02em' }}>
+                  Checkout Governance &amp; Live Pages
+                </h1>
+                <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 9px', borderRadius: 6, background: 'rgba(16, 185, 129, 0.15)', color: '#34D399', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+                  Dual-Escrow Architecture
+                </span>
+                <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 9px', borderRadius: 6, background: 'rgba(56, 189, 248, 0.12)', color: '#38BDF8', border: '1px solid rgba(56, 189, 248, 0.25)' }}>
+                  CBE Compliant
                 </span>
               </div>
+              <p style={{ fontSize: 13, color: '#94A3B8', marginTop: 4, marginBottom: 0 }}>
+                Master blueprints are designed here on the Hub. Brand portals select approved templates and add light customization.
+              </p>
             </div>
 
-            {/* Modal Body */}
-            <div style={{ padding: '24px' }}>
-              {/* Payment Method Selector Tabs */}
-              <div style={{ marginBottom: 20 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: '#374151', marginBottom: 8, display: 'flex', justifyContent: 'space-between' }}>
-                  <span>اختر طريقة الدفع (Payment Method)</span>
-                  <span style={{ color: '#6366F1', fontSize: 11 }}>بوابة: {previewPage.gateway}</span>
-                </div>
+            {/* Main Mode Tabs */}
+            <div style={{ display: 'flex', background: 'rgba(15, 23, 42, 0.9)', padding: 4, borderRadius: 10, border: '1px solid rgba(255, 255, 255, 0.1)', gap: 4 }}>
+              <button
+                id="btn-tab-monitor"
+                onClick={() => setActiveTab('MONITOR')}
+                style={{
+                  padding: '8px 18px',
+                  borderRadius: 7,
+                  fontSize: 12.5,
+                  fontWeight: 700,
+                  border: 'none',
+                  cursor: 'pointer',
+                  background: activeTab === 'MONITOR' ? '#10B981' : 'transparent',
+                  color: activeTab === 'MONITOR' ? '#FFFFFF' : '#94A3B8',
+                  transition: 'all 0.15s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
+              >
+                <span>🖥️ Active Pages Monitor</span>
+                <span style={{ fontSize: 11, padding: '1px 6px', borderRadius: 4, background: activeTab === 'MONITOR' ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.08)' }}>
+                  {brandConfigs.length}
+                </span>
+              </button>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-                  {/* Fawry */}
-                  <div
-                    onClick={() => { setActiveMethod('FAWRY'); setCheckoutStep('SELECT'); }}
-                    style={{
-                      border: activeMethod === 'FAWRY' ? '2px solid #F59E0B' : '1px solid #E5E7EB',
-                      borderRadius: 10,
-                      padding: '10px 6px',
-                      textAlign: 'center',
-                      cursor: 'pointer',
-                      background: activeMethod === 'FAWRY' ? '#FEF3C7' : '#FFFFFF',
-                      transition: 'all 0.15s',
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 2 }}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#92400E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                    </div>
-                    <div style={{ fontSize: 11, fontWeight: 800, color: '#92400E' }}>كود فوري</div>
-                    <div style={{ fontSize: 10, color: '#6B7280' }}>Fawry Code</div>
-                  </div>
+              <button
+                id="btn-tab-architect"
+                onClick={() => setActiveTab('ARCHITECT')}
+                style={{
+                  padding: '8px 18px',
+                  borderRadius: 7,
+                  fontSize: 12.5,
+                  fontWeight: 700,
+                  border: 'none',
+                  cursor: 'pointer',
+                  background: activeTab === 'ARCHITECT' ? '#3B82F6' : 'transparent',
+                  color: activeTab === 'ARCHITECT' ? '#FFFFFF' : '#94A3B8',
+                  transition: 'all 0.15s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
+              >
+                <span>🎨 Master Blueprint Architect</span>
+                <span style={{ fontSize: 11, padding: '1px 6px', borderRadius: 4, background: activeTab === 'ARCHITECT' ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.08)' }}>
+                  {blueprints.length}
+                </span>
+              </button>
+            </div>
+          </div>
 
-                  {/* Wallets */}
-                  <div
-                    onClick={() => { setActiveMethod('WALLET'); setCheckoutStep('SELECT'); }}
-                    style={{
-                      border: activeMethod === 'WALLET' ? '2px solid #10B981' : '1px solid #E5E7EB',
-                      borderRadius: 10,
-                      padding: '10px 6px',
-                      textAlign: 'center',
-                      cursor: 'pointer',
-                      background: activeMethod === 'WALLET' ? '#ECFDF5' : '#FFFFFF',
-                      transition: 'all 0.15s',
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 2 }}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#065F46" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-                    </div>
-                    <div style={{ fontSize: 11, fontWeight: 800, color: '#065F46' }}>محفظة كاش</div>
-                    <div style={{ fontSize: 10, color: '#6B7280' }}>Vodafone/Wallet</div>
-                  </div>
+          {/* Success Banner */}
+          {saveSuccessMsg && (
+            <div style={{ marginBottom: 16, padding: '10px 16px', borderRadius: 8, background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.4)', color: '#34D399', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span>✓</span> {saveSuccessMsg}
+            </div>
+          )}
 
-                  {/* Card */}
-                  <div
-                    onClick={() => { setActiveMethod('CARD'); setCheckoutStep('SELECT'); }}
-                    style={{
-                      border: activeMethod === 'CARD' ? '2px solid #3B82F6' : '1px solid #E5E7EB',
-                      borderRadius: 10,
-                      padding: '10px 6px',
-                      textAlign: 'center',
-                      cursor: 'pointer',
-                      background: activeMethod === 'CARD' ? '#EFF6FF' : '#FFFFFF',
-                      transition: 'all 0.15s',
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 2 }}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1E40AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                    </div>
-                    <div style={{ fontSize: 11, fontWeight: 800, color: '#1E40AF' }}>بطاقة بنكية</div>
-                    <div style={{ fontSize: 10, color: '#6B7280' }}>Meeza / Visa</div>
-                  </div>
-                </div>
+          {/* Live Platform KPI Telemetry Cards */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+            <div style={{ background: 'rgba(255, 255, 255, 0.025)', border: '1px solid rgba(255, 255, 255, 0.07)', borderRadius: 12, padding: '14px 18px' }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Monitored Live Checkouts
               </div>
-
-              {/* ─── CONDITIONAL PAYMENT METHOD INTERFACES ─── */}
-
-              {/* 1. FAWRY INTERFACE */}
-              {activeMethod === 'FAWRY' && (
-                <div style={{ background: '#FFFBEB', border: '1.5px solid #FCD34D', borderRadius: 14, padding: '20px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#92400E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                      <div>
-                        <div style={{ fontSize: 13, fontWeight: 800, color: '#92400E' }}>كود الدفع عبر فوري (Fawry Pay)</div>
-                        <div style={{ fontSize: 11, color: '#B45309' }}>ادفع نقداً لدى أي ماكينة أو فرع فوري</div>
-                      </div>
-                    </div>
-                    <span style={{ fontSize: 10, background: '#FEF3C7', color: '#92400E', padding: '3px 8px', borderRadius: 999, fontWeight: 700 }}>
-                      صالح لمدة ٤٨ ساعة
-                    </span>
-                  </div>
-
-                  {/* Big Reference Code Box */}
-                  <div style={{ background: '#FFFFFF', border: '2px dashed #F59E0B', borderRadius: 10, padding: '14px', textAlign: 'center', marginBottom: 14 }}>
-                    <div style={{ fontSize: 11, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>
-                      الرقم المرجعي للدفع (Fawry Ref Code)
-                    </div>
-                    <div style={{ fontSize: 24, fontWeight: 900, fontFamily: 'monospace', color: '#B45309', letterSpacing: '0.08em', marginBottom: 8 }}>
-                      {fawryCode}
-                    </div>
-                    <button
-                      onClick={copyFawryCode}
-                      style={{
-                        background: copiedCode ? '#059669' : '#F59E0B',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: 6,
-                        padding: '4px 12px',
-                        fontSize: 11,
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                      }}
-                    >
-                      {copiedCode ? '✓ تم النسخ' : 'نسخ الكود (Copy)'}
-                    </button>
-                  </div>
-
-                  {/* Fawry Steps */}
-                  <div style={{ fontSize: 12, color: '#78350F', lineHeight: 1.6, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    <div><strong>١.</strong> توجه لأي منفذ فوري أو استخدم تطبيق myFawry.</div>
-                    <div><strong>٢.</strong> اطلب خدمة <strong>"فوري باي — Fawry Pay"</strong> كود خدمة: <strong>788</strong>.</div>
-                    <div><strong>٣.</strong> أدخل الرقم المرجعي أعلاه وسدد <strong>{previewPage.currency} {previewPage.amount.toLocaleString()}</strong>.</div>
-                    <div><strong>٤.</strong> سيتم تأكيد التحاقك كطالب معتمد فورياً وإرسال إيصال الدفع.</div>
-                  </div>
-
-                  <button
-                    onClick={() => setCheckoutStep('CONFIRMED')}
-                    style={{
-                      width: '100%',
-                      marginTop: 16,
-                      background: '#F59E0B',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: 10,
-                      padding: '12px',
-                      fontWeight: 800,
-                      fontSize: 13,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    تم السداد لدى فوري — تأكيد التسجيل الفوري ✓
-                  </button>
-                </div>
-              )}
-
-              {/* 2. MOBILE WALLET INTERFACE */}
-              {activeMethod === 'WALLET' && (
-                <div style={{ background: '#ECFDF5', border: '1.5px solid #A7F3D0', borderRadius: 14, padding: '20px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#065F46" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-                    <div>
-                      <div style={{ fontSize: 13, fontWeight: 800, color: '#065F46' }}>الدفع بالمحفظة الإلكترونية (Mobile Wallet)</div>
-                      <div style={{ fontSize: 11, color: '#047857' }}>فودافون كاش، أورنج، اتصالات، وي، انستاباي</div>
-                    </div>
-                  </div>
-
-                  <div style={{ marginBottom: 14 }}>
-                    <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#065F46', marginBottom: 6 }}>
-                      رقم محفظة الموبايل المصرية *
-                    </label>
-                    <input
-                      type="tel"
-                      value={walletPhone}
-                      onChange={(e) => setWalletPhone(e.target.value)}
-                      placeholder="010xxxxxxxx أو 011 / 012 / 015"
-                      style={{
-                        width: '100%',
-                        padding: '10px 14px',
-                        borderRadius: 8,
-                        border: '1.5px solid #10B981',
-                        fontSize: 14,
-                        fontFamily: 'monospace',
-                        outline: 'none',
-                        background: '#FFFFFF',
-                      }}
-                    />
-                  </div>
-
-                  <div style={{ fontSize: 12, color: '#065F46', lineHeight: 1.6, marginBottom: 14 }}>
-                    سيصلك إشعار فوري من المحفظة أو رسالة لتأكيد الخصم برقمك السري.
-                  </div>
-
-                  <button
-                    onClick={() => setCheckoutStep('CONFIRMED')}
-                    style={{
-                      width: '100%',
-                      background: '#10B981',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: 10,
-                      padding: '12px',
-                      fontWeight: 800,
-                      fontSize: 13,
-                      cursor: 'pointer',
-                      boxShadow: '0 4px 14px rgba(16, 185, 129, 0.3)',
-                    }}
-                  >
-                    تأكيد الخصم وسداد {previewPage.currency} {previewPage.amount.toLocaleString()} →
-                  </button>
-                </div>
-              )}
-
-              {/* 3. CARD INTERFACE */}
-              {activeMethod === 'CARD' && (
-                <div style={{ background: '#EFF6FF', border: '1.5px solid #BFDBFE', borderRadius: 14, padding: '20px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1E40AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                      <div>
-                        <div style={{ fontSize: 13, fontWeight: 800, color: '#1E40AF' }}>البطاقات البنكية المعتمدة</div>
-                        <div style={{ fontSize: 11, color: '#3B82F6' }}>ميزة (Meeza)، فيزا، ماستركارد</div>
-                      </div>
-                    </div>
-                    <div style={{ display: 'flex', gap: 4 }}>
-                      <span style={{ background: '#FFFFFF', padding: '2px 6px', borderRadius: 4, fontSize: 10, fontWeight: 700, border: '1px solid #DBEAFE' }}>ميزة</span>
-                      <span style={{ background: '#FFFFFF', padding: '2px 6px', borderRadius: 4, fontSize: 10, fontWeight: 700, border: '1px solid #DBEAFE' }}>Visa</span>
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 14 }}>
-                    <input
-                      readOnly
-                      value="5078 •••• •••• 4219"
-                      style={{ width: '100%', padding: '10px 12px', border: '1px solid #93C5FD', borderRadius: 8, background: '#FFFFFF', fontSize: 13, fontFamily: 'monospace' }}
-                    />
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                      <input readOnly value="12/28" style={{ padding: '10px 12px', border: '1px solid #93C5FD', borderRadius: 8, background: '#FFFFFF', fontSize: 13, textAlign: 'center' }} />
-                      <input readOnly value="CVV: •••" style={{ padding: '10px 12px', border: '1px solid #93C5FD', borderRadius: 8, background: '#FFFFFF', fontSize: 13, textAlign: 'center' }} />
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => setCheckoutStep('CONFIRMED')}
-                    style={{
-                      width: '100%',
-                      background: '#2563EB',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: 10,
-                      padding: '12px',
-                      fontWeight: 800,
-                      fontSize: 13,
-                      cursor: 'pointer',
-                      boxShadow: '0 4px 14px rgba(37, 99, 235, 0.3)',
-                    }}
-                  >
-                    سداد {previewPage.currency} {previewPage.amount.toLocaleString()} عبر {previewPage.gateway} →
-                  </button>
-                </div>
-              )}
-
-              {/* Confirmation State */}
-              {checkoutStep === 'CONFIRMED' && (
-                <div style={{ marginTop: 16, background: '#ECFDF5', border: '2px solid #059669', borderRadius: 12, padding: '18px', textAlign: 'center' }}>
-                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 6 }}>
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-                      <path d="M6 12v5c3 3 9 3 12 0v-5"/>
-                    </svg>
-                  </div>
-                  <div style={{ fontSize: 15, fontWeight: 800, color: '#065F46', marginBottom: 4 }}>
-                    تم تأكيد القيد وسداد الرسوم بنجاح!
-                  </div>
-                  <div style={{ fontSize: 12, color: '#047857', marginBottom: 12 }}>
-                    معرف العملية: <code>TXN-EG-{Math.floor(100000 + Math.random() * 900000)}</code>
-                  </div>
-                  <a
-                    href="http://localhost:3013/students"
-                    target="_blank"
-                    rel="noreferrer"
-                    style={{
-                      background: '#059669',
-                      color: 'white',
-                      padding: '8px 16px',
-                      borderRadius: 8,
-                      fontSize: 12,
-                      fontWeight: 700,
-                      textDecoration: 'none',
-                      display: 'inline-block',
-                    }}
-                  >
-                    عرض سجل الطالب في بوابة المزود ↗
-                  </a>
-                </div>
-              )}
+              <div style={{ fontSize: 24, fontWeight: 800, color: '#FFFFFF', marginTop: 4 }}>
+                {activeCount} <span style={{ fontSize: 13, color: '#10B981', fontWeight: 600 }}>Active</span>
+                <span style={{ fontSize: 12, color: '#64748B', marginLeft: 6 }}>/ {brandConfigs.length} total</span>
+              </div>
+              <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 4 }}>
+                Across all registered brands &amp; ventures
+              </div>
             </div>
 
-            {/* High-Trust Footer */}
-            <div
-              style={{
-                background: '#F8FAFC',
-                borderTop: '1px solid #E2E8F0',
-                padding: '14px 20px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 10,
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
-                {/* bldr badge */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 5, background: '#D10721', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 900 }}>
-                    b
-                  </div>
-                  <span style={{ fontSize: 11, color: '#334155' }}>
-                    Payment Managed by <strong style={{ color: '#0F172A' }}>bldr</strong>
-                  </span>
-                </div>
-
-                {/* Gateway Badge */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span style={{ fontSize: 10.5, color: '#64748B' }}>Secured payment by:</span>
-                  <span
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 6,
-                      padding: '3px 8px',
-                      borderRadius: 6,
-                      background: previewPage.gateway === 'Fawry Pay' ? '#FEF3C7' : previewPage.gateway === 'Paymob (Accept)' ? '#EFF6FF' : '#FEE2E2',
-                      color: previewPage.gateway === 'Fawry Pay' ? '#92400E' : previewPage.gateway === 'Paymob (Accept)' ? '#1E40AF' : '#991B1B',
-                      fontWeight: 800,
-                      fontSize: 10.5,
-                      border: `1px solid ${previewPage.gateway === 'Fawry Pay' ? '#FDE68A' : previewPage.gateway === 'Paymob (Accept)' ? '#BFDBFE' : '#FECACA'}`,
-                    }}
-                  >
-                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: previewPage.gateway === 'Fawry Pay' ? '#F59E0B' : previewPage.gateway === 'Paymob (Accept)' ? '#2563EB' : '#DC2626', display: 'inline-block' }} />
-                    <span>{previewPage.gateway}</span>
-                  </span>
-                </div>
+            <div style={{ background: 'rgba(255, 255, 255, 0.025)', border: '1px solid rgba(255, 255, 255, 0.07)', borderRadius: 12, padding: '14px 18px' }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Total Processed Volume
               </div>
+              <div style={{ fontSize: 24, fontWeight: 800, color: '#38BDF8', marginTop: 4 }}>
+                EGP {(totalVolume / 1000).toFixed(1)}K
+              </div>
+              <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 4 }}>
+                Settled through Geidea, Paymob &amp; Fawry
+              </div>
+            </div>
 
-              <div style={{ borderTop: '1px dashed #E2E8F0', paddingTop: 8, display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#64748B' }}>
-                <span>256-Bit SSL · CBE Compliant</span>
-                <span>PCI DSS Level 1 · 3D Secure</span>
+            <div style={{ background: 'rgba(255, 255, 255, 0.025)', border: '1px solid rgba(255, 255, 255, 0.07)', borderRadius: 12, padding: '14px 18px' }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                24h Enrolled Students
+              </div>
+              <div style={{ fontSize: 24, fontWeight: 800, color: '#A78BFA', marginTop: 4 }}>
+                {totalStudents} <span style={{ fontSize: 12, color: '#94A3B8', fontWeight: 500 }}>paid enrollments</span>
+              </div>
+              <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 4 }}>
+                Online rails + physical serial code activations
+              </div>
+            </div>
+
+            <div style={{ background: 'rgba(255, 255, 255, 0.025)', border: '1px solid rgba(255, 255, 255, 0.07)', borderRadius: 12, padding: '14px 18px' }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Hub Master Blueprints
+              </div>
+              <div style={{ fontSize: 24, fontWeight: 800, color: '#F59E0B', marginTop: 4 }}>
+                {blueprints.length} <span style={{ fontSize: 12, color: '#34D399', fontWeight: 600 }}>Standardized</span>
+              </div>
+              <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 4 }}>
+                Governed centrally • 0-Code for brands
               </div>
             </div>
           </div>
         </div>
-      )}
 
-      {/* ─── BUILDER MODAL ─── */}
-      {showBuilder && (
-        <div className="hub-modal-backdrop">
-          <div className="hub-modal" style={{ maxWidth: 520 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-              <h2 className="hub-modal-title" style={{ marginBottom: 0 }}>Create Egyptian Payment Page</h2>
-              <button onClick={() => setShowBuilder(false)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: 'var(--hub-text-3)' }}>✕</button>
-            </div>
+        {/* ─── TAB 1: ACTIVE PAGES & VENTURES MONITOR ─── */}
+        {activeTab === 'MONITOR' && (
+          <div style={{ padding: '24px 32px', flex: 1 }}>
+            {/* Filter Bar */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, gap: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1 }}>
+                <div style={{ position: 'relative', flex: 1, maxWidth: 360 }}>
+                  <input
+                    type="text"
+                    placeholder="Search brand name, venture, or gateway..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    style={{
+                      width: '100%',
+                      height: 38,
+                      borderRadius: 8,
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      border: '1px solid rgba(255, 255, 255, 0.12)',
+                      padding: '0 12px 0 34px',
+                      color: '#FFFFFF',
+                      fontSize: 13,
+                      outline: 'none',
+                    }}
+                  />
+                  <span style={{ position: 'absolute', left: 11, top: 10, color: '#64748B', fontSize: 14 }}>🔍</span>
+                </div>
 
-            <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <div>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6, color: 'var(--hub-text-2)' }}>Venture / Provider</label>
                 <select
-                  className="hub-select"
-                  style={{ width: '100%' }}
-                  value={form.venture}
-                  onChange={(e) => setForm({ ...form, venture: e.target.value })}
+                  value={selectedVenture}
+                  onChange={(e) => setSelectedVenture(e.target.value)}
+                  style={{
+                    height: 38,
+                    borderRadius: 8,
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    padding: '0 12px',
+                    color: '#FFFFFF',
+                    fontSize: 13,
+                    outline: 'none',
+                    cursor: 'pointer',
+                  }}
                 >
-                  {VENTURES.map((v) => <option key={v} value={v}>{v}</option>)}
+                  <option value="all">🌐 All Ventures</option>
+                  <option value="studyhub">StudyHub Academy</option>
+                  <option value="apex">Apex Classes</option>
+                  <option value="el-hesa">EL HESA Institute</option>
+                  <option value="bldr">bldr Storefront Pilot</option>
+                  <option value="career-hub">Career Hub</option>
                 </select>
               </div>
 
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#94A3B8' }}>
+                <span>Showing <strong>{filteredBrands.length}</strong> monitored checkouts</span>
+                <button
+                  onClick={() => setActiveTab('ARCHITECT')}
+                  style={{
+                    background: 'rgba(59, 130, 246, 0.15)',
+                    border: '1px solid rgba(59, 130, 246, 0.35)',
+                    color: '#60A5FA',
+                    borderRadius: 7,
+                    padding: '6px 12px',
+                    fontSize: 12,
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    marginLeft: 8,
+                  }}
+                >
+                  Architect New Blueprint →
+                </button>
+              </div>
+            </div>
+
+            {/* Monitored Brand Checkouts Cards Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: 20 }}>
+              {filteredBrands.map((brand) => {
+                const assignedBp = blueprints.find((b) => b.id === brand.templateId) || blueprints[0];
+                return (
+                  <div
+                    key={brand.ventureId}
+                    style={{
+                      background: 'rgba(15, 23, 42, 0.75)',
+                      border: brand.status === 'ACTIVE' ? '1px solid rgba(255, 255, 255, 0.1)' : '1px dashed rgba(239, 68, 68, 0.35)',
+                      borderRadius: 14,
+                      padding: 20,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25)',
+                      position: 'relative',
+                    }}
+                  >
+                    {/* Brand Card Header */}
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <div
+                            style={{
+                              width: 36,
+                              height: 36,
+                              borderRadius: 8,
+                              background: brand.accentColor || '#0EA5E9',
+                              color: '#FFFFFF',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontWeight: 800,
+                              fontSize: 14,
+                              boxShadow: `0 2px 10px ${brand.accentColor}55`,
+                            }}
+                          >
+                            {brand.brandLogoText || brand.ventureId.slice(0, 2).toUpperCase()}
+                          </div>
+                          <div>
+                            <div style={{ fontSize: 15, fontWeight: 700, color: '#FFFFFF' }}>
+                              {brand.brandName}
+                            </div>
+                            <div style={{ fontSize: 11.5, color: '#64748B' }}>
+                              Venture: {brand.ventureName}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Status Toggle Badge */}
+                        <button
+                          onClick={() => handleToggleBrandStatus(brand.ventureId)}
+                          style={{
+                            padding: '3px 8px',
+                            borderRadius: 6,
+                            fontSize: 11,
+                            fontWeight: 700,
+                            border: 'none',
+                            cursor: 'pointer',
+                            background: brand.status === 'ACTIVE' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+                            color: brand.status === 'ACTIVE' ? '#34D399' : '#F87171',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 5,
+                          }}
+                          title="Click to toggle Active / Paused"
+                        >
+                          <span style={{ width: 6, height: 6, borderRadius: '50%', background: brand.status === 'ACTIVE' ? '#10B981' : '#EF4444' }} />
+                          {brand.status}
+                        </button>
+                      </div>
+
+                      {/* Selected Blueprint Pill */}
+                      <div style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '10px 12px', borderRadius: 8, marginBottom: 14, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <span style={{ fontSize: 11, color: '#94A3B8' }}>Active Hub Template:</span>
+                          <span style={{ fontSize: 11, fontWeight: 700, color: '#38BDF8' }}>{assignedBp?.name}</span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
+                          <span style={{ fontSize: 11, color: '#94A3B8' }}>Layout Architecture:</span>
+                          <span style={{ fontSize: 11, color: '#CBD5E1', textTransform: 'capitalize' }}>{assignedBp?.layout.replace('-', ' ')}</span>
+                        </div>
+                      </div>
+
+                      {/* Gateway & Rails */}
+                      <div style={{ marginBottom: 14 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                          <span style={{ fontSize: 11.5, color: '#94A3B8' }}>Connected Gateway:</span>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: '#34D399' }}>{brand.connectedGateway}</span>
+                        </div>
+
+                        {/* Rail badges */}
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                          {brand.activeRails.fawry && (
+                            <span style={{ fontSize: 10, background: 'rgba(245, 158, 11, 0.15)', color: '#FBBF24', padding: '2px 6px', borderRadius: 4, border: '1px solid rgba(245, 158, 11, 0.3)' }}>
+                              ⚡ Fawry Kiosk
+                            </span>
+                          )}
+                          {brand.activeRails.wallet && (
+                            <span style={{ fontSize: 10, background: 'rgba(239, 68, 68, 0.15)', color: '#F87171', padding: '2px 6px', borderRadius: 4, border: '1px solid rgba(239, 68, 68, 0.3)' }}>
+                              📱 Wallets &amp; InstaPay
+                            </span>
+                          )}
+                          {brand.activeRails.card && (
+                            <span style={{ fontSize: 10, background: 'rgba(59, 130, 246, 0.15)', color: '#60A5FA', padding: '2px 6px', borderRadius: 4, border: '1px solid rgba(59, 130, 246, 0.3)' }}>
+                              💳 Visa / MC / Meeza
+                            </span>
+                          )}
+                          {brand.activeRails.activationCode && (
+                            <span style={{ fontSize: 10, background: 'rgba(16, 185, 129, 0.15)', color: '#34D399', padding: '2px 6px', borderRadius: 4, border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+                              🎟️ Serial Code Activation
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Conversions & Volume */}
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, padding: '8px 10px', background: 'rgba(0, 0, 0, 0.25)', borderRadius: 8, marginBottom: 14 }}>
+                        <div>
+                          <div style={{ fontSize: 10, color: '#64748B', textTransform: 'uppercase' }}>24h Paid Enrollments</div>
+                          <div style={{ fontSize: 14, fontWeight: 700, color: '#FFFFFF', marginTop: 2 }}>{brand.conversions24h} students</div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 10, color: '#64748B', textTransform: 'uppercase' }}>Gross Volume</div>
+                          <div style={{ fontSize: 14, fontWeight: 700, color: '#38BDF8', marginTop: 2 }}>EGP {brand.totalVolumeEgp.toLocaleString()}</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Card Actions */}
+                    <div style={{ display: 'flex', gap: 8, paddingTop: 12, borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                      <button
+                        onClick={() => handleOpenPreview(brand)}
+                        style={{
+                          flex: 1,
+                          height: 34,
+                          borderRadius: 7,
+                          background: 'rgba(56, 189, 248, 0.15)',
+                          border: '1px solid rgba(56, 189, 248, 0.3)',
+                          color: '#38BDF8',
+                          fontSize: 12,
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 6,
+                        }}
+                      >
+                        <span>👁️ Inspect Live Checkout</span>
+                      </button>
+
+                      <a
+                        href={`http://localhost:3001/payment-pages`}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{
+                          height: 34,
+                          padding: '0 12px',
+                          borderRadius: 7,
+                          background: 'rgba(255, 255, 255, 0.06)',
+                          border: '1px solid rgba(255, 255, 255, 0.12)',
+                          color: '#CBD5E1',
+                          fontSize: 12,
+                          fontWeight: 600,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          textDecoration: 'none',
+                        }}
+                        title="Open Brand Portal Master Checkout"
+                      >
+                        Brand Portal ↗
+                      </a>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* ─── TAB 2: MASTER BLUEPRINT ARCHITECT (MAIN EDITOR) ─── */}
+        {activeTab === 'ARCHITECT' && (
+          <div style={{ padding: '24px 32px', flex: 1 }}>
+            {/* Architect Header Bar */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
               <div>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6, color: 'var(--hub-text-2)' }}>Page Offering Title</label>
-                <input
-                  required
-                  className="hub-input"
-                  placeholder="e.g. Graphic Design Diploma"
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                />
+                <h2 style={{ fontSize: 18, fontWeight: 700, color: '#FFFFFF', margin: 0 }}>
+                  Central Master Blueprints Catalog
+                </h2>
+                <p style={{ fontSize: 12.5, color: '#94A3B8', marginTop: 4, marginBottom: 0 }}>
+                  These standardized templates dictate layout, Egyptian payment rails, and compliance rules. All brand portals choose from this library.
+                </p>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <button
+                onClick={handleStartNewBlueprint}
+                style={{
+                  padding: '9px 18px',
+                  borderRadius: 8,
+                  background: 'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)',
+                  border: 'none',
+                  color: '#FFFFFF',
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  boxShadow: '0 4px 14px rgba(59, 130, 246, 0.35)',
+                }}
+              >
+                <span>+ Architect New Master Blueprint</span>
+              </button>
+            </div>
+
+            {/* Blueprints Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(420px, 1fr))', gap: 20 }}>
+              {blueprints.map((bp) => {
+                const brandsUsingThis = brandConfigs.filter((b) => b.templateId === bp.id);
+                return (
+                  <div
+                    key={bp.id}
+                    style={{
+                      background: 'rgba(15, 23, 42, 0.85)',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      borderRadius: 14,
+                      padding: 24,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+                    }}
+                  >
+                    <div>
+                      {/* Top Blueprint Badges */}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                        <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 6, background: 'rgba(56, 189, 248, 0.15)', color: '#38BDF8', border: '1px solid rgba(56, 189, 248, 0.3)' }}>
+                          {bp.badge}
+                        </span>
+                        <span style={{ fontSize: 11, color: '#64748B' }}>
+                          Version {bp.version}
+                        </span>
+                      </div>
+
+                      <div style={{ fontSize: 17, fontWeight: 800, color: '#FFFFFF', marginBottom: 2 }}>
+                        {bp.name}
+                      </div>
+                      <div style={{ fontSize: 12.5, color: '#94A3B8', direction: 'rtl', marginBottom: 8, textAlign: 'right' }}>
+                        {bp.nameAr}
+                      </div>
+
+                      <p style={{ fontSize: 12.5, color: '#94A3B8', lineHeight: 1.5, marginBottom: 16 }}>
+                        {bp.description}
+                      </p>
+
+                      {/* Technical Architecture Specs */}
+                      <div style={{ background: 'rgba(0, 0, 0, 0.25)', padding: '12px 14px', borderRadius: 8, marginBottom: 16, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8, fontSize: 12 }}>
+                          <div>
+                            <span style={{ color: '#64748B' }}>Layout Model:</span>{' '}
+                            <strong style={{ color: '#FFFFFF', textTransform: 'capitalize' }}>{bp.layout.replace('-', ' ')}</strong>
+                          </div>
+                          <div>
+                            <span style={{ color: '#64748B' }}>Header Banner:</span>{' '}
+                            <strong style={{ color: '#FFFFFF', textTransform: 'capitalize' }}>{bp.headerStyle}</strong>
+                          </div>
+                          <div>
+                            <span style={{ color: '#64748B' }}>Default Accent:</span>{' '}
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                              <span style={{ width: 10, height: 10, borderRadius: '50%', background: bp.defaultAccentColor }} />
+                              <strong style={{ color: '#FFFFFF' }}>{bp.defaultAccentColor}</strong>
+                            </span>
+                          </div>
+                          <div>
+                            <span style={{ color: '#64748B' }}>Status:</span>{' '}
+                            <strong style={{ color: bp.isPublished ? '#34D399' : '#F87171' }}>
+                              {bp.isPublished ? 'Live in Brand Portals' : 'Draft / Private'}
+                            </strong>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Permitted Payment Rails */}
+                      <div style={{ marginBottom: 16 }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', marginBottom: 6 }}>
+                          Permitted Payment Rails (Enforced by Hub)
+                        </div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                          {bp.allowedPaymentRails.fawry && (
+                            <span style={{ fontSize: 10.5, background: 'rgba(245, 158, 11, 0.12)', color: '#FBBF24', padding: '3px 7px', borderRadius: 5 }}>
+                              ⚡ Fawry Kiosk
+                            </span>
+                          )}
+                          {bp.allowedPaymentRails.wallet && (
+                            <span style={{ fontSize: 10.5, background: 'rgba(239, 68, 68, 0.12)', color: '#F87171', padding: '3px 7px', borderRadius: 5 }}>
+                              📱 Mobile Wallets (Vodafone/InstaPay)
+                            </span>
+                          )}
+                          {bp.allowedPaymentRails.card && (
+                            <span style={{ fontSize: 10.5, background: 'rgba(59, 130, 246, 0.12)', color: '#60A5FA', padding: '3px 7px', borderRadius: 5 }}>
+                              💳 Visa / MC / Meeza
+                            </span>
+                          )}
+                          {bp.allowedPaymentRails.activationCode && (
+                            <span style={{ fontSize: 10.5, background: 'rgba(16, 185, 129, 0.12)', color: '#34D399', padding: '3px 7px', borderRadius: 5 }}>
+                              🎟️ Scratch-Off / Serial Code
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Brands using this blueprint */}
+                      <div style={{ fontSize: 12, color: '#94A3B8' }}>
+                        Used by <strong>{brandsUsingThis.length}</strong> brand{brandsUsingThis.length === 1 ? '' : 's'}:{' '}
+                        {brandsUsingThis.map((b) => b.brandName).join(', ') || 'None yet'}
+                      </div>
+                    </div>
+
+                    {/* Edit Blueprint Action */}
+                    <div style={{ display: 'flex', gap: 10, marginTop: 18, paddingTop: 14, borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                      <button
+                        onClick={() => {
+                          setEditingBlueprint(bp);
+                          setIsNewBlueprint(false);
+                        }}
+                        style={{
+                          flex: 1,
+                          height: 38,
+                          borderRadius: 8,
+                          background: 'rgba(255, 255, 255, 0.07)',
+                          border: '1px solid rgba(255, 255, 255, 0.15)',
+                          color: '#FFFFFF',
+                          fontSize: 12.5,
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 6,
+                        }}
+                      >
+                        <span>⚙️ Edit Template Blueprint &amp; Rails</span>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* ─── MODAL 1: LIVE BRAND CHECKOUT INSPECTOR ─── */}
+        {previewBrand && (
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0, 0, 0, 0.85)',
+              backdropFilter: 'blur(8px)',
+              zIndex: 100,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 24,
+            }}
+          >
+            <div
+              style={{
+                width: '100%',
+                maxWidth: 900,
+                maxHeight: '90vh',
+                overflowY: 'auto',
+                background: '#0F172A',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                borderRadius: 16,
+                boxShadow: '0 25px 60px rgba(0, 0, 0, 0.7)',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              {/* Modal Top Bar */}
+              <div style={{ padding: '16px 24px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255, 255, 255, 0.03)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#38BDF8', background: 'rgba(56, 189, 248, 0.15)', padding: '3px 8px', borderRadius: 6 }}>
+                    Live Inspection
+                  </span>
+                  <div style={{ fontSize: 16, fontWeight: 700, color: '#FFFFFF' }}>
+                    {previewBrand.brandName} • Master Checkout Simulator
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setPreviewBrand(null)}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#94A3B8',
+                    fontSize: 20,
+                    cursor: 'pointer',
+                    padding: '4px 8px',
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Inspector Content */}
+              <div style={{ padding: 24 }}>
+                {/* Simulated Student Checkout Interface */}
+                <div
+                  style={{
+                    background: '#FFFFFF',
+                    borderRadius: 12,
+                    color: '#0F172A',
+                    overflow: 'hidden',
+                    boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)',
+                  }}
+                >
+                  {/* Brand Header Banner */}
+                  <div
+                    style={{
+                      background: previewBrand.bannerStyle === 'gradient'
+                        ? `linear-gradient(135deg, ${previewBrand.accentColor} 0%, #0F172A 100%)`
+                        : previewBrand.bannerStyle === 'dark' ? '#0B0F19' : previewBrand.accentColor,
+                      color: '#FFFFFF',
+                      padding: '20px 24px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <div
+                        style={{
+                          width: 44,
+                          height: 44,
+                          borderRadius: 8,
+                          background: '#FFFFFF',
+                          color: previewBrand.accentColor,
+                          fontWeight: 900,
+                          fontSize: 18,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        {previewBrand.brandLogoText || 'BL'}
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 18, fontWeight: 800 }}>{previewBrand.brandName}</div>
+                        <div style={{ fontSize: 11, opacity: 0.85 }}>بوابة السداد الإلكتروني المعتمدة • CBE Compliant</div>
+                      </div>
+                    </div>
+
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontSize: 11, opacity: 0.8 }}>الدعم والمساعدة</div>
+                      <div style={{ fontSize: 13, fontWeight: 700 }}>{previewBrand.supportPhone}</div>
+                    </div>
+                  </div>
+
+                  {/* Course Details & Payment Rails */}
+                  <div style={{ padding: 24, display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 24 }}>
+                    <div>
+                      <div style={{ fontSize: 12, color: '#64748B', fontWeight: 600 }}>بيانات الطالب للتسجيل الرسمي (Student Details)</div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 10 }}>
+                        <input
+                          type="text"
+                          defaultValue="أحمد كمال (Ahmed Kamal)"
+                          readOnly
+                          style={{ padding: '9px 12px', borderRadius: 8, border: '1px solid #CBD5E1', fontSize: 13 }}
+                        />
+                        <input
+                          type="text"
+                          defaultValue="01023456789"
+                          readOnly
+                          style={{ padding: '9px 12px', borderRadius: 8, border: '1px solid #CBD5E1', fontSize: 13 }}
+                        />
+                      </div>
+
+                      {/* Payment Rail Selector */}
+                      <div style={{ marginTop: 20 }}>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: '#334155', marginBottom: 10 }}>
+                          طريقة الدفع (Payment Method):
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+                          {previewBrand.activeRails.fawry && (
+                            <button
+                              onClick={() => setActiveRail('FAWRY')}
+                              style={{
+                                padding: 10,
+                                borderRadius: 8,
+                                border: activeRail === 'FAWRY' ? `2px solid ${previewBrand.accentColor}` : '1px solid #CBD5E1',
+                                background: activeRail === 'FAWRY' ? '#EFF6FF' : '#FFFFFF',
+                                fontWeight: 700,
+                                fontSize: 12,
+                                cursor: 'pointer',
+                                textAlign: 'left',
+                              }}
+                            >
+                              ⚡ كود دفع فوري (Fawry)
+                            </button>
+                          )}
+                          {previewBrand.activeRails.wallet && (
+                            <button
+                              onClick={() => setActiveRail('WALLET')}
+                              style={{
+                                padding: 10,
+                                borderRadius: 8,
+                                border: activeRail === 'WALLET' ? `2px solid ${previewBrand.accentColor}` : '1px solid #CBD5E1',
+                                background: activeRail === 'WALLET' ? '#EFF6FF' : '#FFFFFF',
+                                fontWeight: 700,
+                                fontSize: 12,
+                                cursor: 'pointer',
+                                textAlign: 'left',
+                              }}
+                            >
+                              📱 محفظة إلكترونية و إنستاباي
+                            </button>
+                          )}
+                          {previewBrand.activeRails.card && (
+                            <button
+                              onClick={() => setActiveRail('CARD')}
+                              style={{
+                                padding: 10,
+                                borderRadius: 8,
+                                border: activeRail === 'CARD' ? `2px solid ${previewBrand.accentColor}` : '1px solid #CBD5E1',
+                                background: activeRail === 'CARD' ? '#EFF6FF' : '#FFFFFF',
+                                fontWeight: 700,
+                                fontSize: 12,
+                                cursor: 'pointer',
+                                textAlign: 'left',
+                              }}
+                            >
+                              💳 بطاقة بنكية (Visa/Meeza)
+                            </button>
+                          )}
+                          {previewBrand.activeRails.activationCode && (
+                            <button
+                              onClick={() => setActiveRail('CODE')}
+                              style={{
+                                padding: 10,
+                                borderRadius: 8,
+                                border: activeRail === 'CODE' ? `2px solid #10B981` : '1px solid #CBD5E1',
+                                background: activeRail === 'CODE' ? '#ECFDF5' : '#FFFFFF',
+                                fontWeight: 700,
+                                fontSize: 12,
+                                cursor: 'pointer',
+                                textAlign: 'left',
+                                color: activeRail === 'CODE' ? '#047857' : '#0F172A',
+                              }}
+                            >
+                              🎟️ تفعيل كود مطبوع (Code)
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Rail Dynamic Content */}
+                      <div style={{ marginTop: 16, padding: 14, background: '#F8FAFC', borderRadius: 8, border: '1px solid #E2E8F0' }}>
+                        {activeRail === 'FAWRY' && (
+                          <div>
+                            <div style={{ fontSize: 11, color: '#64748B' }}>رقم المرجع للسداد في أي فرع فوري:</div>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 6 }}>
+                              <span style={{ fontSize: 20, fontWeight: 900, fontFamily: 'monospace', letterSpacing: '0.05em', color: '#0F172A' }}>
+                                {fawryRefCode}
+                              </span>
+                              <button
+                                onClick={copyFawry}
+                                style={{ padding: '5px 10px', borderRadius: 6, background: '#0F172A', color: '#FFFFFF', fontSize: 11, border: 'none', cursor: 'pointer' }}
+                              >
+                                {copiedCode ? '✓ تم النسخ' : 'نسخ الكود'}
+                              </button>
+                            </div>
+                          </div>
+                        )}
+
+                        {activeRail === 'WALLET' && (
+                          <div>
+                            <div style={{ fontSize: 11, color: '#64748B' }}>أدخل رقم فودافون كاش أو إنستاباي:</div>
+                            <input
+                              type="text"
+                              defaultValue="01023456789"
+                              style={{ width: '100%', marginTop: 6, padding: '7px 10px', borderRadius: 6, border: '1px solid #CBD5E1', fontSize: 13 }}
+                            />
+                          </div>
+                        )}
+
+                        {activeRail === 'CARD' && (
+                          <div>
+                            <div style={{ fontSize: 11, color: '#64748B' }}>سداد آمن ومباشر عبر بوابة {previewBrand.connectedGateway}:</div>
+                            <div style={{ fontSize: 12, color: '#059669', fontWeight: 600, marginTop: 4 }}>
+                              🔒 مشفر 256-Bit • متوافق مع بنك مصر والبنك الأهلي
+                            </div>
+                          </div>
+                        )}
+
+                        {activeRail === 'CODE' && (
+                          <div>
+                            <div style={{ fontSize: 11, color: '#047857', fontWeight: 700 }}>سداد بكود ورقي أو كشط من السنتر:</div>
+                            <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
+                              <input
+                                type="text"
+                                placeholder="مثال: SH-2026-F982"
+                                value={activationCodeInput}
+                                onChange={(e) => setActivationCodeInput(e.target.value)}
+                                style={{ flex: 1, padding: '7px 10px', borderRadius: 6, border: '1px solid #A7F3D0', fontSize: 13, textTransform: 'uppercase' }}
+                              />
+                              <button
+                                onClick={() => setCodeRedeemed(true)}
+                                style={{ padding: '7px 12px', borderRadius: 6, background: '#059669', color: '#FFFFFF', border: 'none', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
+                              >
+                                تحقق وتفعيل
+                              </button>
+                            </div>
+                            {codeRedeemed && (
+                              <div style={{ fontSize: 11, color: '#059669', fontWeight: 700, marginTop: 6 }}>
+                                ✓ تم التحقق بنجاح من كود السنتر المعتمد!
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Course Summary Side */}
+                    <div style={{ background: '#F8FAFC', padding: 20, borderRadius: 10, border: '1px solid #E2E8F0', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                      <div>
+                        <span style={{ fontSize: 10, fontWeight: 800, color: previewBrand.accentColor, background: '#FFFFFF', padding: '2px 8px', borderRadius: 4, border: '1px solid #E2E8F0' }}>
+                          معتمد من المنصة
+                        </span>
+                        <div style={{ fontSize: 16, fontWeight: 800, marginTop: 8 }}>
+                          معسكر هندسة البرمجيات والويب الشامل
+                        </div>
+                        <div style={{ fontSize: 11, color: '#64748B', marginTop: 4 }}>
+                          الدفعة المعتمدة للربع القادم • 12 أسبوع
+                        </div>
+
+                        <div style={{ marginTop: 24, paddingTop: 16, borderTop: '1px solid #E2E8F0' }}>
+                          <div style={{ fontSize: 11, color: '#64748B' }}>إجمالي الرسوم المطلوبة:</div>
+                          <div style={{ fontSize: 28, fontWeight: 900, color: '#0F172A' }}>
+                            EGP 4,800
+                          </div>
+                        </div>
+                      </div>
+
+                      <div style={{ fontSize: 10.5, color: '#64748B', textAlign: 'center', marginTop: 20 }}>
+                        🔒 الدفع مشفر ومؤمن بالكامل عبر نظام الضمان الثنائي
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div style={{ padding: '16px 24px', borderTop: '1px solid rgba(255, 255, 255, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255, 255, 255, 0.02)' }}>
+                <span style={{ fontSize: 12, color: '#64748B' }}>
+                  Gateway: <strong>{previewBrand.connectedGateway}</strong> • Escrow: <strong>Active</strong>
+                </span>
+
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <button
+                    onClick={() => handleToggleBrandStatus(previewBrand.ventureId)}
+                    style={{
+                      padding: '8px 14px',
+                      borderRadius: 8,
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      color: previewBrand.status === 'ACTIVE' ? '#F87171' : '#34D399',
+                      fontSize: 12,
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {previewBrand.status === 'ACTIVE' ? 'Pause This Checkout' : 'Activate This Checkout'}
+                  </button>
+
+                  <button
+                    onClick={() => setPreviewBrand(null)}
+                    style={{
+                      padding: '8px 16px',
+                      borderRadius: 8,
+                      background: '#10B981',
+                      border: 'none',
+                      color: '#FFFFFF',
+                      fontSize: 12,
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Done Inspecting
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ─── MODAL 2: ARCHITECT / EDIT MASTER BLUEPRINT ─── */}
+        {editingBlueprint && (
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0, 0, 0, 0.85)',
+              backdropFilter: 'blur(8px)',
+              zIndex: 100,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 24,
+            }}
+          >
+            <div
+              style={{
+                width: '100%',
+                maxWidth: 720,
+                maxHeight: '90vh',
+                overflowY: 'auto',
+                background: '#0F172A',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                borderRadius: 16,
+                boxShadow: '0 25px 60px rgba(0, 0, 0, 0.7)',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              {/* Header */}
+              <div style={{ padding: '18px 24px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6, color: 'var(--hub-text-2)' }}>Amount (EGP)</label>
+                  <h3 style={{ fontSize: 16, fontWeight: 800, color: '#FFFFFF', margin: 0 }}>
+                    {isNewBlueprint ? 'Architect New Master Blueprint' : 'Edit Master Template Blueprint'}
+                  </h3>
+                  <p style={{ fontSize: 12, color: '#94A3B8', marginTop: 2, marginBottom: 0 }}>
+                    Governed by Central Hub. Controls layout and allowed payment rails for all brand portals.
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => setEditingBlueprint(null)}
+                  style={{ background: 'transparent', border: 'none', color: '#94A3B8', fontSize: 20, cursor: 'pointer' }}
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Form Body */}
+              <form onSubmit={handleSaveBlueprint} style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#CBD5E1', marginBottom: 6 }}>
+                    Blueprint Name (English)
+                  </label>
                   <input
+                    type="text"
+                    value={editingBlueprint.name}
+                    onChange={(e) => setEditingBlueprint({ ...editingBlueprint, name: e.target.value })}
+                    style={{ width: '100%', height: 40, borderRadius: 8, background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.15)', color: '#FFFFFF', padding: '0 12px', fontSize: 13 }}
                     required
-                    type="number"
-                    className="hub-input"
-                    value={form.amount}
-                    onChange={(e) => setForm({ ...form, amount: e.target.value })}
                   />
                 </div>
+
                 <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6, color: 'var(--hub-text-2)' }}>Payment Gateway</label>
-                  <select
-                    className="hub-select"
-                    style={{ width: '100%' }}
-                    value={form.gateway}
-                    onChange={(e) => setForm({ ...form, gateway: e.target.value as PaymentPage['gateway'] })}
-                  >
-                    {GATEWAYS.map((g) => <option key={g} value={g}>{g}</option>)}
-                  </select>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#CBD5E1', marginBottom: 6 }}>
+                    Blueprint Arabic Title (اسم القالب بالعربية)
+                  </label>
+                  <input
+                    type="text"
+                    value={editingBlueprint.nameAr}
+                    onChange={(e) => setEditingBlueprint({ ...editingBlueprint, nameAr: e.target.value })}
+                    style={{ width: '100%', height: 40, borderRadius: 8, background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.15)', color: '#FFFFFF', padding: '0 12px', fontSize: 13, direction: 'rtl' }}
+                    required
+                  />
                 </div>
-              </div>
 
-              <div>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6, color: 'var(--hub-text-2)' }}>Active Payment Methods</label>
-                <div style={{ display: 'flex', gap: 14, background: 'var(--hub-bg)', padding: '10px 14px', borderRadius: 8, border: '1px solid var(--hub-border)' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, cursor: 'pointer' }}>
-                    <input type="checkbox" checked={form.fawry} onChange={(e) => setForm({ ...form, fawry: e.target.checked })} />
-                    Fawry Code
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#CBD5E1', marginBottom: 6 }}>
+                    Description &amp; Intended Use Case
                   </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, cursor: 'pointer' }}>
-                    <input type="checkbox" checked={form.wallet} onChange={(e) => setForm({ ...form, wallet: e.target.checked })} />
-                    Mobile Wallets
-                  </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, cursor: 'pointer' }}>
-                    <input type="checkbox" checked={form.card} onChange={(e) => setForm({ ...form, card: e.target.checked })} />
-                    Meeza / Cards
-                  </label>
+                  <textarea
+                    rows={2}
+                    value={editingBlueprint.description}
+                    onChange={(e) => setEditingBlueprint({ ...editingBlueprint, description: e.target.value })}
+                    style={{ width: '100%', borderRadius: 8, background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.15)', color: '#FFFFFF', padding: 10, fontSize: 13, resize: 'vertical' }}
+                    required
+                  />
                 </div>
-              </div>
 
-              <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
-                <button type="button" className="hub-btn hub-btn-secondary" onClick={() => setShowBuilder(false)} style={{ flex: 1 }}>Cancel</button>
-                <button type="submit" className="hub-btn hub-btn-primary" style={{ flex: 1 }}>Publish Page</button>
-              </div>
-            </form>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#CBD5E1', marginBottom: 6 }}>
+                      Layout Structure
+                    </label>
+                    <select
+                      value={editingBlueprint.layout}
+                      onChange={(e) => setEditingBlueprint({ ...editingBlueprint, layout: e.target.value as CheckoutLayoutType })}
+                      style={{ width: '100%', height: 40, borderRadius: 8, background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.15)', color: '#FFFFFF', padding: '0 10px', fontSize: 13 }}
+                    >
+                      <option value="split-hero">Split Hero (2-Column)</option>
+                      <option value="single-column">Single Column (Mobile)</option>
+                      <option value="compact-card">Compact Card (Embed)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#CBD5E1', marginBottom: 6 }}>
+                      Header Style
+                    </label>
+                    <select
+                      value={editingBlueprint.headerStyle}
+                      onChange={(e) => setEditingBlueprint({ ...editingBlueprint, headerStyle: e.target.value as CheckoutBannerStyle })}
+                      style={{ width: '100%', height: 40, borderRadius: 8, background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.15)', color: '#FFFFFF', padding: '0 10px', fontSize: 13 }}
+                    >
+                      <option value="gradient">Gradient Accent</option>
+                      <option value="dark">Dark Obsidian</option>
+                      <option value="solid">Solid Color</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#CBD5E1', marginBottom: 6 }}>
+                      Default Accent Color
+                    </label>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <input
+                        type="color"
+                        value={editingBlueprint.defaultAccentColor}
+                        onChange={(e) => setEditingBlueprint({ ...editingBlueprint, defaultAccentColor: e.target.value })}
+                        style={{ width: 40, height: 40, padding: 0, border: 'none', borderRadius: 8, background: 'transparent', cursor: 'pointer' }}
+                      />
+                      <input
+                        type="text"
+                        value={editingBlueprint.defaultAccentColor}
+                        onChange={(e) => setEditingBlueprint({ ...editingBlueprint, defaultAccentColor: e.target.value })}
+                        style={{ flex: 1, height: 40, borderRadius: 8, background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.15)', color: '#FFFFFF', padding: '0 10px', fontSize: 13 }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Permitted Egyptian Rails Toggles */}
+                <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: 16, borderRadius: 10, border: '1px solid rgba(255, 255, 255, 0.07)' }}>
+                  <div style={{ fontSize: 12, fontWeight: 800, color: '#FFFFFF', marginBottom: 4 }}>
+                    Permitted Egyptian Payment Rails (Hub Governance)
+                  </div>
+                  <div style={{ fontSize: 11, color: '#94A3B8', marginBottom: 12 }}>
+                    Unchecking a rail prevents brand portals using this blueprint from exposing that method to students.
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5, color: '#CBD5E1', cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={editingBlueprint.allowedPaymentRails.fawry}
+                        onChange={(e) => setEditingBlueprint({
+                          ...editingBlueprint,
+                          allowedPaymentRails: { ...editingBlueprint.allowedPaymentRails, fawry: e.target.checked }
+                        })}
+                        style={{ accentColor: '#10B981', width: 16, height: 16 }}
+                      />
+                      <span>⚡ Fawry Direct Kiosk Reference</span>
+                    </label>
+
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5, color: '#CBD5E1', cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={editingBlueprint.allowedPaymentRails.wallet}
+                        onChange={(e) => setEditingBlueprint({
+                          ...editingBlueprint,
+                          allowedPaymentRails: { ...editingBlueprint.allowedPaymentRails, wallet: e.target.checked }
+                        })}
+                        style={{ accentColor: '#10B981', width: 16, height: 16 }}
+                      />
+                      <span>📱 Mobile Wallets &amp; InstaPay</span>
+                    </label>
+
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5, color: '#CBD5E1', cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={editingBlueprint.allowedPaymentRails.card}
+                        onChange={(e) => setEditingBlueprint({
+                          ...editingBlueprint,
+                          allowedPaymentRails: { ...editingBlueprint.allowedPaymentRails, card: e.target.checked }
+                        })}
+                        style={{ accentColor: '#10B981', width: 16, height: 16 }}
+                      />
+                      <span>💳 Visa / Mastercard / Meeza</span>
+                    </label>
+
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5, color: '#CBD5E1', cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={editingBlueprint.allowedPaymentRails.activationCode}
+                        onChange={(e) => setEditingBlueprint({
+                          ...editingBlueprint,
+                          allowedPaymentRails: { ...editingBlueprint.allowedPaymentRails, activationCode: e.target.checked }
+                        })}
+                        style={{ accentColor: '#10B981', width: 16, height: 16 }}
+                      />
+                      <span>🎟️ Physical Scratch-Off Serial Codes</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5, color: '#CBD5E1', cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={editingBlueprint.isPublished}
+                      onChange={(e) => setEditingBlueprint({ ...editingBlueprint, isPublished: e.target.checked })}
+                      style={{ accentColor: '#10B981', width: 16, height: 16 }}
+                    />
+                    <span>Publish live to all Brand Portals template catalog</span>
+                  </label>
+
+                  <div style={{ display: 'flex', gap: 10 }}>
+                    <button
+                      type="button"
+                      onClick={() => setEditingBlueprint(null)}
+                      style={{ padding: '8px 16px', borderRadius: 8, background: 'rgba(255, 255, 255, 0.08)', border: 'none', color: '#CBD5E1', fontSize: 12.5, cursor: 'pointer' }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      style={{ padding: '8px 20px', borderRadius: 8, background: '#10B981', border: 'none', color: '#FFFFFF', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}
+                    >
+                      Save &amp; Publish Blueprint
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

@@ -29,7 +29,7 @@ const NAV_ITEMS: NavItemDef[] = [
     d: 'M6.4 9.6l3.2-3.2M5.2 7.8L3.6 9.4a2.2 2.2 0 003.1 3.1l1.6-1.6M10.8 8.2l1.6-1.6a2.2 2.2 0 00-3.1-3.1L7.7 5.1',
   },
   {
-    label: 'Payment Pages',
+    label: 'Checkout Studio & Monitor',
     href: '/payment-pages',
     d: 'M3 3h10v10H3zM3 6h10M6 6v7',
   },

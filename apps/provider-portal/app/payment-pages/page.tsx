@@ -1,7 +1,13 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import ProviderSidebar from '../../components/Sidebar';
+import {
+  getMasterBlueprints,
+  getBrandCheckoutConfig,
+  saveBrandCheckoutConfig,
+} from '../../lib/checkout-studio';
+import { CheckoutTemplateBlueprint } from '@bldr/shared-types';
 import {
   FawryLogo,
   VodafoneCashLogo,
@@ -138,6 +144,62 @@ export default function MasterCheckoutStudioPage() {
   const [embedCopied, setEmbedCopied] = useState(false);
   const [saveToast, setSaveToast] = useState(false);
 
+  // Central Hub Governed Blueprints & Venture State
+  const [blueprints, setBlueprints] = useState<CheckoutTemplateBlueprint[]>([]);
+  const [selectedBlueprintId, setSelectedBlueprintId] = useState<string>('tpl-split-academy');
+  const [currentVentureId, setCurrentVentureId] = useState<string>('studyhub');
+
+  // Load blueprints and venture config on mount
+  useEffect(() => {
+    const bps = getMasterBlueprints();
+    setBlueprints(bps);
+
+    const vId = (typeof window !== 'undefined' ? localStorage.getItem('bldr_venture_id') : null) || 'studyhub';
+    setCurrentVentureId(vId);
+
+    const savedConfig = getBrandCheckoutConfig(vId);
+    if (savedConfig) {
+      setSelectedBlueprintId(savedConfig.templateId || 'tpl-split-academy');
+      setTemplate(prev => ({
+        ...prev,
+        providerName: savedConfig.brandName || prev.providerName,
+        providerLogoText: savedConfig.brandLogoText || prev.providerLogoText,
+        providerLogoUrl: savedConfig.brandLogoUrl || prev.providerLogoUrl,
+        accentColor: savedConfig.accentColor || prev.accentColor,
+        bannerStyle: savedConfig.bannerStyle || prev.bannerStyle,
+        supportPhone: savedConfig.supportPhone || prev.supportPhone,
+        supportEmail: savedConfig.supportEmail || prev.supportEmail,
+        showLogoInHero: savedConfig.showLogoInHero ?? prev.showLogoInHero,
+        gateway: savedConfig.connectedGateway || prev.gateway,
+        methods: {
+          fawry: savedConfig.activeRails.fawry,
+          wallet: savedConfig.activeRails.wallet,
+          card: savedConfig.activeRails.card,
+        },
+      }));
+    }
+
+    const handleBlueprintsUpdated = () => {
+      setBlueprints(getMasterBlueprints());
+    };
+    window.addEventListener('bldr:blueprints-updated', handleBlueprintsUpdated);
+    return () => window.removeEventListener('bldr:blueprints-updated', handleBlueprintsUpdated);
+  }, []);
+
+  const handleSelectBlueprint = (bp: CheckoutTemplateBlueprint) => {
+    setSelectedBlueprintId(bp.id);
+    setTemplate(prev => ({
+      ...prev,
+      bannerStyle: bp.headerStyle,
+      accentColor: prev.accentColor || bp.defaultAccentColor,
+      methods: {
+        fawry: bp.allowedPaymentRails.fawry,
+        wallet: bp.allowedPaymentRails.wallet,
+        card: bp.allowedPaymentRails.card,
+      },
+    }));
+  };
+
   // Brand Logo Customization State
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [customLogoUrl, setCustomLogoUrl] = useState('');
@@ -192,8 +254,34 @@ export default function MasterCheckoutStudioPage() {
   };
 
   const handleSave = () => {
+    const bp = blueprints.find(b => b.id === selectedBlueprintId) || blueprints[0];
+    saveBrandCheckoutConfig({
+      ventureId: currentVentureId,
+      ventureName: template.providerName,
+      templateId: selectedBlueprintId,
+      brandName: template.providerName,
+      brandLogoText: template.providerLogoText,
+      brandLogoUrl: template.providerLogoUrl || '',
+      accentColor: template.accentColor,
+      bannerStyle: template.bannerStyle,
+      supportPhone: template.supportPhone,
+      supportEmail: template.supportEmail,
+      showLogoInHero: template.showLogoInHero ?? true,
+      connectedGateway: template.gateway,
+      activeRails: {
+        fawry: template.methods.fawry,
+        wallet: template.methods.wallet,
+        card: template.methods.card,
+        activationCode: bp?.allowedPaymentRails.activationCode ?? true,
+      },
+      liveSlug: template.providerSlug,
+      status: 'ACTIVE',
+      conversions24h: 142,
+      totalVolumeEgp: 681600,
+      lastCustomizedAt: new Date().toISOString(),
+    });
     setSaveToast(true);
-    setTimeout(() => setSaveToast(false), 2500);
+    setTimeout(() => setSaveToast(false), 3000);
   };
 
   const dynamicCheckoutUrl = `https://pay.bldr.io/checkout/${template.providerSlug}?course_id=${activeCourse.id}&title=${encodeURIComponent(activeCourse.title)}&amount=${activeCourse.price}`;
@@ -242,20 +330,20 @@ export default function MasterCheckoutStudioPage() {
                 Master Checkout Studio
               </h1>
               <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 6, background: '#EFF6FF', color: '#1D4ED8', border: '1px solid #BFDBFE' }}>
-                Dynamic CMS Architecture
+                Governed by Central Hub
               </span>
-              <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 6, background: '#FEF3C7', color: '#92400E' }}>
-                Egypt Payment Rails (Fawry / Wallets / Cards)
+              <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 6, background: '#ECFDF5', color: '#047857', border: '1px solid #A7F3D0' }}>
+                CBE Dual-Escrow Verified
               </span>
             </div>
             <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0 }}>
-              One master branded checkout template that dynamically adapts to every course added in your CMS
+              Choose an approved Central Hub Master Template and personalize your brand — zero manual page building
             </p>
           </div>
           <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
             {saveToast && (
               <span style={{ fontSize: 12, fontWeight: 700, color: '#059669', background: '#ECFDF5', padding: '6px 12px', borderRadius: 8, border: '1px solid #A7F3D0' }}>
-                Changes Saved Live
+                ✓ Changes Saved &amp; Live in Hub Monitor
               </span>
             )}
             <button
@@ -274,12 +362,12 @@ export default function MasterCheckoutStudioPage() {
         </header>
 
         {/* Global Architecture Notice Banner */}
-        <div style={{ background: '#F8FAFC', borderBottom: '1px solid #E2E8F0', padding: '10px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ fontSize: 12.5, color: '#334155' }}>
-            <strong style={{ color: '#0F172A' }}>Zero Page-Creation Workflow:</strong> You do not need to build a new payment page for each course. Personalize your Academy Master Theme once, and whenever you add a course from your CMS or course creator, it automatically populates this branded checkout dynamically.
+        <div style={{ background: '#F0FDF4', borderBottom: '1px solid #BBF7D0', padding: '10px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ fontSize: 12.5, color: '#166534' }}>
+            <strong style={{ color: '#14532D' }}>Hub-Governed Workflow:</strong> Checkout layouts, Egyptian payment rails, and Central Bank compliance are engineered centrally on the Central Hub. Select an approved template from the catalog below and apply your brand identity.
           </div>
-          <span style={{ fontSize: 11, fontWeight: 700, background: '#E2E8F0', color: '#334155', padding: '3px 8px', borderRadius: 6, whiteSpace: 'nowrap' }}>
-            Single Master Template
+          <span style={{ fontSize: 11, fontWeight: 700, background: '#DCFCE7', color: '#15803D', padding: '3px 8px', borderRadius: 6, whiteSpace: 'nowrap', border: '1px solid #86EFAC' }}>
+            Hub-Approved Catalog
           </span>
         </div>
 
@@ -347,11 +435,71 @@ export default function MasterCheckoutStudioPage() {
               {/* TAB 1: MASTER BRAND & THEME */}
               {activeTab === 'BRANDING' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                  {/* Section 1: Provider Identity & Header */}
+                  {/* Section 1: Choose Master Blueprint from Central Hub */}
+                  <div style={{ background: 'white', borderRadius: 12, border: '2px solid #3B82F6', padding: '20px 22px', boxShadow: '0 4px 14px rgba(59, 130, 246, 0.08)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <h3 style={{ fontSize: 15, fontWeight: 800, margin: 0, color: '#0F172A' }}>
+                          1. Select Master Template from Central Hub
+                        </h3>
+                        <span style={{ fontSize: 10.5, fontWeight: 700, padding: '2px 8px', borderRadius: 6, background: '#EFF6FF', color: '#1D4ED8', border: '1px solid #BFDBFE' }}>
+                          Hub Governed
+                        </span>
+                      </div>
+                    </div>
+                    <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2, marginBottom: 14 }}>
+                      Template layouts, Egyptian payment rails, and Central Bank escrow compliance are managed by Central Financial Hub. Pick your academy blueprint:
+                    </p>
+
+                    {/* Blueprint Cards Grid */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+                      {blueprints.filter(b => b.isPublished).map((bp) => {
+                        const isSelected = selectedBlueprintId === bp.id;
+                        return (
+                          <div
+                            key={bp.id}
+                            onClick={() => handleSelectBlueprint(bp)}
+                            style={{
+                              border: isSelected ? '2px solid #10B981' : '1px solid #E2E8F0',
+                              borderRadius: 10,
+                              padding: '14px 16px',
+                              background: isSelected ? '#F0FDF4' : '#F8FAFC',
+                              cursor: 'pointer',
+                              transition: 'all 0.15s ease',
+                              position: 'relative',
+                            }}
+                          >
+                            {isSelected && (
+                              <span style={{ position: 'absolute', top: 10, right: 10, fontSize: 10, fontWeight: 800, background: '#10B981', color: 'white', padding: '2px 6px', borderRadius: 4 }}>
+                                ✓ Selected
+                              </span>
+                            )}
+                            <span style={{ fontSize: 10, fontWeight: 700, color: '#2563EB', background: '#DBEAFE', padding: '2px 6px', borderRadius: 4 }}>
+                              {bp.badge}
+                            </span>
+                            <div style={{ fontSize: 13.5, fontWeight: 700, color: '#0F172A', marginTop: 6 }}>
+                              {bp.name}
+                            </div>
+                            <div style={{ fontSize: 11, color: '#64748B', marginTop: 4, lineHeight: 1.4 }}>
+                              {bp.description.slice(0, 95)}...
+                            </div>
+                            <div style={{ marginTop: 8, display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                              {bp.allowedPaymentRails.fawry && <span style={{ fontSize: 9, background: '#FEF3C7', color: '#92400E', padding: '1px 5px', borderRadius: 3 }}>⚡ Fawry</span>}
+                              {bp.allowedPaymentRails.wallet && <span style={{ fontSize: 9, background: '#FEE2E2', color: '#991B1B', padding: '1px 5px', borderRadius: 3 }}>📱 Wallets</span>}
+                              {bp.allowedPaymentRails.card && <span style={{ fontSize: 9, background: '#DBEAFE', color: '#1E40AF', padding: '1px 5px', borderRadius: 3 }}>💳 Cards</span>}
+                              {bp.allowedPaymentRails.activationCode && <span style={{ fontSize: 9, background: '#D1FAE5', color: '#065F46', padding: '1px 5px', borderRadius: 3 }}>🎟️ Serial Code</span>}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Section 2: Provider Identity & Header */}
                   <div style={{ background: 'white', borderRadius: 12, border: '1px solid var(--border)', padding: '20px 22px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                       <h3 style={{ fontSize: 14, fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>
-                        Provider Logo & Brand Identity
+                        2. Provider Logo &amp; Brand Identity (Simple Customization)
                       </h3>
                       <span style={{ fontSize: 10.5, fontWeight: 700, padding: '2px 8px', borderRadius: 6, background: '#EFF6FF', color: '#1D4ED8', border: '1px solid #BFDBFE' }}>
                         Custom Branding

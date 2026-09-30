@@ -351,3 +351,54 @@ export interface EnrollmentCode {
   notes?: string | null;
   createdAt: string;
 }
+
+// ─── Master Checkout Blueprints & Brand Configurations ───────────────────────
+
+export type CheckoutLayoutType = 'split-hero' | 'single-column' | 'compact-card';
+export type CheckoutBannerStyle = 'gradient' | 'dark' | 'solid';
+
+export interface CheckoutPaymentRailsConfig {
+  fawry: boolean;
+  wallet: boolean;
+  card: boolean;
+  activationCode: boolean;
+}
+
+export interface CheckoutTemplateBlueprint {
+  id: string;
+  name: string;
+  nameAr: string;
+  description: string;
+  badge: string;
+  layout: CheckoutLayoutType;
+  headerStyle: CheckoutBannerStyle;
+  defaultAccentColor: string;
+  allowedPaymentRails: CheckoutPaymentRailsConfig;
+  securitySeals: string[];
+  version: string;
+  isPublished: boolean;
+  author: string;
+  updatedAt: string;
+}
+
+export interface BrandCheckoutConfig {
+  ventureId: string;
+  ventureName: string;
+  templateId: string;
+  brandName: string;
+  brandLogoText: string;
+  brandLogoUrl: string;
+  accentColor: string;
+  bannerStyle: CheckoutBannerStyle;
+  supportPhone: string;
+  supportEmail: string;
+  showLogoInHero: boolean;
+  connectedGateway: 'Geidea' | 'Paymob (Accept)' | 'Fawry Pay';
+  activeRails: CheckoutPaymentRailsConfig;
+  liveSlug: string;
+  status: 'ACTIVE' | 'PAUSED' | 'MAINTENANCE';
+  conversions24h: number;
+  totalVolumeEgp: number;
+  lastCustomizedAt: string;
+}
+
