@@ -17,42 +17,6 @@ function SingleProductContent() {
   const [isPaid, setIsPaid] = useState(false);
   const [lang, setLang] = useState<'EN' | 'AR'>('EN');
   const [isContactOpen, setIsContactOpen] = useState(false);
-  const [isInitiatingCheckout, setIsInitiatingCheckout] = useState(false);
-
-  const handleBuyNow = async () => {
-    setIsInitiatingCheckout(true);
-    try {
-      const generatedOrderId = `bldr_ord_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-      const res = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          productId: product.id,
-          orderId: generatedOrderId,
-          title: lang === 'AR' ? product.titleAr : product.title,
-          amountEgp: product.priceEGP,
-          customer: {
-            name: 'Samir Rashed',
-            email: 'samir@bldr.dev',
-            phone: '+201001234567',
-          },
-          returnUrl: `${window.location.origin}/orders/${generatedOrderId}/success?session_id={CHECKOUT_SESSION_ID}`,
-          cancelUrl: window.location.href,
-        }),
-      });
-
-      const data = await res.json();
-      if (data.checkoutUrl) {
-        window.location.href = data.checkoutUrl;
-      } else {
-        alert(data.error || 'Failed to start payment session with Payment Hub');
-        setIsInitiatingCheckout(false);
-      }
-    } catch (e: any) {
-      alert(e.message || 'Error initiating checkout session');
-      setIsInitiatingCheckout(false);
-    }
-  };
 
   useEffect(() => {
     if (queryPaid) {
@@ -262,11 +226,9 @@ function SingleProductContent() {
                       </span>
                     </a>
                   ) : (
-                    <button
+                    <Link
                       id="btn-pay-now-product"
-                      type="button"
-                      onClick={handleBuyNow}
-                      disabled={isInitiatingCheckout}
+                      href={`/pay/${product.paySlug}?productId=${product.id}`}
                       style={{
                         display: 'inline-flex',
                         alignItems: 'center',
@@ -274,22 +236,19 @@ function SingleProductContent() {
                         height: 48,
                         padding: '0 28px',
                         borderRadius: 8,
-                        background: isInitiatingCheckout ? '#5A6A80' : '#2E6F5E',
+                        background: '#2E6F5E',
                         color: '#FFFFFF',
                         fontSize: 15,
                         fontWeight: 700,
-                        border: 'none',
-                        cursor: isInitiatingCheckout ? 'wait' : 'pointer',
+                        textDecoration: 'none',
                         boxShadow: '0 4px 14px rgba(46, 111, 94, 0.3)',
                         transition: 'background 0.15s ease',
                       }}
                     >
                       <span>
-                        {isInitiatingCheckout
-                          ? (isRtl ? 'جاري تحضير صفحة الدفع الآمنة…' : 'Preparing Secure Hub Checkout…')
-                          : (isRtl ? 'ادفع الآن وحجز مقعدك فورياً' : 'Buy Now / Pay via Central Hub')}
+                        {isRtl ? 'ادفع الآن وحجز مقعدك فورياً' : 'Pay Now / Secure Your Seat'}
                       </span>
-                    </button>
+                    </Link>
                   )}
 
                   {/* Secondary CTA: Contact Modal */}
