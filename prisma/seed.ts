@@ -1,10 +1,10 @@
-import { PrismaClient, ProviderStatus, PurchaseType, EngagementType, UserRole } from '@prisma/client';
+import { PrismaClient, ProviderStatus, PurchaseType, EngagementType, UserRole, CardWalletGateway, IntegrationMode, PlatformFeeModel } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Seeding bldr database...');
+  console.log('[bldr] Seeding database...');
 
   // ─── Global Commission Rule (10%) ──────────────────────────────────────────
   const existingRule = await prisma.commissionRule.findFirst({
@@ -45,6 +45,19 @@ async function main() {
     where: { slug: 'bldr' },
     update: {
       conversionToken: 'house_sec_tok_bldr_2024',
+      cardWalletGateway: CardWalletGateway.GEIDEA,
+      fawryEnabled: true,
+      integrationMode: IntegrationMode.NATIVE,
+      platformFeeModel: PlatformFeeModel.PERCENTAGE,
+      platformFeePct: 0.03,
+      vatOnFeesEnabled: true,
+      vatRate: 0.14,
+      reservePct: 0.05,
+      reserveReleaseDays: 14,
+      payoutCadence: 'weekly',
+      payoutMinThreshold: 100000,
+      externalWebhookUrl: 'http://localhost:3000/api/webhooks/bldr-payments',
+      externalWebhookSecret: 'whsec_test_bldr_pilot_2026',
     },
     create: {
       slug: 'bldr',
@@ -54,6 +67,19 @@ async function main() {
       isHouseBrand: true,
       status: ProviderStatus.APPROVED,
       conversionToken: 'house_sec_tok_bldr_2024',
+      cardWalletGateway: CardWalletGateway.GEIDEA,
+      fawryEnabled: true,
+      integrationMode: IntegrationMode.NATIVE,
+      platformFeeModel: PlatformFeeModel.PERCENTAGE,
+      platformFeePct: 0.03,
+      vatOnFeesEnabled: true,
+      vatRate: 0.14,
+      reservePct: 0.05,
+      reserveReleaseDays: 14,
+      payoutCadence: 'weekly',
+      payoutMinThreshold: 100000,
+      externalWebhookUrl: 'http://localhost:3000/api/webhooks/bldr-payments',
+      externalWebhookSecret: 'whsec_test_bldr_pilot_2026',
     },
   });
   console.log(`✅ House-brand provider: bldr (id: ${houseBrand.id})`);
@@ -266,11 +292,11 @@ async function main() {
         },
       });
     }
-    console.log(`  ✅ Sample listing: ${listing.title} (${listing.purchaseType})`);
+    console.log(`  [OK] Sample listing: ${listing.title} (${listing.purchaseType})`);
   }
 
 
-  console.log('\n🎉 Seeding complete!');
+  console.log('\n[bldr] Seeding complete!');
   console.log('─'.repeat(50));
   console.log(`Admin login:          ${adminEmail} / ${adminPassword}`);
   console.log(`House-brand login:    ${providerEmail} / Provider@bldr2024!`);

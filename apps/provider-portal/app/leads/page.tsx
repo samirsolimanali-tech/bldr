@@ -63,7 +63,7 @@ export default function LeadsPage() {
                 {loading ? (
                   <tr><td colSpan={8} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>Loading…</td></tr>
                 ) : leads.length === 0 ? (
-                  <tr><td colSpan={8}><div className="empty-state"><div className="empty-state-icon">💬</div><p>No leads yet</p></div></td></tr>
+                  <tr><td colSpan={8}><div className="empty-state"><p>No leads yet</p></div></td></tr>
                 ) : leads.map(l => (
                   <tr key={l.id}>
                     <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{l.name}</td>
@@ -72,7 +72,7 @@ export default function LeadsPage() {
                     <td>{l.listing?.title || '—'}</td>
                     <td>
                       <span className={`badge ${l.engagementType === 'BOOK_CALL' ? 'badge-blue' : 'badge-accent'}`}>
-                        {l.engagementType === 'BOOK_CALL' ? '📅 Call' : '💬 Quote'}
+                        {l.engagementType === 'BOOK_CALL' ? 'Call' : 'Quote'}
                       </span>
                     </td>
                     <td>

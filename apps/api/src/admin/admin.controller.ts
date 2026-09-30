@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { IsOptional, IsString, IsNumber, Min, Max } from 'class-validator';
 import { Type } from 'class-transformer';
@@ -69,5 +69,42 @@ export class AdminController {
   @Delete('commission/provider/:providerId')
   removeProviderRate(@Param('providerId') providerId: string) {
     return this.svc.removeProviderRate(providerId);
+  }
+
+  // ─── Products & Listings ──────────────────────────────────────────────────
+
+  @Get('listings')
+  listListings(
+    @Query('category') category?: string,
+    @Query('providerId') providerId?: string,
+    @Query('q') q?: string,
+    @Query('status') status?: string,
+  ) {
+    return this.svc.listAllListings({ category, providerId, q, status });
+  }
+
+  @Post('listings')
+  createListing(@Body() dto: any) {
+    return this.svc.createListing(dto);
+  }
+
+  @Patch('listings/:id')
+  updateListing(@Param('id') id: string, @Body() dto: any) {
+    return this.svc.updateListing(id, dto);
+  }
+
+  @Patch('listings/:id/toggle-publish')
+  toggleListingPublish(@Param('id') id: string) {
+    return this.svc.toggleListingPublish(id);
+  }
+
+  @Patch('listings/:id/toggle-featured')
+  toggleListingFeatured(@Param('id') id: string) {
+    return this.svc.toggleListingFeatured(id);
+  }
+
+  @Delete('listings/:id')
+  deleteListing(@Param('id') id: string) {
+    return this.svc.deleteListing(id);
   }
 }

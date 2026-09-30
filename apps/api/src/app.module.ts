@@ -15,6 +15,7 @@ import { CommissionModule } from './commission/commission.module';
 import { PayoutsModule } from './payouts/payouts.module';
 import { AdminModule } from './admin/admin.module';
 import { SimulationModule } from './simulation/simulation.module';
+import { CheckoutModule } from './checkout/checkout.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { SimulationModule } from './simulation/simulation.module';
     PayoutsModule,
     AdminModule,
     SimulationModule,
+    CheckoutModule,   // Model B: external checkout-session API (POST /v1/checkout/sessions)
   ],
 })
 export class AppModule {}

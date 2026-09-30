@@ -3,14 +3,14 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: {
-    default: 'bldr — Multi-Vendor Service Marketplace',
-    template: '%s | bldr',
+    default: 'Bldr — Build. Launch. Scale.',
+    template: '%s | Bldr',
   },
   description:
-    'Discover expert service providers across education, media, consulting, marketing and more. Compare, book, and buy with confidence on bldr.',
-  keywords: ['marketplace', 'services', 'education', 'consulting', 'media production'],
+    'Bldr is a premium platform delivering world-class digital products, services, and solutions. We help businesses build, launch, and scale with confidence.',
+  keywords: ['bldr', 'digital products', 'software', 'services', 'agency'],
   openGraph: {
-    siteName: 'bldr',
+    siteName: 'Bldr',
     type: 'website',
   },
 };

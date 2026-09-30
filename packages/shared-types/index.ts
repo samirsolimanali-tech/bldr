@@ -97,6 +97,18 @@ export interface ProviderDTO {
   createdAt: string;
 }
 
+export enum SaleMode {
+  DIRECT = 'DIRECT',
+  REDIRECT = 'REDIRECT',
+}
+
+export enum ListingType {
+  COURSE = 'COURSE',
+  PRODUCT = 'PRODUCT',
+  SERVICE = 'SERVICE',
+  PROJECT = 'PROJECT',
+}
+
 export interface ListingDTO {
   id: string;
   title: string;
@@ -108,7 +120,10 @@ export interface ListingDTO {
   mediaUrls: string[];
   purchaseType: PurchaseType;
   engagementType: EngagementType;
+  saleMode?: SaleMode;
   redirectUrl?: string;
+  ventureId?: string;
+  type?: ListingType | string;
   isFeatured: boolean;
   isPublished: boolean;
   providerId: string;

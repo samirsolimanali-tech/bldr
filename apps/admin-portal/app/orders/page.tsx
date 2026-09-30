@@ -88,7 +88,7 @@ export default function AdminOrdersPage() {
           <div style={{ display: 'flex', gap: '8px' }}>
             {[
               { id: '', label: 'All Orders' },
-              { id: 'PENDING_VERIFICATION', label: '🔍 Pending Verification' },
+              { id: 'PENDING_VERIFICATION', label: 'Pending Verification' },
               { id: 'PAID', label: 'Paid' },
               { id: 'PENDING', label: 'Pending' },
               { id: 'FAILED', label: 'Failed' },
@@ -160,7 +160,7 @@ export default function AdminOrdersPage() {
                 {loading ? (
                   <tr><td colSpan={10} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>Loading records…</td></tr>
                 ) : orders.length === 0 ? (
-                  <tr><td colSpan={10}><div className="empty-state"><div className="empty-state-icon">📋</div><p>No orders found</p></div></td></tr>
+                  <tr><td colSpan={10}><div className="empty-state"><p>No orders found</p></div></td></tr>
                 ) : orders.map(o => (
                   <tr key={o.id}>
                     <td style={{ fontFamily: 'monospace', fontSize: '12px', color: 'var(--text-secondary)' }}>
@@ -168,7 +168,7 @@ export default function AdminOrdersPage() {
                     </td>
                     <td>
                       <span className={`badge ${o.source === 'REDIRECT' ? 'badge-accent' : 'badge-blue'}`}>
-                        {o.source === 'REDIRECT' ? '↗ Redirect' : '🛒 Native'}
+                        {o.source === 'REDIRECT' ? 'Redirect' : 'Native'}
                       </span>
                     </td>
                     <td style={{ fontWeight: 600 }}>{o.provider?.name || '—'}</td>

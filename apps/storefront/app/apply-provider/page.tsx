@@ -7,29 +7,23 @@ import { BldrNav, BldrFooter, ProjectContactModal, tokens } from '@bldr/ui';
 export default function ApplyProviderPage() {
   const [lang, setLang] = useState<'EN' | 'AR'>('EN');
   const [isContactOpen, setIsContactOpen] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const isRtl = lang === 'AR';
 
-  const [form, setForm] = useState({
-    providerName: '',
+  const [formState, setFormState] = useState({
+    businessName: '',
     contactName: '',
     email: '',
     phone: '',
-    offeringType: 'Courses & Cohorts',
-    audienceSize: 'Growing (50 - 500 students)',
-    websiteUrl: '',
-    description: '',
+    category: 'EdTech / Academy',
+    annualVolume: '$100k - $500k',
+    website: '',
   });
 
-  const isRtl = lang === 'AR';
+  const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setIsSubmitted(true);
-    }, 900);
+    setSubmitted(true);
   };
 
   return (
@@ -41,6 +35,7 @@ export default function ApplyProviderPage() {
         flexDirection: 'column',
         background: '#F4F5F7',
         fontFamily: isRtl ? "'Readex Pro', sans-serif" : tokens.fonts.ui,
+        color: '#141416',
       }}
     >
       <BldrNav
@@ -49,406 +44,321 @@ export default function ApplyProviderPage() {
         onStartProject={() => setIsContactOpen(true)}
       />
 
-      <main style={{ flex: 1, padding: '56px 32px 96px' }}>
-        <div style={{ maxWidth: 1160, margin: '0 auto' }}>
-          {/* Hero Section */}
-          <div style={{ textAlign: 'center', maxWidth: 820, margin: '0 auto 64px' }}>
+      <main style={{ flex: 1, padding: '48px 32px 84px' }}>
+        <div style={{ maxWidth: 1040, margin: '0 auto' }}>
+          {/* Breadcrumbs */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#5A6A80', marginBottom: 28 }}>
+            <Link href="/" style={{ color: '#8A94A6', textDecoration: 'none' }}>
+              {isRtl ? 'الرئيسية' : 'Home'}
+            </Link>
+            <span>/</span>
+            <span style={{ fontWeight: 600, color: '#141416' }}>
+              {isRtl ? 'انضم كمزود خدمة' : 'Apply as Provider'}
+            </span>
+          </div>
 
+          {/* Header Banner */}
+          <div
+            style={{
+              background: '#FFFFFF',
+              borderRadius: 20,
+              border: '1px solid rgba(20,20,22,0.08)',
+              padding: '48px 40px',
+              marginBottom: 36,
+              boxShadow: '0 4px 20px rgba(20,20,22,0.04)',
+              textAlign: 'center',
+            }}
+          >
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                padding: '6px 14px',
+                borderRadius: 999,
+                background: 'rgba(16, 185, 129, 0.1)',
+                color: '#059669',
+                fontSize: 13,
+                fontWeight: 700,
+                marginBottom: 16,
+              }}
+            >
+              ✦ {isRtl ? 'شبكة مزودي خدمة bldr المعتمدين' : 'Bldr Certified Provider Network'}
+            </div>
             <h1
               style={{
-                fontSize: 'clamp(32px, 4.5vw, 52px)',
+                fontFamily: isRtl ? "'Readex Pro', sans-serif" : tokens.fonts.display,
+                fontSize: 'clamp(28px, 4vw, 44px)',
                 fontWeight: 800,
-                color: '#12203C',
-                lineHeight: 1.15,
-                letterSpacing: '-0.035em',
-                margin: '0 0 20px',
+                letterSpacing: '-0.03em',
+                color: '#141416',
+                lineHeight: 1.2,
+                margin: '0 0 16px',
               }}
             >
-              {isRtl
-                ? 'انشر وتوسع في دوراتك وورش عملك مع بنية دفع وتسويق جاهزة.'
-                : 'Host your courses, workshops & digital products on the bldr platform.'}
+              {isRtl ? 'وسع أعمالك واستقبل مدفوعاتك مع bldr' : 'Scale & Monetize Your Services with Bldr'}
             </h1>
-
             <p
               style={{
-                fontSize: 17,
+                fontSize: 16,
                 color: '#5A6A80',
-                lineHeight: 1.68,
-                fontWeight: 300,
-                margin: '0 0 32px',
+                maxWidth: 640,
+                margin: '0 auto',
+                lineHeight: 1.7,
               }}
             >
               {isRtl
-                ? 'اربط برامجك مباشرة مع بوابة الدفع المركزية في مصر (فيزا، ماستركارد، ميزة، فوري، ومحافظ إلكترونية)، واستفد من دعم استوديو Sidekick في التسويق وجلب الطلاب.'
-                : 'Plug directly into Egypt’s central payment hub, accept Cards, Fawry, and Mobile Wallets with automated reconciliation, and leverage Sidekick Studio for marketing, ad funnels, and student enrollment.'}
+                ? 'انضم إلى نخبة الأكاديميات واستوديوهات التطوير والوكالات الإبداعية المستفيدة من نظام الدفع المركزي وإدارة تسجيل الطلاب المؤتمتة.'
+                : 'Join leading academies, software studios, and creative agencies leveraging Bldr’s Central Payment Hub, automated student intake, and multi-gateway checkout.'}
             </p>
+          </div>
 
-            <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <a
-                href="#apply-form"
+          {/* Value Proposition Cards */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 18, marginBottom: 36 }}>
+            {[
+              { id: 'card', title: isRtl ? 'بوابات دفع جاهزة' : 'Zero Gateway Friction', desc: isRtl ? 'قبول مدى، أبل باي، وبطاقات الدفع دون تعقيدات بنكية.' : 'Accept Mada, Apple Pay & cards without complex bank paperwork.' },
+              { id: 'link', title: isRtl ? 'روابط دفع فورية' : 'Instant Checkout Links', desc: isRtl ? 'توليد روابط دفع وصفحات شحن مخصصة لطلابك وعملائك.' : 'Generate high-converting checkout links and custom payment pages.' },
+              { id: 'track', title: isRtl ? 'تتبع فوري للطلاب' : 'Student & Payer Tracking', desc: isRtl ? 'متابعة لحظية لكل طالب، بوابة الدفع، وإدارة الاسترداد.' : 'Real-time visibility into paid students, gateways, and refunds.' },
+              { id: 'payout', title: isRtl ? 'تسويات مالية مجدولة' : 'Automated Payouts', desc: isRtl ? 'تحويل أرباحك الصافية دورياً مباشرة لحسابك التجاري.' : 'Automated scheduled settlements directly to your bank account.' },
+            ].map((card) => (
+              <div
+                key={card.title}
                 style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  height: 50,
-                  padding: '0 32px',
-                  borderRadius: 999,
-                  background: tokens.colors.brandDark,
-                  color: '#FFFFFF',
-                  fontSize: 15,
-                  fontWeight: 600,
-                  textDecoration: 'none',
-                  boxShadow: '0 4px 16px rgba(20,20,22,0.18)',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                <span>📝</span>
-                <span>{isRtl ? 'قدّم طلبك الآن مجاناً' : 'Apply as a Provider'}</span>
-              </a>
-
-              <Link
-                href="/products"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  height: 50,
-                  padding: '0 24px',
-                  borderRadius: 999,
                   background: '#FFFFFF',
-                  border: '1px solid #D3DAE4',
-                  color: '#12203C',
-                  fontSize: 14.5,
-                  fontWeight: 600,
-                  textDecoration: 'none',
+                  borderRadius: 14,
+                  border: '1px solid rgba(20,20,22,0.08)',
+                  padding: '24px 20px',
+                  boxShadow: '0 2px 10px rgba(20,20,22,0.02)',
                 }}
               >
-                <span>{isRtl ? 'استعرض كتالوج المزودين الحاليين ←' : 'Explore Current Products Catalog →'}</span>
-              </Link>
-            </div>
+                <div style={{ width: 36, height: 36, borderRadius: 8, background: '#F1F5F9', color: '#1E293B', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
+                  {card.id === 'card' ? (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                  ) : card.id === 'link' ? (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                  ) : card.id === 'track' ? (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                  ) : (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  )}
+                </div>
+                <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 8, color: '#141416' }}>{card.title}</h3>
+                <p style={{ fontSize: 13, color: '#5A6A80', lineHeight: 1.6, margin: 0 }}>{card.desc}</p>
+              </div>
+            ))}
           </div>
 
-          {/* 4 Pillars of Value for Providers */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 24, marginBottom: 64 }}>
-            <div style={{ background: '#FFFFFF', borderRadius: 16, border: '1px solid rgba(20,20,22,0.08)', padding: '28px 24px', boxShadow: '0 2px 10px rgba(20,20,22,0.03)' }}>
-              <div style={{ fontSize: 32, marginBottom: 14 }}>⚡</div>
-              <h3 style={{ fontSize: 18, fontWeight: 700, color: '#12203C', margin: '0 0 10px' }}>
-                {isRtl ? 'تسوية مالية ومبيعات فورية' : 'Automated Sales & Instant Settlement'}
-              </h3>
-              <p style={{ fontSize: 14, color: '#5A6A80', lineHeight: 1.6, margin: 0, fontWeight: 300 }}>
-                {isRtl
-                  ? 'استلم أرباحك فوراً عند بيع أي دورة أو خدمة مع تقارير مبيعات شفافة وتسويات مباشرة إلى حسابك البنكي أو محفظتك.'
-                  : 'Receive your earnings seamlessly with transparent sales analytics and automated direct payouts to your bank account or wallet.'}
-              </p>
-            </div>
-
-            <div style={{ background: '#FFFFFF', borderRadius: 16, border: '1px solid rgba(20,20,22,0.08)', padding: '28px 24px', boxShadow: '0 2px 10px rgba(20,20,22,0.03)' }}>
-              <div style={{ fontSize: 32, marginBottom: 14 }}>🎯</div>
-              <h3 style={{ fontSize: 18, fontWeight: 700, color: '#12203C', margin: '0 0 10px' }}>
-                {isRtl ? 'دعم التسويق من Sidekick' : 'Sidekick Studio Marketing'}
-              </h3>
-              <p style={{ fontSize: 14, color: '#5A6A80', lineHeight: 1.6, margin: 0, fontWeight: 300 }}>
-                {isRtl
-                  ? 'صفحات هبوط ذات تحويل عالي، إعلانات ممولة جغرافية تستهدف الطلاب وأولياء الأمور، وتأكيد حجز مقاعد فوري عبر الواتساب.'
-                  : 'High-converting course landing pages, localized paid ad campaigns, and automated WhatsApp enrollment confirmation.'}
-              </p>
-            </div>
-
-            <div style={{ background: '#FFFFFF', borderRadius: 16, border: '1px solid rgba(20,20,22,0.08)', padding: '28px 24px', boxShadow: '0 2px 10px rgba(20,20,22,0.03)' }}>
-              <div style={{ fontSize: 32, marginBottom: 14 }}>📊</div>
-              <h3 style={{ fontSize: 18, fontWeight: 700, color: '#12203C', margin: '0 0 10px' }}>
-                {isRtl ? 'لوحة تحكم وإدارة الطلاب' : 'Dedicated Provider Portal'}
-              </h3>
-              <p style={{ fontSize: 14, color: '#5A6A80', lineHeight: 1.6, margin: 0, fontWeight: 300 }}>
-                {isRtl
-                  ? 'متابعة لحظية لحجم المبيعات، أعداد المشتركين، تقارير الحضور، وإدارة الإرجاع بسهولة تامة عبر بوابة المزودين الخاصة.'
-                  : 'Real-time sales analytics, roster lists, student contacts, and transparent commission ledger reports.'}
-              </p>
-            </div>
-
-            <div style={{ background: '#FFFFFF', borderRadius: 16, border: '1px solid rgba(20,20,22,0.08)', padding: '28px 24px', boxShadow: '0 2px 10px rgba(20,20,22,0.03)' }}>
-              <div style={{ fontSize: 32, marginBottom: 14 }}>🛡️</div>
-              <h3 style={{ fontSize: 18, fontWeight: 700, color: '#12203C', margin: '0 0 10px' }}>
-                {isRtl ? 'تسويات دورية لحسابك البنكي' : 'Guaranteed Bank Payouts'}
-              </h3>
-              <p style={{ fontSize: 14, color: '#5A6A80', lineHeight: 1.6, margin: 0, fontWeight: 300 }}>
-                {isRtl
-                  ? 'تسوية مستحقاتك وتحويلها بانتظام لحسابك البنكي المصري مع تقارير مالية مدققة وإشعارات فورية بكل معاملة.'
-                  : 'Regular net payouts deposited directly into your Egyptian bank account with full ledger transparency.'}
-              </p>
-            </div>
-          </div>
-
-          {/* How It Works Steps */}
-          <div style={{ background: '#FFFFFF', borderRadius: 20, border: '1px solid rgba(20,20,22,0.08)', padding: '40px 36px', marginBottom: 64 }}>
-            <h2 style={{ fontSize: 24, fontWeight: 800, color: '#12203C', margin: '0 0 28px', textAlign: 'center' }}>
-              {isRtl ? 'كيف تعمل منظومة المزودين في bldr؟' : 'How the Provider Partnership Works'}
-            </h2>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 32 }}>
-              <div style={{ display: 'flex', gap: 16 }}>
-                <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#141416', color: '#fff', fontSize: 16, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>
-                  1
-                </div>
-                <div>
-                  <h4 style={{ margin: '0 0 6px', fontSize: 16, fontWeight: 700, color: '#141416' }}>
-                    {isRtl ? 'تقديم الطلب والتفاصيل' : 'Submit Offering Details'}
-                  </h4>
-                  <p style={{ margin: 0, fontSize: 13.5, color: '#5A6A80', lineHeight: 1.6 }}>
-                    {isRtl
-                      ? 'املأ النموذج بالأسفل مع تحديد نوع برامجك التعليمية، جدول المواعيد، وروابط أعمالك السابقة.'
-                      : 'Fill in the application below with your curriculum outline, target pricing, and credentials.'}
-                  </p>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: 16 }}>
-                <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#141416', color: '#fff', fontSize: 16, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>
-                  2
-                </div>
-                <div>
-                  <h4 style={{ margin: '0 0 6px', fontSize: 16, fontWeight: 700, color: '#141416' }}>
-                    {isRtl ? 'الموافقة وتفعيل بوابة الدفع' : 'Verification & Gateway Setup'}
-                  </h4>
-                  <p style={{ margin: 0, fontSize: 13.5, color: '#5A6A80', lineHeight: 1.6 }}>
-                    {isRtl
-                      ? 'يراجع فريق bldr طلبك وتجهيز روابط الدفع المركزية وحسابك في بوابة المزودين خلال ٢٤-٤٨ ساعة.'
-                      : 'Our partnership team reviews your syllabus, provisions your portal login, and generates your checkout links.'}
-                  </p>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: 16 }}>
-                <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#141416', color: '#fff', fontSize: 16, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>
-                  3
-                </div>
-                <div>
-                  <h4 style={{ margin: '0 0 6px', fontSize: 16, fontWeight: 700, color: '#141416' }}>
-                    {isRtl ? 'النشر والانطلاق واستقبال المبيعات' : 'Go Live & Accept Enrollments'}
-                  </h4>
-                  <p style={{ margin: 0, fontSize: 13.5, color: '#5A6A80', lineHeight: 1.6 }}>
-                    {isRtl
-                      ? 'يظهر منتجك في الكتالوج الموحد ويبدأ الطلاب بالدفع والتسجيل الفوري مع استلامك إشعارات فورية.'
-                      : 'Your offering is published to the bldr catalog and you receive instant WhatsApp & webhook sales alerts.'}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Interactive Provider Application Form */}
-          <div id="apply-form" style={{ background: '#FFFFFF', borderRadius: 20, border: '1px solid rgba(20,20,22,0.08)', padding: '40px 36px', boxShadow: '0 4px 20px rgba(20,20,22,0.05)' }}>
-            <div style={{ maxWidth: 760, margin: '0 auto' }}>
-              <div style={{ textAlign: 'center', marginBottom: 32 }}>
-                <h2 style={{ fontSize: 26, fontWeight: 800, color: '#12203C', margin: '0 0 8px' }}>
-                  {isRtl ? 'نموذج التقديم للانضمام كمزود معتمد' : 'Provider Partnership Application Form'}
-                </h2>
-                <p style={{ fontSize: 14.5, color: '#5A6A80', margin: 0 }}>
-                  {isRtl
-                    ? 'أرسل تفاصيلك وسيقوم فريق علاقات المزودين في bldr بالتواصل معك خلال يوم عمل واحد.'
-                    : 'Submit your details and our venture team will reach out within 1 business day.'}
-                </p>
-              </div>
-
-              {isSubmitted ? (
+          {/* Application Form */}
+          <div
+            style={{
+              background: '#FFFFFF',
+              borderRadius: 16,
+              border: '1px solid rgba(20,20,22,0.08)',
+              padding: '40px 36px',
+              boxShadow: '0 4px 16px rgba(20,20,22,0.04)',
+            }}
+          >
+            {submitted ? (
+              <div style={{ textAlign: 'center', padding: '48px 16px' }}>
                 <div
                   style={{
-                    padding: '36px 24px',
-                    borderRadius: 14,
-                    background: '#E6EFEB',
-                    border: '1px solid rgba(46, 111, 94, 0.25)',
-                    textAlign: 'center',
-                    animation: 'fadeIn 0.2s ease',
+                    width: 60,
+                    height: 60,
+                    borderRadius: '50%',
+                    background: '#ECFDF5',
+                    color: '#059669',
+                    fontSize: 28,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 18px',
                   }}
                 >
-                  <div style={{ fontSize: 44, marginBottom: 12 }}>🎉</div>
-                  <h3 style={{ fontSize: 22, fontWeight: 700, color: '#2E6F5E', margin: '0 0 10px' }}>
-                    {isRtl ? 'تم استلام طلبك بنجاح!' : 'Application Submitted Successfully!'}
-                  </h3>
-                  <p style={{ fontSize: 15, color: '#1B2A4A', maxWidth: 520, margin: '0 auto 20px', lineHeight: 1.6 }}>
-                    {isRtl
-                      ? 'شكراً لاهتمامك بالانضمام إلى شبكة مزودي bldr. سنراجع بياناتك ونتواصل معك عبر الواتساب والبريد الإلكتروني لجدولة جلسة الإعداد التقني.'
-                      : 'Thank you for your interest in joining bldr. Our team will review your application and reach out via WhatsApp and email to complete onboarding.'}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsSubmitted(false);
-                      setForm({
-                        providerName: '',
-                        contactName: '',
-                        email: '',
-                        phone: '',
-                        offeringType: 'Courses & Cohorts',
-                        audienceSize: 'Growing (50 - 500 students)',
-                        websiteUrl: '',
-                        description: '',
-                      });
-                    }}
-                    style={{
-                      height: 42,
-                      padding: '0 24px',
-                      borderRadius: 8,
-                      background: '#2E6F5E',
-                      color: '#FFFFFF',
-                      fontSize: 13.5,
-                      fontWeight: 700,
-                      border: 'none',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {isRtl ? 'تقديم طلب لبرنامج آخر' : 'Submit Another Application'}
-                  </button>
+                  ✓
                 </div>
-              ) : (
-                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
-                    <div>
-                      <label style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: '#1B2A4A', marginBottom: 6 }}>
-                        {isRtl ? 'اسم المحاضر / المركز / الأكاديمية *' : 'Provider / Academy / Tutor Name *'}
-                      </label>
-                      <input
-                        required
-                        type="text"
-                        placeholder={isRtl ? 'مثال: أكاديمية تيك بريدج' : 'e.g. Apex Coding Academy'}
-                        value={form.providerName}
-                        onChange={(e) => setForm({ ...form, providerName: e.target.value })}
-                        style={{ width: '100%', height: 42, padding: '0 12px', borderRadius: 8, border: '1px solid #D3DAE4', fontSize: 13.5, boxSizing: 'border-box' }}
-                      />
-                    </div>
-
-                    <div>
-                      <label style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: '#1B2A4A', marginBottom: 6 }}>
-                        {isRtl ? 'اسم المسؤول للتواصل *' : 'Primary Contact Person *'}
-                      </label>
-                      <input
-                        required
-                        type="text"
-                        placeholder={isRtl ? 'مثال: كريم السيد' : 'e.g. Tarek Mansour'}
-                        value={form.contactName}
-                        onChange={(e) => setForm({ ...form, contactName: e.target.value })}
-                        style={{ width: '100%', height: 42, padding: '0 12px', borderRadius: 8, border: '1px solid #D3DAE4', fontSize: 13.5, boxSizing: 'border-box' }}
-                      />
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
-                    <div>
-                      <label style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: '#1B2A4A', marginBottom: 6 }}>
-                        {isRtl ? 'البريد الإلكتروني للعمل *' : 'Work Email *'}
-                      </label>
-                      <input
-                        required
-                        type="email"
-                        placeholder="tutor@academy.eg"
-                        value={form.email}
-                        onChange={(e) => setForm({ ...form, email: e.target.value })}
-                        style={{ width: '100%', height: 42, padding: '0 12px', borderRadius: 8, border: '1px solid #D3DAE4', fontSize: 13.5, boxSizing: 'border-box' }}
-                      />
-                    </div>
-
-                    <div>
-                      <label style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: '#1B2A4A', marginBottom: 6 }}>
-                        {isRtl ? 'رقم الهاتف / الواتساب *' : 'Phone / WhatsApp Number *'}
-                      </label>
-                      <input
-                        required
-                        type="tel"
-                        placeholder="+20 10 1234 5678"
-                        value={form.phone}
-                        onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                        style={{ width: '100%', height: 42, padding: '0 12px', borderRadius: 8, border: '1px solid #D3DAE4', fontSize: 13.5, boxSizing: 'border-box' }}
-                      />
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
-                    <div>
-                      <label style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: '#1B2A4A', marginBottom: 6 }}>
-                        {isRtl ? 'نوع البرامج والمنتجات *' : 'Primary Offering Type *'}
-                      </label>
-                      <select
-                        value={form.offeringType}
-                        onChange={(e) => setForm({ ...form, offeringType: e.target.value })}
-                        style={{ width: '100%', height: 42, padding: '0 10px', borderRadius: 8, border: '1px solid #D3DAE4', fontSize: 13.5, background: '#FFFFFF', boxSizing: 'border-box' }}
-                      >
-                        <option value="Courses & Cohorts">Courses & Live Bootcamps (دورات ومعسكرات)</option>
-                        <option value="Workshops & Sprints">Workshops & Intensive Sprints (ورش عمل)</option>
-                        <option value="Platform Assessments">Platform Passes & Assessments (تقييمات واشتراكات)</option>
-                        <option value="Books & Toolkits">Books, Guides & Toolkits (كتب وأدلة)</option>
-                        <option value="Events & Summits">Events & Summits (فعاليات ومؤتمرات)</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: '#1B2A4A', marginBottom: 6 }}>
-                        {isRtl ? 'حجم الطلاب / المشتركين حالياً' : 'Current Student / Audience Base'}
-                      </label>
-                      <select
-                        value={form.audienceSize}
-                        onChange={(e) => setForm({ ...form, audienceSize: e.target.value })}
-                        style={{ width: '100%', height: 42, padding: '0 10px', borderRadius: 8, border: '1px solid #D3DAE4', fontSize: 13.5, background: '#FFFFFF', boxSizing: 'border-box' }}
-                      >
-                        <option value="Just starting (< 50 students)">Just starting (&lt; 50 learners)</option>
-                        <option value="Growing (50 - 500 students)">Growing (50 – 500 learners)</option>
-                        <option value="Established (500+ students)">Established (500+ active learners)</option>
-                      </select>
-                    </div>
-                  </div>
-
+                <h3
+                  style={{
+                    fontFamily: isRtl ? "'Readex Pro', sans-serif" : tokens.fonts.display,
+                    fontSize: 22,
+                    fontWeight: 700,
+                    color: '#141416',
+                    marginBottom: 10,
+                  }}
+                >
+                  {isRtl ? 'تم استلام طلب انضمامك!' : 'Application Dispatched!'}
+                </h3>
+                <p style={{ color: '#5A6A80', fontSize: 15, lineHeight: 1.6, maxWidth: 460, margin: '0 auto 24px' }}>
+                  {isRtl
+                    ? 'شكراً لك، سيقوم فريق الشراكات بمراجعة بياناتك وإرسال بيانات اعتماد بوابة المزودين الخاصة بك.'
+                    : 'Thank you for applying. Our merchant operations team will review your business profile and dispatch your provider portal credentials.'}
+                </p>
+                <a
+                  href="http://localhost:3013/register"
+                  style={{
+                    background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                    color: '#FFFFFF',
+                    padding: '12px 24px',
+                    borderRadius: 8,
+                    textDecoration: 'none',
+                    fontWeight: 600,
+                    fontSize: 14,
+                    display: 'inline-block',
+                  }}
+                >
+                  {isRtl ? 'الانتقال لبوابة تسجيل المزودين ←' : 'Open Provider Portal Registration →'}
+                </a>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #E2E8F0', paddingBottom: 16 }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: '#1B2A4A', marginBottom: 6 }}>
-                      {isRtl ? 'رابط الموقع أو وسائل التواصل (LinkedIn / Facebook / YouTube)' : 'Website or Social Profile Link'}
+                    <h2
+                      style={{
+                        fontFamily: isRtl ? "'Readex Pro', sans-serif" : tokens.fonts.display,
+                        fontSize: 20,
+                        fontWeight: 700,
+                        color: '#141416',
+                        margin: 0,
+                      }}
+                    >
+                      {isRtl ? 'طلب انضمام مزود جديد' : 'Provider Application'}
+                    </h2>
+                    <p style={{ fontSize: 13, color: '#5A6A80', margin: '4px 0 0' }}>
+                      {isRtl ? 'أكمل ملفك التعريفي لبدء استقبال المدفوعات' : 'Fill out your business profile to get started with Bldr.'}
+                    </p>
+                  </div>
+                  <a
+                    href="http://localhost:3013/login"
+                    style={{ fontSize: 13, color: '#2563EB', textDecoration: 'none', fontWeight: 600 }}
+                  >
+                    {isRtl ? 'لديك حساب بالفعل؟ تسجيل الدخول ←' : 'Already registered? Sign in →'}
+                  </a>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#141416', marginBottom: 6 }}>
+                      {isRtl ? 'اسم الشركة أو الأكاديمية *' : 'Business / Company Name *'}
                     </label>
                     <input
-                      type="url"
-                      placeholder="https://facebook.com/your-academy or https://yourdomain.com"
-                      value={form.websiteUrl}
-                      onChange={(e) => setForm({ ...form, websiteUrl: e.target.value })}
-                      style={{ width: '100%', height: 42, padding: '0 12px', borderRadius: 8, border: '1px solid #D3DAE4', fontSize: 13.5, boxSizing: 'border-box' }}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: '#1B2A4A', marginBottom: 6 }}>
-                      {isRtl ? 'نبذة عن البرامج التي ترغب في استضافتها على bldr *' : 'Brief Overview of Programs You Wish to Host *'}
-                    </label>
-                    <textarea
                       required
-                      rows={3}
-                      placeholder={isRtl ? 'أخبرنا عن موضوعات الدورات، مدتها، ومستوى الطلاب المستهدف...' : 'Describe your course subjects, target duration, pricing expectations, or prerequisites...'}
-                      value={form.description}
-                      onChange={(e) => setForm({ ...form, description: e.target.value })}
-                      style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #D3DAE4', fontSize: 13.5, fontFamily: 'inherit', boxSizing: 'border-box' }}
+                      type="text"
+                      placeholder={isRtl ? 'مثال: أكاديمية ستادي هب' : 'e.g. StudyHub Academy'}
+                      value={formState.businessName}
+                      onChange={(e) => setFormState({ ...formState, businessName: e.target.value })}
+                      style={{ width: '100%', background: '#FFFFFF', border: '1px solid #CBD5E1', borderRadius: 8, padding: '10px 14px', color: '#141416', fontSize: 14, outline: 'none' }}
                     />
                   </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#141416', marginBottom: 6 }}>
+                      {isRtl ? 'اسم مسؤول التواصل *' : 'Primary Contact Name *'}
+                    </label>
+                    <input
+                      required
+                      type="text"
+                      placeholder={isRtl ? 'مثال: سارة الحسن' : 'e.g. Sara Al-Hassan'}
+                      value={formState.contactName}
+                      onChange={(e) => setFormState({ ...formState, contactName: e.target.value })}
+                      style={{ width: '100%', background: '#FFFFFF', border: '1px solid #CBD5E1', borderRadius: 8, padding: '10px 14px', color: '#141416', fontSize: 14, outline: 'none' }}
+                    />
+                  </div>
+                </div>
 
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    style={{
-                      height: 50,
-                      marginTop: 8,
-                      borderRadius: 999,
-                      background: tokens.colors.brandDark,
-                      color: '#FFFFFF',
-                      fontSize: 15,
-                      fontWeight: 700,
-                      border: 'none',
-                      cursor: 'pointer',
-                      boxShadow: '0 4px 14px rgba(20,20,22,0.2)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: 8,
-                      transition: 'all 0.15s ease',
-                    }}
-                  >
-                    <span>{loading ? '...' : (isRtl ? 'إرسال طلب الانضمام كمزود خدمة ←' : 'Submit Provider Application →')}</span>
-                  </button>
-                </form>
-              )}
-            </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#141416', marginBottom: 6 }}>
+                      {isRtl ? 'البريد الإلكتروني للعمل *' : 'Business Email *'}
+                    </label>
+                    <input
+                      required
+                      type="email"
+                      placeholder="sara@company.com"
+                      value={formState.email}
+                      onChange={(e) => setFormState({ ...formState, email: e.target.value })}
+                      style={{ width: '100%', background: '#FFFFFF', border: '1px solid #CBD5E1', borderRadius: 8, padding: '10px 14px', color: '#141416', fontSize: 14, outline: 'none' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#141416', marginBottom: 6 }}>
+                      {isRtl ? 'رقم الهاتف أو واتساب *' : 'Phone / WhatsApp *'}
+                    </label>
+                    <input
+                      required
+                      type="tel"
+                      placeholder="+966 5x xxx xxxx"
+                      value={formState.phone}
+                      onChange={(e) => setFormState({ ...formState, phone: e.target.value })}
+                      style={{ width: '100%', background: '#FFFFFF', border: '1px solid #CBD5E1', borderRadius: 8, padding: '10px 14px', color: '#141416', fontSize: 14, outline: 'none' }}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#141416', marginBottom: 6 }}>
+                      {isRtl ? 'مجال العمل' : 'Industry Sector'}
+                    </label>
+                    <select
+                      value={formState.category}
+                      onChange={(e) => setFormState({ ...formState, category: e.target.value })}
+                      style={{ width: '100%', background: '#FFFFFF', border: '1px solid #CBD5E1', borderRadius: 8, padding: '10px 14px', color: '#141416', fontSize: 14, outline: 'none' }}
+                    >
+                      <option value="EdTech / Academy">EdTech / Education Academy</option>
+                      <option value="Creative Agency">Creative & Marketing Agency</option>
+                      <option value="Software Studio">Software & Product Studio</option>
+                      <option value="Consulting Firm">Management Consulting</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#141416', marginBottom: 6 }}>
+                      {isRtl ? 'حجم المعاملات السنوي المتوقع' : 'Estimated Annual Volume'}
+                    </label>
+                    <select
+                      value={formState.annualVolume}
+                      onChange={(e) => setFormState({ ...formState, annualVolume: e.target.value })}
+                      style={{ width: '100%', background: '#FFFFFF', border: '1px solid #CBD5E1', borderRadius: 8, padding: '10px 14px', color: '#141416', fontSize: 14, outline: 'none' }}
+                    >
+                      <option value="Under $100k">Under $100,000</option>
+                      <option value="$100k - $500k">$100,000 - $500,000</option>
+                      <option value="$500k - $2M">$500,000 - $2,000,000</option>
+                      <option value="$2M+">$2,000,000+</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#141416', marginBottom: 6 }}>
+                    {isRtl ? 'الموقع الإلكتروني أو رابط الأعمال' : 'Website or Social Presence'}
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="https://yourcompany.com"
+                    value={formState.website}
+                    onChange={(e) => setFormState({ ...formState, website: e.target.value })}
+                    style={{ width: '100%', background: '#FFFFFF', border: '1px solid #CBD5E1', borderRadius: 8, padding: '10px 14px', color: '#141416', fontSize: 14, outline: 'none' }}
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  style={{
+                    background: 'linear-gradient(135deg, #141416 0%, #2A2A30 100%)',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    borderRadius: 10,
+                    padding: '14px 28px',
+                    fontSize: 15,
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 12px rgba(20, 20, 22, 0.2)',
+                    transition: 'all 0.15s ease',
+                    marginTop: 4,
+                  }}
+                >
+                  {isRtl ? 'إرسال طلب الانضمام ←' : 'Submit Provider Application →'}
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </main>

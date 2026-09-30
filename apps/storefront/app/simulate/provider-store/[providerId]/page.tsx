@@ -78,7 +78,7 @@ function ProviderStoreContent() {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <span style={{ fontSize: '24px' }}>🎓</span>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#14171C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
           <span style={{ fontSize: '18px', fontWeight: 800, color: '#14171C' }}>
             {providerId === 'bldr' ? 'bldr Academy Partner Portal' : 'TechBridge Academy Direct Store'}
           </span>
@@ -120,7 +120,7 @@ function ProviderStoreContent() {
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ color: '#5B6169' }}>Tracking Click ID:</span>
               <span style={{ fontFamily: 'monospace', fontWeight: 600, color: '#14171C' }}>
-                {clickId || '⚠️ No click_id provided'}
+                {clickId || 'No click_id provided'}
               </span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -161,7 +161,7 @@ function ProviderStoreContent() {
                   textAlign: 'left',
                 }}
               >
-                🔒 <strong>Anti-Fraud Protection:</strong> The commission has been logged for transparency, but zero payout balance has been credited to the provider yet.
+                <strong>Anti-Fraud Protection:</strong> The commission has been logged for transparency, but zero payout balance has been credited to the provider yet.
               </div>
               <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
                 <a

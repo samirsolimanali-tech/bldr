@@ -1,16 +1,59 @@
 {
   "hero": {
-    "tag": "Venture Architecture & Engineering",
-    "tagAr": "هندسة وبناء المشاريع الرقمية",
-    "title": "We build ventures.\nAnd sell their products.",
-    "titleAr": "نبني المشاريع.\nونبيع منتجاتها.",
-    "subtitle": "A single accountability line combining venture-grade software engineering, paid acquisition, and commercial strategy across Cairo and the Middle East.",
-    "subtitleAr": "خط مسؤولية واحد يجمع بين تطوير البرمجيات للمشاريع، وإدارة الإعلانات الممولة، والاستراتيجية التجارية في مصر والشرق الأوسط.",
-    "ctaLabel": "Start a Project",
-    "ctaLabelAr": "ابدأ مشروعك معنا",
-    "secondaryLabel": "View Services",
-    "secondaryLabelAr": "استعرض خدماتنا",
+    "tag": "",
+    "tagAr": "",
+    "title": "We build the product, the brand, and the team that runs it.",
+    "titleAr": "نبني المنتج الرقمي، العلامة التجارية، والفريق الذي يديرها.",
+    "subtitle": "bldr operates specialist units and builds its own ventures. You work with the units you need and keep one point of contact for all of it — nobody hands the outcome to somebody else.",
+    "subtitleAr": "تدير bldr وحدات متخصصة وتبني مشاريعها الخاصة. تعمل مع الوحدات التي تحتاجها في التسويق والبرمجيات وبناء المنتجات تحت نقطة اتصال واحدة ومسؤولية كاملة.",
+    "ctaLabel": "Start a project →",
+    "ctaLabelAr": "ابدأ مشروعك معنا ←",
+    "secondaryLabel": "Explore Services",
+    "secondaryLabelAr": "استكشف الخدمات",
     "secondaryLink": "/services"
+  },
+  "whatsBroken": {
+    "tag": "What's Broken in Traditional Models",
+    "tagAr": "ما هو الخلل في النماذج التقليدية؟",
+    "title": "Everyone did their part. Nobody owned the outcome.",
+    "titleAr": "الجميع قام بدوره.. ولكن لا أحد امتلك النتيجة النهائية.",
+    "cards": [
+      {
+        "title": "Software House",
+        "titleAr": "شركة البرمجيات",
+        "sub": "waiting on final specs",
+        "subAr": "في انتظار المواصفات النهائية",
+        "angle": "-2deg"
+      },
+      {
+        "title": "Marketing Agency",
+        "titleAr": "وكالة التسويق",
+        "sub": "hasn't seen the product",
+        "subAr": "لم تشهد المنتج على أرض الواقع",
+        "angle": "1.5deg"
+      },
+      {
+        "title": "Consultant",
+        "titleAr": "المستشار",
+        "sub": "left after the slide deck",
+        "subAr": "غادر بعد تقديم العرض",
+        "angle": "-1deg"
+      },
+      {
+        "title": "Your Team",
+        "titleAr": "فريق عملك",
+        "sub": "never trained to run it",
+        "subAr": "لم يتم تدريبه على التشغيل",
+        "angle": "2deg"
+      },
+      {
+        "title": "Systems Vendor",
+        "titleAr": "مزود الأنظمة",
+        "sub": "scope ended at handover",
+        "subAr": "انتهى دوره عند التسليم",
+        "angle": "-1.5deg"
+      }
+    ]
   },
   "howWereBuilt": {
     "tag": "How We're Built",
@@ -80,9 +123,21 @@
     "ctaLabel": "Explore All Projects & Case Studies",
     "ctaLabelAr": "استكشف كافة المشاريع وسوابق الأعمال",
     "metrics": [
-      { "value": "38k+", "label": "Patients Managed", "labelAr": "مريض مسجل ومنتظم" },
-      { "value": "45k+", "label": "Enrolled Students", "labelAr": "طالب في المنصات" },
-      { "value": "99.95%", "label": "Platform Uptime", "labelAr": "استقرار وجاهزية" }
+      {
+        "value": "38k+",
+        "label": "Patients Managed",
+        "labelAr": "مريض مسجل ومنتظم"
+      },
+      {
+        "value": "45k+",
+        "label": "Enrolled Students",
+        "labelAr": "طالب في المنصات"
+      },
+      {
+        "value": "99.95%",
+        "label": "Platform Uptime",
+        "labelAr": "استقرار وجاهزية"
+      }
     ]
   },
   "carousel": {
@@ -103,9 +158,14 @@
         "metricLabelAr": "مريض مسجل ومنتظم",
         "summary": "HIPAA-aligned web portal with encrypted WebRTC video telemetry, multi-clinic calendar scheduling, and automated patient reminders.",
         "summaryAr": "بوابة رعاية صحية متطورة مع غرف استشارات مرئية مشفرة، جدولة مواعيد فورية للعيادات، وتنبيهات آلية للمرضى.",
-        "techStack": ["Next.js 14", "WebRTC", "PostgreSQL", "Docker"],
+        "techStack": [
+          "Next.js 14",
+          "WebRTC",
+          "PostgreSQL",
+          "Docker"
+        ],
         "accentColor": "#2C5F9E",
-        "icon": "🩺",
+        "icon": "health",
         "image": ""
       },
       {
@@ -123,9 +183,14 @@
         "metricLabelAr": "طالب مسجل ومنتظم",
         "summary": "Scalable educational infrastructure with dynamic watermarking, live cohort progression, and instant Fawry & card checkout enrollment.",
         "summaryAr": "بنية رقمية متكاملة للتعليم عن بُعد تدعم البث المباشر، الفيديوهات المشفرة، والتفعيل التلقائي للاشتراكات بعد الدفع فورياً.",
-        "techStack": ["HLS Video DRM", "Next.js", "PostgreSQL", "Tailwind"],
+        "techStack": [
+          "HLS Video DRM",
+          "Next.js",
+          "PostgreSQL",
+          "Tailwind"
+        ],
         "accentColor": "#FD9426",
-        "icon": "🎓",
+        "icon": "edu",
         "image": ""
       },
       {
@@ -143,9 +208,14 @@
         "metricLabelAr": "عائد الإنفاق الإعلاني",
         "summary": "Full-funnel brand launch combining high-converting motion ad creatives, headless fast landing pages, and Meta Conversions API tracking.",
         "summaryAr": "إطلاق متكامل لعلامة تجارية يشمل صناعة إعلانات الفيديو القصيرة، صفحات هبوط فورية الشراء، وتتبع خوادم الإعلانات بدقة متناهية.",
-        "techStack": ["Meta CAPI", "Next.js", "Figma", "DaVinci"],
+        "techStack": [
+          "Meta CAPI",
+          "Next.js",
+          "Figma",
+          "DaVinci"
+        ],
         "accentColor": "#D10721",
-        "icon": "📈",
+        "icon": "growth",
         "image": ""
       },
       {
@@ -163,9 +233,14 @@
         "metricLabelAr": "رحلة توصيل يومية مؤتمتة",
         "summary": "Real-time driver assignment using spatial PostGIS queries, progressive offline PWA companion apps, and automated client SMS tracking.",
         "summaryAr": "منصة سحابية متقدمة توفر التوجيه الذكي للمناديب وتتبع الخرائط الحي وتأكيد استلام الشحنات برمز OTP مع لوحة تحكم مركزية.",
-        "techStack": ["WebSockets", "PostGIS", "React PWA", "Node.js"],
+        "techStack": [
+          "WebSockets",
+          "PostGIS",
+          "React PWA",
+          "Node.js"
+        ],
         "accentColor": "#10B981",
-        "icon": "🚚",
+        "icon": "fleet",
         "image": ""
       },
       {
@@ -183,9 +258,14 @@
         "metricLabelAr": "جاهزية مؤسسية كاملة",
         "summary": "Executive pitch collateral, bilingual investor data room with document watermarking, and dynamic financial simulation modeling.",
         "summaryAr": "بوابة مستثمرين رقمية مشفرة، ونماذج محاكاة مالية تفاعلية، مع تصميم هوية مؤسسية كاملة ساهمت في إغلاق الجولة الاستثمارية.",
-        "techStack": ["Next.js", "Financial Modeling", "Data Room", "TypeScript"],
+        "techStack": [
+          "Next.js",
+          "Financial Modeling",
+          "Data Room",
+          "TypeScript"
+        ],
         "accentColor": "#8B5CF6",
-        "icon": "🏛️",
+        "icon": "capital",
         "image": ""
       }
     ]

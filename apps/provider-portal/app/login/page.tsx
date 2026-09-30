@@ -92,15 +92,25 @@ export default function LoginPage() {
           </div>
           <h1
             style={{
-              margin: 0,
-              fontSize: '15px',
-              fontWeight: 600,
-              color: '#5A6A80',
-              letterSpacing: '-0.01em',
+              margin: '0 0 4px 0',
+              fontSize: '17px',
+              fontWeight: 700,
+              color: '#12203C',
+              letterSpacing: '-0.02em',
             }}
           >
-            Provider Portal
+            Brand & Financial Portal
           </h1>
+          <p
+            style={{
+              margin: 0,
+              fontSize: '12.5px',
+              color: '#64748B',
+              lineHeight: 1.4,
+            }}
+          >
+            Sign in to track orders, balances, payouts, and financial statements for your brand.
+          </p>
         </div>
 
         {/* Essential Form */}
@@ -225,7 +235,7 @@ export default function LoginPage() {
                 fontWeight: 600,
               }}
             >
-              ⚠️ {error}
+              {error}
             </div>
           )}
 

@@ -22,7 +22,7 @@ export default function OrdersPage() {
     customerEmail: '',
     customerName: '',
     orderRef: '',
-    currency: 'USD',
+    currency: 'EGP',
   });
   const [reportSubmitting, setReportSubmitting] = useState(false);
   const [reportError, setReportError] = useState('');
@@ -160,7 +160,7 @@ export default function OrdersPage() {
                 {loading ? (
                   <tr><td colSpan={9} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>Loading orders…</td></tr>
                 ) : orders.length === 0 ? (
-                  <tr><td colSpan={9}><div className="empty-state"><div className="empty-state-icon">📋</div><p>No orders matching filter</p></div></td></tr>
+                  <tr><td colSpan={9}><div className="empty-state"><p>No orders matching filter</p></div></td></tr>
                 ) : orders.map(o => (
                   <tr key={o.id}>
                     <td style={{ fontFamily: 'monospace', fontSize: '12px', color: 'var(--text-secondary)' }}>
@@ -168,7 +168,7 @@ export default function OrdersPage() {
                     </td>
                     <td>
                       <span className={`badge ${o.source === 'REDIRECT' ? 'badge-accent' : 'badge-blue'}`}>
-                        {o.source === 'REDIRECT' ? '↗ Redirect' : '🛒 Native'}
+                        {o.source === 'REDIRECT' ? 'Redirect' : 'Native'}
                       </span>
                     </td>
                     <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{o.listing?.title || '—'}</td>
@@ -255,7 +255,7 @@ export default function OrdersPage() {
                   value={reportForm.currency}
                   onChange={e => setReportForm(f => ({ ...f, currency: e.target.value }))}
                 >
-                  {['USD', 'EGP', 'SAR', 'AED', 'GBP', 'EUR'].map(c => (
+                  {['EGP', 'USD', 'SAR', 'AED', 'GBP', 'EUR'].map(c => (
                     <option key={c} value={c}>{c}</option>
                   ))}
                 </select>

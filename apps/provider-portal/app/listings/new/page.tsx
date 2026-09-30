@@ -11,7 +11,7 @@ export default function NewListingPage() {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState({
-    title: '', description: '', price: '', currency: 'USD',
+    title: '', description: '', price: '', currency: 'EGP',
     category: 'Education', tags: '',
     purchaseType: 'NATIVE', engagementType: 'BUY_NOW',
     redirectUrl: '', isFeatured: false, isPublished: true,
@@ -103,7 +103,7 @@ export default function NewListingPage() {
                     <label className="form-label">Currency</label>
                     <select id="listing-currency" className="form-input"
                       value={form.currency} onChange={e => f('currency', e.target.value)}>
-                      {['USD', 'EGP', 'SAR', 'AED', 'GBP', 'EUR'].map(c => <option key={c}>{c}</option>)}
+                      {['EGP', 'USD', 'SAR', 'AED', 'GBP', 'EUR'].map(c => <option key={c}>{c}</option>)}
                     </select>
                   </div>
                 </div>
@@ -133,8 +133,8 @@ export default function NewListingPage() {
                     <label className="form-label">Purchase type *</label>
                     <select id="listing-purchasetype" className="form-input"
                       value={form.purchaseType} onChange={e => f('purchaseType', e.target.value)}>
-                      <option value="NATIVE">🛒 Native (checkout on our site)</option>
-                      <option value="REDIRECT">↗ Redirect (send to your store)</option>
+                      <option value="NATIVE">Native (checkout on our site)</option>
+                      <option value="REDIRECT">Redirect (send to your store)</option>
                     </select>
                   </div>
                   <div className="form-group">
@@ -148,6 +148,21 @@ export default function NewListingPage() {
                   </div>
 
                 </div>
+                {form.purchaseType === 'NATIVE' && (
+                  <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 8, padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: '#0F172A' }}>
+                        Automatic Master Branded Checkout (Zero extra setup)
+                      </div>
+                      <div style={{ fontSize: 12, color: '#64748B' }}>
+                        This course will automatically use your Academy Master Template with Fawry, Wallets, and Meeza enabled. No need to create a new page.
+                      </div>
+                    </div>
+                    <a href="/payment-pages" target="_blank" style={{ fontSize: 12, fontWeight: 700, color: 'white', background: 'var(--brand)', padding: '6px 12px', borderRadius: 6, textDecoration: 'none', whiteSpace: 'nowrap' }}>
+                      Customize Template →
+                    </a>
+                  </div>
+                )}
                 {form.purchaseType === 'REDIRECT' && (
                   <div className="form-group">
                     <label className="form-label">Redirect URL *</label>
@@ -177,8 +192,8 @@ export default function NewListingPage() {
               <h2 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '16px' }}>Settings</h2>
               <div style={{ display: 'flex', gap: '24px' }}>
                 {[
-                  { field: 'isPublished', label: '✅ Publish immediately' },
-                  { field: 'isFeatured', label: '⭐ Mark as featured' },
+                  { field: 'isPublished', label: 'Publish immediately' },
+                  { field: 'isFeatured', label: 'Mark as featured' },
                 ].map(opt => (
                   <label key={opt.field} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px' }}>
                     <input type="checkbox" id={`listing-${opt.field}`}
@@ -191,10 +206,10 @@ export default function NewListingPage() {
             </div>
 
             {error && <p style={{ color: 'var(--red)', fontSize: '13px' }}>{error}</p>}
-            {state === 'success' && <p style={{ color: 'var(--green)', fontSize: '13px' }}>✅ Listing created! Redirecting…</p>}
+            {state === 'success' && <p style={{ color: 'var(--green)', fontSize: '13px' }}>Listing created! Redirecting…</p>}
 
             <button id="btn-create-listing" type="submit" className="btn btn-primary btn-lg" disabled={state === 'loading'}>
-              {state === 'loading' ? '⏳ Creating…' : '+ Create Listing'}
+              {state === 'loading' ? 'Creating…' : '+ Create Listing'}
             </button>
           </form>
         </div>

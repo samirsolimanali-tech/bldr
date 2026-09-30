@@ -92,7 +92,7 @@ function CheckoutConfirmContent() {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: '40px', margin: '0 auto 24px',
             }}>
-              ✅
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#16A34A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
             <h1 style={{ fontSize: '28px', fontWeight: 900, marginBottom: '12px' }}>
               Payment Confirmed!
@@ -113,7 +113,7 @@ function CheckoutConfirmContent() {
                 { label: 'Order ID', value: order.id.slice(-8).toUpperCase() },
                 { label: 'Amount', value: `${order.currency} ${Number(order.amount).toFixed(2)}` },
                 { label: 'Email', value: order.customerEmail },
-                { label: 'Status', value: '✅ Paid' },
+                { label: 'Status', value: 'Paid' },
               ].map(row => (
                 <div key={row.label} style={{
                   display: 'flex', justifyContent: 'space-between',
@@ -139,7 +139,7 @@ function CheckoutConfirmContent() {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: '40px', margin: '0 auto 24px',
             }}>
-              ❌
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </div>
             <h1 style={{ fontSize: '24px', fontWeight: 800, marginBottom: '12px' }}>
               Payment not confirmed

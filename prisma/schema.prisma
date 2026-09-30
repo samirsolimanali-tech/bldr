@@ -1,5 +1,17 @@
-// This is your Prisma schema file
-// Learn more: https://pris.ly/d/prisma-schema
+// ─── Prisma Schema — BLDR Central Payment Hub ────────────────────────────────
+// Naming convention: "brand" / "venture" throughout. The term "Provider" in
+// model names below is legacy from when BLDR intended third-party sellers.
+// Internally these are all BLDR-owned brands; the models are kept compatible
+// to avoid a breaking migration but are treated arm's-length for accounting.
+//
+// PENDING NAMING MIGRATION (tracked in ARCH-001):
+//   Provider model  →  Brand / Venture
+//   providerId      →  ventureId
+//   ProviderUser    →  VentureUser
+//   CommissionRule  →  PlatformFeeRule
+// This will be a single migration executed in Phase 2 once the checkout-session
+// API is stable. Until then, use the alias annotations below as the source of
+// truth for semantic meaning.
 
 generator client {
   provider = "prisma-client-js"
@@ -12,6 +24,7 @@ datasource db {
 
 // ─── Enums ────────────────────────────────────────────────────────────────────
 
+/// @alias VentureStatus — Active/suspended state of an internal BLDR brand.
 enum ProviderStatus {
   PENDING
   APPROVED
@@ -20,8 +33,8 @@ enum ProviderStatus {
 }
 
 enum PurchaseType {
-  NATIVE
-  REDIRECT
+  NATIVE    // Student checked out inside BLDR native storefront (Model A)
+  REDIRECT  // External LMS redirected to BLDR checkout session (Model B)
 }
 
 enum EngagementType {
@@ -62,12 +75,43 @@ enum PayoutStatus {
 
 enum UserRole {
   ADMIN
-  PROVIDER
+  PROVIDER  // @alias VENTURE_TEAM_MEMBER
   CUSTOMER
+}
+
+/// Which PSP handles Card & Wallet transactions for a given venture.
+/// Exactly one gateway per venture. No primary/fallback failover between the two.
+/// Fawry is a separate, independent rail controlled by fawryEnabled on the Provider model.
+enum CardWalletGateway {
+  GEIDEA   // Geidea hosted checkout — pilot default for bldr storefront
+  PAYMOB   // Paymob (Accept) hosted iframe
+}
+
+/// Fee model applied at settlement time, before net is calculated for a brand.
+enum PlatformFeeModel {
+  PERCENTAGE         // e.g. 3.0% of gross
+  FLAT_PER_TXN      // e.g. EGP 5.00 per order
+  COMBINED           // percentage + flat fee per txn
+}
+
+/// Settlement statement status (generated weekly; approved by Finance Ops).
+enum StatementStatus {
+  DRAFT
+  FINALISED
+  DISPUTED
+}
+
+/// Integration mode for a brand — determines portal sidebar and API behaviour.
+enum IntegrationMode {
+  NATIVE    // Brand uses BLDR's own storefront + CRM (Model A)
+  BOLT_ON   // Brand has external LMS; uses checkout-session API + webhook (Model B)
 }
 
 // ─── Models ───────────────────────────────────────────────────────────────────
 
+/// @alias Brand / Venture — an internal BLDR brand. All brands are 100% owned
+/// by bldr. Data is strictly isolated: queries MUST always filter by id/slug so
+/// one brand team never sees another's transactions.
 model Provider {
   id            String         @id @default(cuid())
   slug          String         @unique
@@ -77,22 +121,71 @@ model Provider {
   logoUrl       String?
   bannerUrl     String?
   website       String?
-  isHouseBrand  Boolean        @default(false)
-  status        ProviderStatus @default(PENDING)
+  isHouseBrand  Boolean        @default(true)  // Always true for internal brands
+  status        ProviderStatus @default(APPROVED)
   rejectedReason String?
   conversionToken String?      @unique
+
+  /// Integration model: NATIVE (Model A) or BOLT_ON (Model B / Hybrid)
+  integrationMode IntegrationMode @default(NATIVE)
+
+  // ─── Gateway Assignment ───────────────────────────────────────────────────
+  // Card & Wallet: exactly one PSP per venture. No failover between Geidea/Paymob.
+  // Default: GEIDEA (pilot configuration for bldr storefront).
+  cardWalletGateway   CardWalletGateway @default(GEIDEA)
+
+  // Fawry: independent rail. Toggle controls whether a Fawry reference-code
+  // option appears on this venture's checkout page. Default: false (opt-in).
+  // bldr storefront pilot: true (Fawry enabled alongside Geidea).
+  fawryEnabled        Boolean @default(false)
+
+  // ─── Platform Fee Configuration ──────────────────────────────────────────
+  // Applied at settlement time. Finance Ops can edit per-brand. Never hardcoded.
+  platformFeeModel    PlatformFeeModel @default(PERCENTAGE)
+  platformFeePct      Decimal?         @db.Decimal(5, 4)  // e.g. 0.0300 = 3%
+  platformFeeFlat     Int?             // minor units (piasters), e.g. 500 = EGP 5.00
+  platformFeeNote     String?          // human-readable rationale for this brand's rate
+
+  // ─── VAT on Fees Configuration ────────────────────────────────────────────
+  // Controls whether VAT is applied to gateway fees + platform fee at settlement.
+  // Both the on/off toggle and the rate are configurable per brand.
+  vatOnFeesEnabled    Boolean          @default(true)
+  vatRate             Decimal          @default(0.1400) @db.Decimal(5, 4) // e.g. 0.1400 = 14%
+
+  // ─── Reserve / Hold-Back ─────────────────────────────────────────────────
+  // Internal risk buffer. Protects bldr's cash position against refund/chargeback.
+  reservePct          Decimal  @default(0.05)  @db.Decimal(4, 4)  // 5% default
+  reserveReleaseDays  Int      @default(14)    // days before reserve releases
+
+  // ─── Payout / Settlement Policy ──────────────────────────────────────────
+  payoutCadence       String   @default("weekly")   // "daily" | "weekly" | "manual"
+  payoutMinThreshold  Int      @default(100000)     // piasters — EGP 1,000 default
+  payoutDayOfWeek     Int?     // 0=Sun…6=Sat; null = manual only
+
+  // ─── Model B — External LMS Integration ──────────────────────────────────
+  // Used when integrationMode = BOLT_ON. Not needed for NATIVE brands.
+  externalSuccessUrl  String?   // success_url template for redirect after payment
+  externalCancelUrl   String?   // cancel_url for abandoned sessions
+  externalWebhookUrl  String?   // BLDR fires order.paid events here (signed HMAC)
+  externalWebhookSecret String? // Used to sign outbound events; generated on creation
+  allowedOrigins      String[]  // Authorized domains for checkout-session requests
+
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 
-  users           ProviderUser[]
-  listings        Listing[]
-  orders          Order[]
-  leads           Lead[]
-  commissionRules CommissionRule[]
-  payouts         Payout[]
-  trackingEvents  TrackingEvent[]
+  users              ProviderUser[]
+  listings           Listing[]
+  orders             Order[]
+  leads              Lead[]
+  commissionRules    CommissionRule[]
+  payouts            Payout[]
+  trackingEvents     TrackingEvent[]
+  checkoutSessions   CheckoutSession[]
+  settlementStatements SettlementStatement[]
 }
 
+/// @alias VentureUser — a bldr team member scoped to one specific brand.
+/// RBAC boundary is enforced at the service layer: queries filter by providerId.
 model ProviderUser {
   id           String   @id @default(cuid())
   email        String   @unique
@@ -101,6 +194,13 @@ model ProviderUser {
   lastName     String
   role         UserRole @default(PROVIDER)
   providerId   String
+
+  // RBAC permission flags within a brand's portal
+  canViewBalances    Boolean @default(true)
+  canConfigureRails  Boolean @default(false)
+  canInitiateRefunds Boolean @default(false)
+  canDownloadReports Boolean @default(true)
+
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -118,12 +218,79 @@ model AdminUser {
   updatedAt    DateTime @updatedAt
 }
 
+// ─── Model B: External Checkout Session ──────────────────────────────────────
+// Created when an external LMS calls POST /v1/checkout/sessions.
+// On completion, BLDR fires an outbound webhook to Provider.externalWebhookUrl.
+
+model CheckoutSession {
+  id             String   @id @default(cuid()) // cs_live_... / cs_test_...
+  providerId     String   // @alias ventureId
+  externalRef    String?  // order ID in the external LMS
+  amountPiasters Int      // integer minor units — no decimals
+  currency       String   @default("EGP")
+  customerName   String?
+  customerEmail  String
+  customerPhone  String?
+  lineItems      Json     // [{ id, title, quantity, unit_amount }]
+  metadata       Json?    // attribution: utm_*, affiliate_code, lms_student_id
+  successUrl     String
+  cancelUrl      String
+  allowedMethods String[] // e.g. ["cards", "wallets", "fawry"]
+  status         String   @default("open")  // open | completed | expired | cancelled
+  expiresAt      DateTime
+  orderId        String?  // populated on completion
+  idempotencyKey String?  @unique
+  createdAt      DateTime @default(now())
+
+  provider Provider @relation(fields: [providerId], references: [id])
+}
+
+// ─── Settlement Statement (Brand-Level P&L) ───────────────────────────────────
+// Generated by Finance Ops on the configured cadence. Each brand's team sees
+// their own statement only — never another brand's.
+
+model SettlementStatement {
+  id              String          @id @default(cuid())
+  providerId      String          // @alias ventureId
+
+  periodStart     DateTime
+  periodEnd       DateTime
+  statementRef    String          @unique // e.g. STL-SH-2026-W39
+
+  // Revenue line items (all in piasters — integer)
+  grossPiasters          Int      // sum of paid order amounts
+  gatewayFeesPiasters    Int      // PSP fees (Paymob, Fawry, etc.)
+  platformFeePiasters    Int      // bldr internal platform fee
+  vatOnFeesPiasters      Int      // VAT on platform + gateway fees
+  refundsPiasters        Int      // refunds issued in period
+  netPiasters            Int      // gross - fees - platform fee - vat - refunds
+
+  // Reserve movement
+  reserveHeldPiasters    Int      // amount moved into reserve this period
+  reserveReleasedPiasters Int     // reserve released from prior periods
+  reserveBalancePiasters  Int     // running reserve balance after this period
+
+  // Metadata
+  txnCount        Int
+  refundCount     Int
+  status          StatementStatus @default(DRAFT)
+  finalisedAt     DateTime?
+  note            String?         @db.Text
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  provider        Provider        @relation(fields: [providerId], references: [id])
+}
+
+// ─── Legacy models (unchanged) ───────────────────────────────────────────────
+
 model Listing {
   id             String         @id @default(cuid())
   title          String
   description    String         @db.Text
   price          Decimal        @db.Decimal(12, 2)
-  currency       String         @default("USD")
+  currency       String         @default("EGP")
   category       String
   tags           String[]
   mediaUrls      String[]
@@ -166,7 +333,7 @@ model Order {
   customerEmail     String
   customerName      String?
   amount            Decimal     @db.Decimal(12, 2)
-  currency          String      @default("USD")
+  currency          String      @default("EGP")
   status            OrderStatus @default(PENDING)
   source            OrderSource @default(NATIVE)
   externalReference String?
@@ -176,7 +343,9 @@ model Order {
   commissionAmount  Decimal?    @db.Decimal(12, 2)
   netAmount         Decimal?    @db.Decimal(12, 2)
   commissionRate    Decimal?    @db.Decimal(5, 4)
+  platformFeeAmount Decimal?    @db.Decimal(12, 2)  // bldr internal fee at settlement
   trackingEventId   String?
+  checkoutSessionId String?     // FK to CheckoutSession if created via Model B API
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
 
@@ -215,16 +384,20 @@ model TrackingEvent {
   orders   Order[]
 }
 
+/// @alias PlatformFeeRule — per-venture configurable platform fee.
+/// Note: "CommissionRule" name is legacy; semantically this is bldr's internal
+/// platform fee (equivalent of what a PayFac charges a merchant).
+/// Phase 2 rename: CommissionRule → PlatformFeeRule, providerId → ventureId.
 model CommissionRule {
   id         String   @id @default(cuid())
-  providerId String?  // null = global default
-  rate       Decimal  @db.Decimal(5, 4) // e.g. 0.1000 = 10%
+  providerId String?  // null = global default; @alias ventureId
+  rate       Decimal  @db.Decimal(5, 4) // e.g. 0.0300 = 3%
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
   provider Provider? @relation(fields: [providerId], references: [id], onDelete: Cascade)
 
-  @@unique([providerId]) // one rule per provider (or one global)
+  @@unique([providerId])
 }
 
 model Payout {

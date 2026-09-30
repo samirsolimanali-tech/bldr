@@ -4,7 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { BldrNav, BldrFooter, ProjectContactModal, tokens, formatEGP } from '@bldr/ui';
-import { PRODUCTS_CATALOG, ProductItem } from '../data';
+import { PRODUCTS_CATALOG, ProductItem, ProductThumbnailIcon } from '../data';
 
 function SingleProductContent() {
   const params = useParams();
@@ -17,6 +17,42 @@ function SingleProductContent() {
   const [isPaid, setIsPaid] = useState(false);
   const [lang, setLang] = useState<'EN' | 'AR'>('EN');
   const [isContactOpen, setIsContactOpen] = useState(false);
+  const [isInitiatingCheckout, setIsInitiatingCheckout] = useState(false);
+
+  const handleBuyNow = async () => {
+    setIsInitiatingCheckout(true);
+    try {
+      const generatedOrderId = `bldr_ord_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productId: product.id,
+          orderId: generatedOrderId,
+          title: lang === 'AR' ? product.titleAr : product.title,
+          amountEgp: product.priceEGP,
+          customer: {
+            name: 'Samir Rashed',
+            email: 'samir@bldr.dev',
+            phone: '+201001234567',
+          },
+          returnUrl: `${window.location.origin}/orders/${generatedOrderId}/success?session_id={CHECKOUT_SESSION_ID}`,
+          cancelUrl: window.location.href,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      } else {
+        alert(data.error || 'Failed to start payment session with Payment Hub');
+        setIsInitiatingCheckout(false);
+      }
+    } catch (e: any) {
+      alert(e.message || 'Error initiating checkout session');
+      setIsInitiatingCheckout(false);
+    }
+  };
 
   useEffect(() => {
     if (queryPaid) {
@@ -155,15 +191,15 @@ function SingleProductContent() {
                 {/* Key Badges */}
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 28 }}>
                   <div style={{ padding: '6px 12px', borderRadius: 8, background: '#F8FAFC', border: '1px solid #E3E8EF', fontSize: 12.5, fontWeight: 600, color: '#323742', display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span>⏱️</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                     <span>{isRtl ? product.durationAr : product.duration}</span>
                   </div>
                   <div style={{ padding: '6px 12px', borderRadius: 8, background: '#F8FAFC', border: '1px solid #E3E8EF', fontSize: 12.5, fontWeight: 600, color: '#323742', display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span>⭐</span>
+                    <span style={{ color: '#D97706' }}>★</span>
                     <span>{product.rating} / 5.0</span>
                   </div>
                   <div style={{ padding: '6px 12px', borderRadius: 8, background: '#F8FAFC', border: '1px solid #E3E8EF', fontSize: 12.5, fontWeight: 600, color: '#323742', display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span>👥</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                     <span>{product.enrolled}+ {isRtl ? 'مشترك مسجل' : 'Enrolled'}</span>
                   </div>
                 </div>
@@ -219,7 +255,6 @@ function SingleProductContent() {
                         transition: 'all 0.15s ease',
                       }}
                     >
-                      <span>🎓</span>
                       <span>
                         {isRtl
                           ? 'سجل الآن / الانتقال لمنصة المزود ←'
@@ -227,9 +262,11 @@ function SingleProductContent() {
                       </span>
                     </a>
                   ) : (
-                    <Link
+                    <button
                       id="btn-pay-now-product"
-                      href={`/pay/${product.paySlug}?productId=${product.id}`}
+                      type="button"
+                      onClick={handleBuyNow}
+                      disabled={isInitiatingCheckout}
                       style={{
                         display: 'inline-flex',
                         alignItems: 'center',
@@ -237,20 +274,22 @@ function SingleProductContent() {
                         height: 48,
                         padding: '0 28px',
                         borderRadius: 8,
-                        background: '#2E6F5E',
+                        background: isInitiatingCheckout ? '#5A6A80' : '#2E6F5E',
                         color: '#FFFFFF',
                         fontSize: 15,
                         fontWeight: 700,
-                        textDecoration: 'none',
+                        border: 'none',
+                        cursor: isInitiatingCheckout ? 'wait' : 'pointer',
                         boxShadow: '0 4px 14px rgba(46, 111, 94, 0.3)',
                         transition: 'background 0.15s ease',
                       }}
                     >
-                      <span>💳</span>
                       <span>
-                        {isRtl ? 'ادفع الآن وحجز مقعدك فورياً' : 'Pay Now / Instant Enrollment'}
+                        {isInitiatingCheckout
+                          ? (isRtl ? 'جاري تحضير صفحة الدفع الآمنة…' : 'Preparing Secure Hub Checkout…')
+                          : (isRtl ? 'ادفع الآن وحجز مقعدك فورياً' : 'Buy Now / Pay via Central Hub')}
                       </span>
-                    </Link>
+                    </button>
                   )}
 
                   {/* Secondary CTA: Contact Modal */}
@@ -300,7 +339,6 @@ function SingleProductContent() {
                     }}
                     title="Toggle state for instant demonstration"
                   >
-                    <span>⚡</span>
                     <span>
                       {isPaid
                         ? isRtl
@@ -339,9 +377,9 @@ function SingleProductContent() {
                   boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
                 }}
               >
-                <span style={{ fontSize: 72, filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.3))' }}>
-                  {product.thumbnailIcon}
-                </span>
+                <div style={{ filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.3))' }}>
+                  <ProductThumbnailIcon icon={product.thumbnailIcon} size={64} color="#FFFFFF" />
+                </div>
               </div>
 
               {/* Price & Guarantee Box */}
@@ -382,8 +420,8 @@ function SingleProductContent() {
 
                 <div style={{ fontSize: 12, color: '#8A94A6', lineHeight: 1.5 }}>
                   {isRtl
-                    ? '🔒 يتم الدفع عبر بوابة الدفع المركزية لـ bldr مع إصدار فوري للإيصال وتأكيد الحجز.'
-                    : '🔒 Securely processed via bldr Central Payment Gateway with instant receipt and ledger verification.'}
+                    ? 'يتم الدفع عبر بوابة الدفع المركزية لـ bldr مع إصدار فوري للإيصال وتأكيد الحجز.'
+                    : 'Securely processed via bldr Central Payment Gateway with instant receipt and ledger verification.'}
                 </div>
               </div>
             </div>
@@ -481,7 +519,6 @@ function SingleProductContent() {
                     boxShadow: isPaid ? '0 2px 10px rgba(21, 128, 61, 0.3)' : 'none',
                   }}
                 >
-                  <span>{isPaid ? '🎓' : '💳'}</span>
                   <span>
                     {isPaid
                       ? isRtl

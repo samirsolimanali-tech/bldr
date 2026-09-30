@@ -1,0 +1,18 @@
+import type { Metadata } from 'next';
+import './globals.css';
+
+export const metadata: Metadata = {
+  title: {
+    default: 'Bldr Central Hub — Financial Operations',
+    template: '%s | Bldr Hub',
+  },
+  description: 'Central payment and financial operations hub for managing ventures, transactions, payouts, and API integrations.',
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
+}

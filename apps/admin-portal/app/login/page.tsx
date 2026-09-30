@@ -224,7 +224,7 @@ export default function AdminLoginPage() {
                 fontWeight: 600,
               }}
             >
-              ⚠️ {error}
+              {error}
             </div>
           )}
 

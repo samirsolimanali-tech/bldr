@@ -57,8 +57,9 @@ export function formatEGP(amount: number | string | null | undefined): string {
 // ─── Backward-compatible Marketplace Helpers ─────────────────────────────────
 export function SimulationBanner({ message }: { message?: string }) {
   return (
-    <div style={{ background: '#FEF6E7', borderBottom: '1px solid #F0D9A8', padding: '8px 16px', fontSize: 12, color: '#B8790A', textAlign: 'center', fontWeight: 600 }}>
-      ⚡ {message || 'Sandbox Simulation Mode Active — No real funds will be charged.'}
+    <div style={{ background: '#FEF6E7', borderBottom: '1px solid #F0D9A8', padding: '8px 16px', fontSize: 12, color: '#B8790A', textAlign: 'center', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      <span>{message || 'Sandbox Simulation Mode Active — No real funds will be charged.'}</span>
     </div>
   );
 }
@@ -66,7 +67,8 @@ export function SimulationBanner({ message }: { message?: string }) {
 export function TrustLine({ gatewayName, note }: { gatewayName?: string; note?: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: '#5A6A80' }}>
-      <span>🔒 {note || 'Powered by bldr Central Payment Hub & PCI DSS certified gateways'} {gatewayName ? `(${gatewayName})` : ''}</span>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <span>{note || 'Powered by bldr Central Payment Hub & PCI DSS certified gateways'} {gatewayName ? `(${gatewayName})` : ''}</span>
     </div>
   );
 }
@@ -756,7 +758,9 @@ export function ProjectContactModal({ isOpen, onClose, lang = 'EN' }: ProjectCon
 
           {submitted ? (
             <div style={{ textAlign: 'center', padding: '32px 16px' }}>
-              <div style={{ fontSize: 48, marginBottom: 12 }}>🚀</div>
+              <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'rgba(46,111,94,0.1)', color: '#2E6F5E', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
               <h3 style={{ fontSize: 20, fontWeight: 800, color: '#12203C', margin: '0 0 8px' }}>
                 {isRtl ? 'تم استلام طلبك بنجاح!' : 'Inquiry Received Successfully!'}
               </h3>
@@ -929,8 +933,9 @@ export function BldrFooter({ lang = 'EN' }: { lang?: 'EN' | 'AR' } = {}) {
             </div>
             <a href="/#built" style={{ fontSize: 14, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>How we&apos;re built</a>
             <a href="/#education" style={{ fontSize: 14, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>Education &amp; EdTech</a>
-            <a href="/projects" style={{ fontSize: 14, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>Our Work &amp; Projects</a>
-            <a href="http://localhost:3002" style={{ fontSize: 14, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>Payment Hub</a>
+            <a href="http://localhost:3011" target="_blank" rel="noreferrer" style={{ fontSize: 14, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>Payment Hub ↗</a>
+            <a href="http://localhost:3012/dashboard" target="_blank" rel="noreferrer" style={{ fontSize: 14, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>Super Admin ↗</a>
+            <a href="http://localhost:3013/login" target="_blank" rel="noreferrer" style={{ fontSize: 14, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>Provider Portal ↗</a>
           </div>
 
           {/* Ecosystem Ventures */}

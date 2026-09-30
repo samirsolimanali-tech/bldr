@@ -313,11 +313,20 @@ function CentralPaymentContent() {
   const payment = resolvePayment(rawSlug);
 
   const [lang, setLang] = useState<'EN' | 'AR'>('EN');
-  const [method, setMethod] = useState<'CARD' | 'WALLET' | 'KIOSK'>('CARD');
+  const [method, setMethod] = useState<'CARD' | 'WALLET' | 'KIOSK'>('KIOSK');
+  const [walletPhone, setWalletPhone] = useState('01012345678');
+  const [fawryRefCode] = useState('788-9921-4820');
+  const [fawryCopied, setFawryCopied] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isPaid, setIsPaid] = useState(false);
   const [paidTxnId, setPaidTxnId] = useState('');
   const isRtl = lang === 'AR';
+
+  const copyFawry = () => {
+    navigator.clipboard.writeText(fawryRefCode.replace(/-/g, ''));
+    setFawryCopied(true);
+    setTimeout(() => setFawryCopied(false), 2000);
+  };
 
   const handlePay = () => {
     setIsProcessing(true);
@@ -401,46 +410,75 @@ function CentralPaymentContent() {
           </div>
         </div>
 
-        {/* ─── Top Bar with Venture Brand ────────────────────────── */}
+        {/* ─── Top Bar with Provider Brand & Verification ────────────────── */}
         <div
           style={{
-            height: 62,
+            height: 68,
             background: '#FFFFFF',
             borderBottom: '1px solid #E3E8EF',
             display: 'flex',
             alignItems: 'center',
             padding: '0 24px',
-            gap: 12,
+            gap: 14,
           }}
         >
-          <span
+          {/* Provider Logo Avatar */}
+          <div
             style={{
-              width: 32,
-              height: 32,
-              borderRadius: 8,
+              width: 40,
+              height: 40,
+              borderRadius: 10,
               background: payment.chipFg,
               color: '#FFFFFF',
-              fontSize: 13,
-              fontWeight: 800,
+              fontSize: 15,
+              fontWeight: 900,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               flex: 'none',
               fontFamily: tokens.fonts.mono,
+              boxShadow: `0 4px 12px ${payment.chipFg}30`,
+              letterSpacing: '0.04em',
             }}
           >
             {payment.ventureCode}
-          </span>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-            <span style={{ fontSize: 15, fontWeight: 800, color: '#12203C', letterSpacing: '-0.02em' }}>
-              {payment.ventureName}
-            </span>
-            <span style={{ fontSize: 10.5, fontWeight: 600, color: '#8A94A6' }}>
-              {isRtl ? 'دفع آمن ومحمي' : 'Secure payment'}
-            </span>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ fontSize: 16, fontWeight: 800, color: '#12203C', letterSpacing: '-0.02em' }}>
+                {payment.ventureName}
+              </span>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 3,
+                  fontSize: 10.5,
+                  fontWeight: 700,
+                  padding: '2px 7px',
+                  background: '#ECFDF5',
+                  color: '#065F46',
+                  borderRadius: 999,
+                  border: '1px solid #A7F3D0',
+                }}
+              >
+                <span>✓</span>
+                <span>{isRtl ? 'مقدم معتمد' : 'Verified Provider'}</span>
+              </span>
+            </div>
+            <div style={{ fontSize: 11, color: '#64748B' }}>
+              {isRtl ? 'المنصة الرسمية المعتمدة لسداد المصروفات' : 'Official Tuition & Enrollment Checkout'}
+            </div>
           </div>
 
           <div style={{ flex: 1 }} />
+
+          {/* Hotline Contact Chip */}
+          <div style={{ textAlign: 'right' }}>
+            <span style={{ fontSize: 10.5, color: '#8A94A6' }}>{isRtl ? 'المساعدة والدعم' : 'Support Hotline'}</span>
+            <div style={{ fontSize: 11.5, fontWeight: 700, color: '#12203C' }}>{payment.supportPhone}</div>
+          </div>
 
           {/* Language Toggle */}
           <div style={{ display: 'flex', padding: 3, background: '#EEF1F5', borderRadius: 8, gap: 2 }}>
@@ -553,7 +591,6 @@ function CentralPaymentContent() {
                   marginTop: 6,
                 }}
               >
-                <span>🎓</span>
                 <span>{isRtl ? 'سجل الآن / الانتقال لمنصة المزود لمتابعة الالتحاق كطالب معتمد ←' : 'Enroll Now / Continue to Provider Website as Paid User →'}</span>
               </a>
 
@@ -672,67 +709,180 @@ function CentralPaymentContent() {
                 </div>
               </div>
 
-              {/* PSP Certified Checkout Simulator Box */}
+              {/* Dynamic Egyptian Checkout Box based on Selected Method */}
               <div style={{ border: '1px solid #DDE3EC', borderRadius: 10, overflow: 'hidden' }}>
-                <div style={{ padding: '9px 14px', background: '#FAFBFD', borderBottom: '1px solid #E3E8EF', display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="#2E6F5E" strokeWidth="1.8" strokeLinecap="round">
-                    <path d="M4.8 7.2V5.4a3.2 3.2 0 016.4 0v1.8M4 7.2h8v5.6H4z" />
-                  </svg>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: '#12203C' }}>
-                    {isRtl ? 'نموذج دفع معتمد (Geidea / Fawry)' : 'PCI DSS Certified Hosted Form (Geidea / Fawry)'}
-                  </span>
-                  <div style={{ flex: 1 }} />
-                  <span style={{ fontFamily: tokens.fonts.mono, fontSize: 9.5, color: '#8A94A6' }}>
-                    Hosted by Provider
-                  </span>
-                </div>
-                <div style={{ padding: '14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: '#8A94A6' }}>
-                      {isRtl ? 'رقم البطاقة' : 'Card Number'}
-                    </span>
-                    <input
-                      type="text"
-                      readOnly
-                      value="5200 •••• •••• 4242"
-                      style={{
-                        height: 36,
-                        border: '1px solid #E3E8EF',
-                        borderRadius: 6,
-                        padding: '0 10px',
-                        fontFamily: tokens.fonts.mono,
-                        fontSize: 13,
-                        color: '#12203C',
-                        background: '#FAFBFD',
-                      }}
-                    />
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                      <span style={{ fontSize: 10, fontWeight: 700, color: '#8A94A6' }}>{isRtl ? 'تاريخ الانتهاء' : 'Expiry'}</span>
-                      <input
-                        type="text"
-                        readOnly
-                        value="12 / 28"
-                        style={{ height: 36, border: '1px solid #E3E8EF', borderRadius: 6, padding: '0 10px', fontFamily: tokens.fonts.mono, fontSize: 13, color: '#12203C', background: '#FAFBFD' }}
-                      />
+                {method === 'KIOSK' && (
+                  <div>
+                    <div style={{ padding: '10px 14px', background: '#FFFBEB', borderBottom: '1px solid #FDE68A', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#F59E0B', display: 'inline-block' }} />
+                        <span style={{ fontSize: 12, fontWeight: 800, color: '#92400E' }}>
+                          {isRtl ? 'بوابة فوري الرسمية (Fawry Pay)' : 'Official Fawry Pay Gateway'}
+                        </span>
+                      </div>
+                      <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 6px', background: '#FEF3C7', color: '#B45309', borderRadius: 4 }}>
+                        كود خدمة 788
+                      </span>
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                      <span style={{ fontSize: 10, fontWeight: 700, color: '#8A94A6' }}>CVC</span>
-                      <input
-                        type="text"
-                        readOnly
-                        value="•••"
-                        style={{ height: 36, border: '1px solid #E3E8EF', borderRadius: 6, padding: '0 10px', fontFamily: tokens.fonts.mono, fontSize: 13, color: '#12203C', background: '#FAFBFD' }}
-                      />
+
+                    <div style={{ padding: '18px 16px', display: 'flex', flexDirection: 'column', gap: 12, background: '#FFFFFF' }}>
+                      <div style={{ background: '#FFFDF5', border: '2px dashed #F59E0B', borderRadius: 10, padding: '14px', textAlign: 'center' }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: '#B45309', marginBottom: 4 }}>
+                          {isRtl ? 'رقم السداد المرجعي المباشر لدى فوري:' : 'Direct Fawry Reference Code:'}
+                        </div>
+                        <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: '0.08em', color: '#1F2937', fontFamily: tokens.fonts.mono, margin: '6px 0' }}>
+                          {fawryRefCode}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={copyFawry}
+                          style={{
+                            background: fawryCopied ? '#059669' : '#F59E0B',
+                            color: '#FFFFFF',
+                            border: 'none',
+                            padding: '6px 14px',
+                            borderRadius: 6,
+                            fontSize: 11.5,
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          {fawryCopied ? (isRtl ? '✓ تم النسخ!' : '✓ Copied!') : (isRtl ? 'نسخ كود فوري' : 'Copy Fawry Code')}
+                        </button>
+                      </div>
+
+                      <div style={{ fontSize: 11, color: '#4B5563', lineHeight: 1.6, background: '#F9FAFB', padding: '10px 12px', borderRadius: 6, border: '1px solid #E5E7EB' }}>
+                        <strong>{isRtl ? 'طريقة السداد عبر منافذ فوري:' : 'How to pay at Fawry retail points:'}</strong><br />
+                        {isRtl
+                          ? '1. توجه لأي منفذ أو ماكينة فوري أو افتح تطبيق myFawry.\n2. اطلب خدمة فوري باي (كود 788 - Bldr EdTech).\n3. ادخل كود السداد أعلاه وسدد المبلغ نقداً لتفعيل حسابك فوراً.'
+                          : '1. Visit any Fawry kiosk or open the myFawry mobile app.\n2. Request service code 788 (Bldr EdTech).\n3. Present your reference code and pay cash to instantly activate your seat.'}
+                      </div>
                     </div>
                   </div>
-                  <span style={{ fontSize: 10.5, color: '#5A6A80' }}>
-                    {isRtl
-                      ? 'بيانات البطاقة لا تعبر خوادم bldr مطلقاً ويتم معالجتها لدى مزود الدفع مباشرة.'
-                      : 'Card details are processed exclusively through certified provider components and never touch bldr servers.'}
-                  </span>
-                </div>
+                )}
+
+                {method === 'WALLET' && (
+                  <div>
+                    <div style={{ padding: '10px 14px', background: '#ECFDF5', borderBottom: '1px solid #A7F3D0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#065F46" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                        <span style={{ fontSize: 12, fontWeight: 800, color: '#065F46' }}>
+                          {isRtl ? 'المحافظ الإلكترونية وإنستاباي' : 'Egyptian Mobile Wallets & InstaPay'}
+                        </span>
+                      </div>
+                      <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 6px', background: '#D1FAE5', color: '#047857', borderRadius: 4 }}>
+                        خصم لحظي فوري
+                      </span>
+                    </div>
+
+                    <div style={{ padding: '18px 16px', display: 'flex', flexDirection: 'column', gap: 12, background: '#FFFFFF' }}>
+                      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                        {['فودافون كاش', 'أورنج كاش', 'اتصالات كاش', 'WE Pay', 'InstaPay'].map(w => (
+                          <span key={w} style={{ fontSize: 10.5, fontWeight: 700, background: '#F1F5F9', color: '#334155', padding: '3px 8px', borderRadius: 4 }}>
+                            {w}
+                          </span>
+                        ))}
+                      </div>
+
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                        <label style={{ fontSize: 11, fontWeight: 700, color: '#1F2937' }}>
+                          {isRtl ? 'ادخل رقم هاتف المحفظة (010 / 011 / 012 / 015):' : 'Enter Egyptian Wallet Mobile Number:'}
+                        </label>
+                        <input
+                          type="text"
+                          value={walletPhone}
+                          onChange={e => setWalletPhone(e.target.value)}
+                          placeholder="010XXXXXXXX"
+                          style={{
+                            height: 38,
+                            border: '1.5px solid #10B981',
+                            borderRadius: 6,
+                            padding: '0 12px',
+                            fontFamily: tokens.fonts.mono,
+                            fontSize: 13,
+                            color: '#12203C',
+                            background: '#F0FDF4',
+                            fontWeight: 700,
+                          }}
+                        />
+                      </div>
+
+                      <span style={{ fontSize: 10.5, color: '#047857', lineHeight: 1.5 }}>
+                        {isRtl
+                          ? 'بمجرد الضغط على زر الدفع، سيصلك إشعار أو رسالة USSD على هاتفك لإدخال الرقم السري وتأكيد السداد.'
+                          : 'Upon clicking proceed, a push authorization prompt will be dispatched to your phone to confirm with your wallet PIN.'}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {method === 'CARD' && (
+                  <div>
+                    <div style={{ padding: '9px 14px', background: '#FAFBFD', borderBottom: '1px solid #E3E8EF', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="#2E6F5E" strokeWidth="1.8" strokeLinecap="round">
+                          <path d="M4.8 7.2V5.4a3.2 3.2 0 016.4 0v1.8M4 7.2h8v5.6H4z" />
+                        </svg>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: '#12203C' }}>
+                          {isRtl ? 'نموذج البطاقات المعتمد وميزة (Geidea / Paymob)' : 'PCI DSS Certified Card Checkout (Meeza / Visa / MC)'}
+                        </span>
+                      </div>
+                      <div style={{ display: 'flex', gap: 4 }}>
+                        <span style={{ fontSize: 9.5, padding: '2px 5px', background: '#DBEAFE', color: '#1E40AF', borderRadius: 3, fontWeight: 800 }}>ميزة Meeza</span>
+                        <span style={{ fontSize: 9.5, padding: '2px 5px', background: '#F1F5F9', color: '#334155', borderRadius: 3, fontWeight: 800 }}>Visa</span>
+                        <span style={{ fontSize: 9.5, padding: '2px 5px', background: '#FEE2E2', color: '#991B1B', borderRadius: 3, fontWeight: 800 }}>Mastercard</span>
+                      </div>
+                    </div>
+
+                    <div style={{ padding: '14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: '#8A94A6' }}>
+                          {isRtl ? 'رقم البطاقة (ميزة أو بنكية)' : 'Card Number (Meeza / Debit / Credit)'}
+                        </span>
+                        <input
+                          type="text"
+                          readOnly
+                          value="5078 •••• •••• 9128 (Meeza)"
+                          style={{
+                            height: 36,
+                            border: '1px solid #E3E8EF',
+                            borderRadius: 6,
+                            padding: '0 10px',
+                            fontFamily: tokens.fonts.mono,
+                            fontSize: 13,
+                            color: '#12203C',
+                            background: '#FAFBFD',
+                          }}
+                        />
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                          <span style={{ fontSize: 10, fontWeight: 700, color: '#8A94A6' }}>{isRtl ? 'تاريخ الانتهاء' : 'Expiry'}</span>
+                          <input
+                            type="text"
+                            readOnly
+                            value="12 / 28"
+                            style={{ height: 36, border: '1px solid #E3E8EF', borderRadius: 6, padding: '0 10px', fontFamily: tokens.fonts.mono, fontSize: 13, color: '#12203C', background: '#FAFBFD' }}
+                          />
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                          <span style={{ fontSize: 10, fontWeight: 700, color: '#8A94A6' }}>CVC</span>
+                          <input
+                            type="text"
+                            readOnly
+                            value="•••"
+                            style={{ height: 36, border: '1px solid #E3E8EF', borderRadius: 6, padding: '0 10px', fontFamily: tokens.fonts.mono, fontSize: 13, color: '#12203C', background: '#FAFBFD' }}
+                          />
+                        </div>
+                      </div>
+                      <span style={{ fontSize: 10.5, color: '#5A6A80' }}>
+                        {isRtl
+                          ? 'محمي بخاصية 3D Secure ومعالج لدى بوابات الدفع المرخصة من البنك المركزي المصري.'
+                          : 'Protected with 3D Secure and processed via Central Bank of Egypt certified gateways.'}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Pay Action Button */}
@@ -743,7 +893,7 @@ function CentralPaymentContent() {
                   style={{
                     height: 48,
                     borderRadius: 9,
-                    background: '#2E6F5E',
+                    background: method === 'KIOSK' ? '#D97706' : method === 'WALLET' ? '#059669' : '#2E6F5E',
                     color: '#FFFFFF',
                     border: 'none',
                     fontSize: 14.5,
@@ -753,35 +903,112 @@ function CentralPaymentContent() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: 8,
-                    boxShadow: '0 2px 8px rgba(46,111,94,0.25)',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                    transition: 'background 0.15s ease',
                   }}
                 >
                   {isProcessing ? (
-                    <span>{isRtl ? 'جاري المعالجة...' : 'Processing checkout...'}</span>
+                    <span>{isRtl ? 'جاري المعالجة والتحقق...' : 'Processing checkout...'}</span>
+                  ) : method === 'KIOSK' ? (
+                    <span>{isRtl ? `تأكيد كود فوري (${formatEGP(payment.amount)}) ←` : `Confirm Fawry Code (${formatEGP(payment.amount)}) ←`}</span>
+                  ) : method === 'WALLET' ? (
+                    <span>{isRtl ? `طلب خصم من المحفظة (${formatEGP(payment.amount)}) ←` : `Authorize Wallet Payment (${formatEGP(payment.amount)}) ←`}</span>
                   ) : (
-                    <span>{isRtl ? `ادفع ${formatEGP(payment.amount)}` : `Pay ${formatEGP(payment.amount)}`}</span>
+                    <span>{isRtl ? `سداد بالبطاقة (${formatEGP(payment.amount)}) ←` : `Pay with Card (${formatEGP(payment.amount)}) ←`}</span>
                   )}
                 </button>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, fontSize: 11, color: '#B8860B', fontWeight: 600 }}>
-                  <span>⏳</span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                   <span>{isRtl ? `ينتهي هذا الرابط خلال ${payment.expiresInMinutes} دقيقة` : `This payment link expires in ${payment.expiresInMinutes}:00`}</span>
                 </div>
               </div>
             </>
           )}
 
-          {/* Legal / Operating Notice */}
-          <div style={{ borderTop: '1px solid #EEF1F5', paddingTop: 18, display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'center', textAlign: 'center' }}>
-            <span style={{ fontSize: 11.5, fontWeight: 700, color: '#5A6A80' }}>
-              Operated by Evolve bldr for Business Management
-            </span>
-            <span style={{ fontSize: 10.5, color: '#8A94A6', maxWidth: 460 }}>
-              {payment.ventureName} is a brand operated by bldr. bldr is the seller of record for this transaction and is responsible for the invoice and fulfillment.
-            </span>
-            <div style={{ display: 'flex', gap: 12, fontSize: 10.5, color: '#2E6F5E', fontWeight: 600, marginTop: 4 }}>
-              <span>support@bldr.io</span>
-              <span>·</span>
-              <span>Cairo, Egypt</span>
+          {/* High-Trust Fintech Footer */}
+          <div
+            style={{
+              borderTop: '1px solid #E2E8F0',
+              paddingTop: 16,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 12,
+            }}
+          >
+            {/* Row 1: Payment Managed by bldr & Secured by Gateway */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+              {/* bldr Management badge */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div
+                  style={{
+                    width: 24,
+                    height: 24,
+                    borderRadius: 6,
+                    background: '#D10721',
+                    color: 'white',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 12,
+                    fontWeight: 900,
+                  }}
+                >
+                  b
+                </div>
+                <div style={{ fontSize: 11.5, color: '#334155' }}>
+                  Payment Managed by <strong style={{ color: '#0F172A', fontWeight: 800 }}>bldr</strong>
+                </div>
+              </div>
+
+              {/* Gateway Security Badge */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 11.5, color: '#64748B' }}>Secured payment by:</span>
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    padding: '4px 10px',
+                    borderRadius: 6,
+                    background: method === 'KIOSK' ? '#FEF3C7' : method === 'WALLET' ? '#EFF6FF' : '#FEE2E2',
+                    color: method === 'KIOSK' ? '#92400E' : method === 'WALLET' ? '#1E40AF' : '#991B1B',
+                    fontWeight: 800,
+                    fontSize: 11.5,
+                    border: `1px solid ${method === 'KIOSK' ? '#FDE68A' : method === 'WALLET' ? '#BFDBFE' : '#FECACA'}`,
+                  }}
+                >
+                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: method === 'KIOSK' ? '#F59E0B' : method === 'WALLET' ? '#2563EB' : '#DC2626', display: 'inline-block' }} />
+                  <span>{method === 'KIOSK' ? 'Fawry Pay' : method === 'WALLET' ? 'Paymob (Accept)' : 'Geidea'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Row 2: Regulatory & Bank Security Trust Seals */}
+            <div
+              style={{
+                borderTop: '1px dashed #CBD5E1',
+                paddingTop: 10,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                fontSize: 10.5,
+                color: '#64748B',
+                flexWrap: 'wrap',
+                gap: 8,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <span>256-Bit SSL Encryption</span>
+                <span>·</span>
+                <span>Central Bank of Egypt Compliant Rails</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <span>PCI DSS Level 1</span>
+                <span>·</span>
+                <span>3D Secure 2.0</span>
+              </div>
             </div>
           </div>
         </div>

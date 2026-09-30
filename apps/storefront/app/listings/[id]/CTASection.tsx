@@ -281,7 +281,7 @@ export function BuyNowButton({ listing }: Props) {
         onClick={handleCheckout}
         disabled={state === 'loading'}
       >
-        {state === 'loading' ? '⏳ Preparing Secure Checkout…' : showForm ? '🔒 Complete Payment' : 'Enroll Now'}
+        {state === 'loading' ? 'Preparing Secure Checkout…' : showForm ? 'Complete Payment' : 'Enroll Now'}
       </button>
 
       {!showForm && (
@@ -382,7 +382,7 @@ export function LeadForm({ listing }: Props) {
       )}
       <button id="btn-lead-submit" type="submit" className="btn btn-primary btn-lg"
         style={{ width: '100%' }} disabled={state === 'loading'}>
-        {state === 'loading' ? '⏳ Submitting…' : isBookCall ? 'Schedule Call' : 'Request Proposal'}
+        {state === 'loading' ? 'Submitting…' : isBookCall ? 'Schedule Call' : 'Request Proposal'}
       </button>
 
       <TrustLine gatewayName="bldr Verified" note="Direct provider connection" />
@@ -418,7 +418,7 @@ export function RedirectButton({ listing }: Props) {
         onClick={handleClick}
         disabled={loading}
       >
-        {loading ? '⏳ Transferring…' : 'Visit Provider Store ↗'}
+        {loading ? 'Transferring…' : 'Visit Provider Store ↗'}
       </button>
       <p style={{ fontSize: '12px', color: 'var(--text-secondary)', textAlign: 'center' }}>
         You will complete checkout on the provider’s external secure platform.

@@ -1,3 +1,5 @@
+import React from 'react';
+
 export interface ProductItem {
   id: string;
   slug: string;
@@ -58,7 +60,7 @@ export const PRODUCTS_CATALOG: ProductItem[] = [
     rating: 4.9,
     enrolled: 310,
     thumbnailGradient: 'linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%)',
-    thumbnailIcon: '💻',
+    thumbnailIcon: 'code',
     paySlug: 'sh-8k2m9q',
     tags: ['React', 'Next.js', 'PostgreSQL', 'Live Mentorship'],
     tagsAr: ['تطوير ويب', 'ريأكت', 'قواعد بيانات', 'مشاريع تخرج'],
@@ -112,7 +114,7 @@ export const PRODUCTS_CATALOG: ProductItem[] = [
     rating: 4.8,
     enrolled: 620,
     thumbnailGradient: 'linear-gradient(135deg, #1E293B 0%, #475569 100%)',
-    thumbnailIcon: '📐',
+    thumbnailIcon: 'design',
     paySlug: 'ac-9w3e5z',
     tags: ['Physics', 'Pure Math', 'Question Banks', 'Live Q&A'],
     tagsAr: ['فيزياء', 'رياضيات', 'بنوك أسئلة', 'بث مباشر'],
@@ -164,7 +166,7 @@ export const PRODUCTS_CATALOG: ProductItem[] = [
     rating: 4.9,
     enrolled: 1450,
     thumbnailGradient: 'linear-gradient(135deg, #D97706 0%, #F59E0B 100%)',
-    thumbnailIcon: '🏆',
+    thumbnailIcon: 'trophy',
     paySlug: 'eh-2n6b8v',
     tags: ['Gamification', 'Quizzes', 'Badges', 'Diagnostics'],
     tagsAr: ['تعليم تفاعلي', 'اختبارات قصيرة', 'أوسمة وجوائز', 'تشخيص فوري'],
@@ -214,7 +216,7 @@ export const PRODUCTS_CATALOG: ProductItem[] = [
     rating: 4.7,
     enrolled: 480,
     thumbnailGradient: 'linear-gradient(135deg, #581C87 0%, #9333EA 100%)',
-    thumbnailIcon: '💼',
+    thumbnailIcon: 'briefcase',
     paySlug: 'ch-5t8o2p',
     tags: ['CV Review', 'ATS Friendly', 'Portfolio', 'Salary Prep'],
     tagsAr: ['سيرة ذاتية', 'تخطي ATS', 'بورتفوليو', 'استعداد للمقابلات'],
@@ -264,7 +266,7 @@ export const PRODUCTS_CATALOG: ProductItem[] = [
     rating: 4.9,
     enrolled: 215,
     thumbnailGradient: 'linear-gradient(135deg, #065F46 0%, #10B981 100%)',
-    thumbnailIcon: '☁️',
+    thumbnailIcon: 'cloud',
     paySlug: 'sh-4r7t1a',
     tags: ['AWS', 'Cloud', 'Sandbox Labs', 'Exam Prep'],
     tagsAr: ['حوسبة سحابية', 'أمازون AWS', 'معامل تطبيقية', 'امتحانات سابقة'],
@@ -316,7 +318,7 @@ export const PRODUCTS_CATALOG: ProductItem[] = [
     rating: 5.0,
     enrolled: 180,
     thumbnailGradient: 'linear-gradient(135deg, #991B1B 0%, #EF4444 100%)',
-    thumbnailIcon: '🎬',
+    thumbnailIcon: 'video',
     paySlug: 'sk-media-prod',
     tags: ['Reels', 'TikTok Ads', 'Lighting & Audio', 'Editing'],
     tagsAr: ['فيديوهات ريلز', 'إعلانات تيك توك', 'إضاءة وصوت', 'مونتاج'],
@@ -364,7 +366,7 @@ export const PRODUCTS_CATALOG: ProductItem[] = [
     rating: 4.9,
     enrolled: 890,
     thumbnailGradient: 'linear-gradient(135deg, #111827 0%, #374151 100%)',
-    thumbnailIcon: '📖',
+    thumbnailIcon: 'book',
     paySlug: 'bm-consult-sess',
     tags: ['E-Commerce', 'Financial Model', 'COD Solutions', 'Handbook'],
     tagsAr: ['تجارة إلكترونية', 'نماذج مالية', 'حلول الشحن', 'دليل شامل'],
@@ -414,7 +416,7 @@ export const PRODUCTS_CATALOG: ProductItem[] = [
     rating: 5.0,
     enrolled: 195,
     thumbnailGradient: 'linear-gradient(135deg, #0F172A 0%, #0284C7 100%)',
-    thumbnailIcon: '🎟️',
+    thumbnailIcon: 'ticket',
     paySlug: 'th-gateway-int',
     tags: ['FinTech', 'Summit', 'Networking', 'Executive Pass'],
     tagsAr: ['تكنولوجيا مالية', 'مؤتمر', 'شبكة علاقات', 'تذكرة تنفيذية'],
@@ -441,3 +443,71 @@ export const PRODUCTS_CATALOG: ProductItem[] = [
     providerWebsiteUrl: '/providers/enroll?provider=Tech+House&providerCode=TH&order=TH-INT-4019&product=FinTech+Founders+Summit&status=PAID',
   },
 ];
+
+export function ProductThumbnailIcon({ icon, size = 48, color = 'white' }: { icon: string; size?: number; color?: string }) {
+  switch (icon) {
+    case 'code':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="16 18 22 12 16 6" />
+          <polyline points="8 6 2 12 8 18" />
+        </svg>
+      );
+    case 'design':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 19l7-7 3 3-7 7-3-3z" />
+          <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
+          <path d="M2 2l7.586 7.586" />
+          <circle cx="11" cy="11" r="2" />
+        </svg>
+      );
+    case 'trophy':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+          <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+          <path d="M4 22h16" />
+          <path d="M10 14.66V17c0 .55-.45 1-1 1H7" />
+          <path d="M14 14.66V17c0 .55.45 1 1 1h2" />
+          <path d="M18 2H6v7a6 6 0 0 0 12 0V2z" />
+        </svg>
+      );
+    case 'briefcase':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+        </svg>
+      );
+    case 'cloud':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
+        </svg>
+      );
+    case 'video':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polygon points="23 7 16 12 23 17 23 7" />
+          <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+        </svg>
+      );
+    case 'book':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+        </svg>
+      );
+    case 'ticket':
+    default:
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z" />
+          <path d="M13 5v2" /><path d="M13 17v2" /><path d="M13 11v2" />
+        </svg>
+      );
+  }
+}
+

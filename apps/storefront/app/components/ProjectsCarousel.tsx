@@ -43,7 +43,7 @@ const CAROUSEL_PROJECTS: CarouselProjectItem[] = [
     summaryAr: 'بوابة رعاية صحية متطورة مع غرف استشارات مرئية مشفرة، جدولة مواعيد فورية للعيادات، وتنبيهات آلية للمرضى.',
     techStack: ['Next.js 14', 'WebRTC', 'PostgreSQL', 'Docker'],
     accentColor: '#2C5F9E',
-    icon: '🩺',
+    icon: 'health',
   },
   {
     id: 'edtech-academy',
@@ -62,7 +62,7 @@ const CAROUSEL_PROJECTS: CarouselProjectItem[] = [
     summaryAr: 'بنية رقمية متكاملة للتعليم عن بُعد تدعم البث المباشر، الفيديوهات المشفرة، والتفعيل التلقائي للاشتراكات بعد الدفع فورياً.',
     techStack: ['HLS Video DRM', 'Next.js', 'PostgreSQL', 'Tailwind'],
     accentColor: '#FD9426',
-    icon: '🎓',
+    icon: 'edu',
   },
   {
     id: 'sidekick-growth',
@@ -81,7 +81,7 @@ const CAROUSEL_PROJECTS: CarouselProjectItem[] = [
     summaryAr: 'إطلاق متكامل لعلامة تجارية يشمل صناعة إعلانات الفيديو القصيرة، صفحات هبوط فورية الشراء، وتتبع خوادم الإعلانات بدقة متناهية.',
     techStack: ['Meta CAPI', 'Next.js', 'Figma', 'DaVinci'],
     accentColor: '#D10721',
-    icon: '📈',
+    icon: 'growth',
   },
   {
     id: 'opsflow-enterprise',
@@ -100,7 +100,7 @@ const CAROUSEL_PROJECTS: CarouselProjectItem[] = [
     summaryAr: 'منصة سحابية متقدمة توفر التوجيه الذكي للمناديب وتتبع الخرائط الحي وتأكيد استلام الشحنات برمز OTP مع لوحة تحكم مركزية.',
     techStack: ['WebSockets', 'PostGIS', 'React PWA', 'Node.js'],
     accentColor: '#10B981',
-    icon: '🚚',
+    icon: 'fleet',
   },
   {
     id: 'kayan-investor-portal',
@@ -119,7 +119,7 @@ const CAROUSEL_PROJECTS: CarouselProjectItem[] = [
     summaryAr: 'بوابة مستثمرين رقمية مشفرة، ونماذج محاكاة مالية تفاعلية، مع تصميم هوية مؤسسية كاملة ساهمت في إغلاق الجولة الاستثمارية.',
     techStack: ['Next.js', 'Financial Modeling', 'Data Room', 'TypeScript'],
     accentColor: '#8B5CF6',
-    icon: '🏛️',
+    icon: 'capital',
   },
 ];
 
@@ -336,7 +336,7 @@ export default function ProjectsCarousel({ lang }: ProjectsCarouselProps) {
                       gap: 4,
                     }}
                   >
-                    <span>🔒</span>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                     <span>bldr.studio/projects/{currentProject.slug}</span>
                   </div>
 
@@ -379,7 +379,17 @@ export default function ProjectsCarousel({ lang }: ProjectsCarouselProps) {
                           fontSize: 18,
                         }}
                       >
-                        {currentProject.icon}
+                        {currentProject.icon === 'health' ? (
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                        ) : currentProject.icon === 'edu' ? (
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                        ) : currentProject.icon === 'growth' ? (
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                        ) : currentProject.icon === 'fleet' ? (
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                        ) : (
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="21" x2="21" y2="21"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="5 6 12 3 19 6"/><line x1="4" y1="10" x2="4" y2="21"/><line x1="20" y1="10" x2="20" y2="21"/></svg>
+                        )}
                       </span>
                       <div>
                         <div style={{ fontSize: 14, fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.01em' }}>

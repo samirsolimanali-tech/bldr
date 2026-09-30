@@ -131,7 +131,7 @@ function ProviderEnrollContent() {
           }}
         >
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.18)', padding: '6px 14px', borderRadius: 20, marginBottom: 16 }}>
-            <span style={{ fontSize: 14 }}>🎓</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#DCFCE7" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
             <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: '0.04em', textTransform: 'uppercase', color: '#DCFCE7' }}>
               {isRtl ? 'تم تأكيد الالتحاق كطالب مسجل ومدفوع' : 'Verified Paid Student Enrollment'}
             </span>
@@ -197,8 +197,8 @@ function ProviderEnrollContent() {
                   gap: 12,
                 }}
               >
-                <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(59,130,246,0.15)', color: '#60A5FA', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>
-                  🎥
+                <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(59,130,246,0.15)', color: '#60A5FA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
                 </div>
                 <div style={{ fontSize: 15, fontWeight: 700, color: '#FFFFFF' }}>
                   {isRtl ? 'القاعة الافتراضية المباشرة' : 'Live Virtual Classroom'}
@@ -240,8 +240,8 @@ function ProviderEnrollContent() {
                   gap: 12,
                 }}
               >
-                <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(34,197,94,0.15)', color: '#4ADE80', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>
-                  💬
+                <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(34,197,94,0.15)', color: '#4ADE80', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
                 </div>
                 <div style={{ fontSize: 15, fontWeight: 700, color: '#FFFFFF' }}>
                   {isRtl ? 'مجتمع الطلاب والموجهين' : 'Student & Mentor Group'}
@@ -283,8 +283,8 @@ function ProviderEnrollContent() {
                   gap: 12,
                 }}
               >
-                <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(234,179,8,0.15)', color: '#FACC15', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>
-                  📚
+                <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(234,179,8,0.15)', color: '#FACC15', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
                 </div>
                 <div style={{ fontSize: 15, fontWeight: 700, color: '#FFFFFF' }}>
                   {isRtl ? 'المقررات والمواد التعليمية' : 'Syllabus & Materials'}
@@ -331,7 +331,7 @@ function ProviderEnrollContent() {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ fontSize: 20 }}>🔒</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
               <div style={{ fontSize: 12.5, color: '#CBD5E1' }}>
                 {isRtl
                   ? 'تمت تسوية هذه المعاملة عبر المحرك المالي لـ bldr. تم إصدار إشعار الويب هوك وتثبيت القيد في السجل المالي المزدوج.'

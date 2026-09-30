@@ -79,7 +79,6 @@ export default function ListingsPage() {
                   <tr>
                     <td colSpan={6}>
                       <div className="empty-state">
-                        <div className="empty-state-icon">📦</div>
                         <p style={{ marginBottom: '12px', fontSize: '15px', color: 'var(--text-secondary)' }}>
                           No listings yet
                         </p>
@@ -91,10 +90,10 @@ export default function ListingsPage() {
                   <tr key={l.id}>
                     <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{l.title}</td>
                     <td>{l.category}</td>
-                    <td>${Number(l.price).toFixed(2)}</td>
+                    <td>EGP {Number(l.price).toFixed(2)}</td>
                     <td>
                       <span className={`badge ${l.purchaseType === 'REDIRECT' ? 'badge-blue' : 'badge-accent'}`}>
-                        {l.purchaseType === 'REDIRECT' ? '↗ Redirect' : '🛒 Native'}
+                        {l.purchaseType === 'REDIRECT' ? 'Redirect' : 'Native'}
                       </span>
                     </td>
                     <td>

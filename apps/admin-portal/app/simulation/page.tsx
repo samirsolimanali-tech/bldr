@@ -249,7 +249,6 @@ export default function AdminSimulationPage() {
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                 <strong style={{ fontSize: '14px' }}>
-                  {feedback.type === 'rejection' ? '🛡️ ' : feedback.type === 'success' ? '✅ ' : '⚠️ '}
                   {feedback.title}
                 </strong>
                 <button
@@ -292,7 +291,7 @@ export default function AdminSimulationPage() {
                       <td style={{ fontFamily: 'monospace', fontSize: '12px' }}>#{o.id.slice(-8).toUpperCase()}</td>
                       <td>
                         <span className={`badge ${o.source === 'REDIRECT' ? 'badge-accent' : 'badge-blue'}`}>
-                          {o.source === 'REDIRECT' ? '↗ Redirect' : '🛒 Native'}
+                          {o.source === 'REDIRECT' ? 'Redirect' : 'Native'}
                         </span>
                       </td>
                       <td>
@@ -349,7 +348,7 @@ export default function AdminSimulationPage() {
                             disabled={activeActionId === o.id}
                             onClick={() => handleTamperTest(o)}
                           >
-                            🛡️ Test Tamper
+                            Test Tamper
                           </button>
                         </div>
                       </td>

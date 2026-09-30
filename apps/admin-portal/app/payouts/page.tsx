@@ -46,12 +46,42 @@ export default function AdminPayoutsPage() {
       <AdminSidebar />
       <div className="main-content">
         <header className="topbar">
-          <h1 className="topbar-title">Payout Management</h1>
-          <span style={{ fontSize: '13px', color: 'var(--amber)', fontWeight: 600 }}>
-            Pending: ${totalPending.toFixed(2)}
-          </span>
+          <div>
+            <h1 className="topbar-title">Settlement Payouts (Central Hub Redirect)</h1>
+            <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: '4px 0 0 0' }}>
+              Multi-brand escrow balances and bank transfers are processed in the Central Payment Hub.
+            </p>
+          </div>
+          <a
+            href="http://localhost:3003/payouts"
+            target="_blank"
+            rel="noreferrer"
+            style={{
+              background: '#059669',
+              color: '#fff',
+              padding: '8px 16px',
+              borderRadius: 8,
+              fontSize: 13,
+              fontWeight: 600,
+              textDecoration: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+            }}
+          >
+            <span>Open Payment Hub Payouts (:3003)</span>
+            <span>&rarr;</span>
+          </a>
         </header>
         <div className="page-content fade-up">
+          <div style={{ background: '#ECFDF5', border: '1px solid #A7F3D0', borderRadius: 10, padding: '14px 18px', marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ fontSize: 13, color: '#065F46', fontWeight: 600 }}>
+              Unified Payout Infrastructure: To prevent duplicate ledgers, bank disbursements to providers and bldr corporate accounts are audited exclusively via the Central Payment Hub.
+            </div>
+            <a href="http://localhost:3003/payouts" target="_blank" rel="noreferrer" style={{ fontSize: 12, fontWeight: 700, color: '#047857', textDecoration: 'underline' }}>
+              Go to Payment Hub Payouts &rarr;
+            </a>
+          </div>
           <div className="table-wrap">
             <table className="data-table">
               <thead>
@@ -61,7 +91,7 @@ export default function AdminPayoutsPage() {
                 {loading ? (
                   <tr><td colSpan={9} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>Loading…</td></tr>
                 ) : payouts.length === 0 ? (
-                  <tr><td colSpan={9}><div className="empty-state"><div className="empty-state-icon">💰</div><p>No payouts yet</p></div></td></tr>
+                  <tr><td colSpan={9}><div className="empty-state"><p>No payouts yet</p></div></td></tr>
                 ) : payouts.map(p => (
                   <tr key={p.id}>
                     <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{p.provider?.name || '—'}</td>
@@ -78,7 +108,7 @@ export default function AdminPayoutsPage() {
                           style={{ background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.3)', color: 'var(--green)', borderRadius: '6px' }}
                           disabled={markingId === p.id}
                           onClick={() => setNoteModal(p)}>
-                          {markingId === p.id ? '…' : '✅ Mark Paid'}
+                          {markingId === p.id ? '…' : 'Mark Paid'}
                         </button>
                       )}
                     </td>
@@ -110,7 +140,7 @@ export default function AdminPayoutsPage() {
               <button className="btn btn-primary btn-lg" style={{ flex: 1, background: 'var(--green)' }}
                 disabled={markingId === noteModal.id}
                 onClick={() => markPaid(noteModal.id, note)}>
-                {markingId === noteModal.id ? 'Saving…' : '✅ Confirm Payment'}
+                {markingId === noteModal.id ? 'Saving…' : 'Confirm Payment'}
               </button>
               <button className="btn btn-secondary btn-lg" onClick={() => setNoteModal(null)}>Cancel</button>
             </div>

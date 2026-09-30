@@ -9,6 +9,18 @@ export default function HomePage() {
   const [lang, setLang] = useState<'EN' | 'AR'>('EN');
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false); // Light is the main/default
+  const [cms, setCms] = useState<any>(null);
+
+  useEffect(() => {
+    fetch('/api/cms')
+      .then((r) => r.json())
+      .then((res) => {
+        if (res?.success && res?.data) {
+          setCms(res.data);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -30,6 +42,24 @@ export default function HomePage() {
 
   const isRtl = lang === 'AR';
   const isDark = isDarkMode;
+
+  const heroTitle = isRtl
+    ? (cms?.hero?.titleAr || 'نبني المنتج الرقمي، العلامة التجارية، والفريق الذي يديرها.')
+    : (cms?.hero?.title || 'We build the product, the brand, and the team that runs it.');
+
+  const heroSubtitle = isRtl
+    ? (cms?.hero?.subtitleAr || 'تدير bldr وحدات متخصصة وتبني مشاريعها الخاصة. تعمل مع الوحدات التي تحتاجها في التسويق والبرمجيات وبناء المنتجات تحت نقطة اتصال واحدة ومسؤولية كاملة.')
+    : (cms?.hero?.subtitle || 'bldr operates specialist units and builds its own ventures. You work with the units you need and keep one point of contact for all of it — nobody hands the outcome to somebody else.');
+
+  const heroPrimaryCta = isRtl
+    ? (cms?.hero?.ctaLabelAr || 'ابدأ مشروعك معنا ←')
+    : (cms?.hero?.ctaLabel || 'Start a project →');
+
+  const heroSecondaryCta = isRtl
+    ? (cms?.hero?.secondaryLabelAr || 'استكشف الخدمات')
+    : (cms?.hero?.secondaryLabel || 'Explore Services');
+
+  const heroSecondaryLink = cms?.hero?.secondaryLink || '/services';
 
   return (
     <div
@@ -94,9 +124,7 @@ export default function HomePage() {
                 textWrap: 'pretty',
                 textShadow: isDark ? '0 2px 14px rgba(0, 0, 0, 0.3)' : 'none',
               }}>
-                {isRtl
-                  ? 'نبني المنتج الرقمي، العلامة التجارية، والفريق الذي يديرها.'
-                  : 'We build the product, the brand, and the team that runs it.'}
+                {heroTitle}
               </h1>
 
               <p style={{
@@ -108,9 +136,7 @@ export default function HomePage() {
                 color: isDark ? 'rgba(240, 246, 255, 0.92)' : '#444852',
                 textShadow: isDark ? '0 1px 8px rgba(0, 0, 0, 0.25)' : 'none',
               }}>
-                {isRtl
-                  ? 'تدير bldr وحدات متخصصة وتبني مشاريعها الخاصة. تعمل مع الوحدات التي تحتاجها في التسويق والبرمجيات وبناء المنتجات تحت نقطة اتصال واحدة ومسؤولية كاملة.'
-                  : 'bldr operates specialist units and builds its own ventures. You work with the units you need and keep one point of contact for all of it — nobody hands the outcome to somebody else.'}
+                {heroSubtitle}
               </p>
 
               <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
@@ -135,10 +161,10 @@ export default function HomePage() {
                     transition: 'transform 0.15s ease',
                   }}
                 >
-                  {isRtl ? 'ابدأ مشروعك معنا ←' : 'Start a project →'}
+                  {heroPrimaryCta}
                 </button>
                 <Link
-                  href="/services"
+                  href={heroSecondaryLink}
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -156,24 +182,7 @@ export default function HomePage() {
                     WebkitBackdropFilter: 'blur(8px)',
                   }}
                 >
-                  {isRtl ? 'استكشف الخدمات والتسويق' : 'Explore Services & Marketing'}
-                </Link>
-                <Link
-                  href="/products"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    height: 52,
-                    padding: '0 20px',
-                    borderRadius: 999,
-                    background: 'transparent',
-                    color: isDark ? 'rgba(240, 246, 255, 0.88)' : '#5A6A80',
-                    fontSize: 14.5,
-                    fontWeight: 500,
-                    textDecoration: 'none',
-                  }}
-                >
-                  {isRtl ? 'دليل الدورات والمنتجات ←' : 'Browse Courses & Products →'}
+                  {heroSecondaryCta}
                 </Link>
               </div>
             </div>
@@ -205,21 +214,21 @@ export default function HomePage() {
           }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, textAlign: 'center', marginBottom: 36 }}>
               <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#D10721' }}>
-                {isRtl ? 'ما هو الخلل في النماذج التقليدية؟' : "What's Broken in Traditional Models"}
+                {isRtl ? (cms?.whatsBroken?.tagAr || 'ما هو الخلل في النماذج التقليدية؟') : (cms?.whatsBroken?.tag || "What's Broken in Traditional Models")}
               </span>
               <h2 style={{ fontSize: 'clamp(24px, 3.5vw, 38px)', fontWeight: 600, letterSpacing: '-0.04em', color: '#141416', margin: 0 }}>
-                {isRtl ? 'الجميع قام بدوره.. ولكن لا أحد امتلك النتيجة النهائية.' : 'Everyone did their part. Nobody owned the outcome.'}
+                {isRtl ? (cms?.whatsBroken?.titleAr || 'الجميع قام بدوره.. ولكن لا أحد امتلك النتيجة النهائية.') : (cms?.whatsBroken?.title || 'Everyone did their part. Nobody owned the outcome.')}
               </h2>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
-              {[
-                { title: isRtl ? 'شركة البرمجيات' : 'Software House', sub: isRtl ? 'في انتظار المواصفات النهائية' : 'waiting on final specs', angle: '-2deg' },
-                { title: isRtl ? 'وكالة التسويق' : 'Marketing Agency', sub: isRtl ? 'لم تشهد المنتج على أرض الواقع' : "hasn't seen the product", angle: '1.5deg' },
-                { title: isRtl ? 'المستشار' : 'Consultant', sub: isRtl ? 'غادر بعد تقديم العرض' : 'left after the slide deck', angle: '-1deg' },
-                { title: isRtl ? 'فريق عملك' : 'Your Team', sub: isRtl ? 'لم يتم تدريبه على التشغيل' : 'never trained to run it', angle: '2deg' },
-                { title: isRtl ? 'مزود الأنظمة' : 'Systems Vendor', sub: isRtl ? 'انتهى دوره عند التسليم' : 'scope ended at handover', angle: '-1.5deg' },
-              ].map((card, i) => (
+              {(cms?.whatsBroken?.cards || [
+                { title: 'Software House', titleAr: 'شركة البرمجيات', sub: 'waiting on final specs', subAr: 'في انتظار المواصفات النهائية', angle: '-2deg' },
+                { title: 'Marketing Agency', titleAr: 'وكالة التسويق', sub: "hasn't seen the product", subAr: 'لم تشهد المنتج على أرض الواقع', angle: '1.5deg' },
+                { title: 'Consultant', titleAr: 'المستشار', sub: 'left after the slide deck', subAr: 'غادر بعد تقديم العرض', angle: '-1deg' },
+                { title: 'Your Team', titleAr: 'فريق عملك', sub: 'never trained to run it', subAr: 'لم يتم تدريبه على التشغيل', angle: '2deg' },
+                { title: 'Systems Vendor', titleAr: 'مزود الأنظمة', sub: 'scope ended at handover', subAr: 'انتهى دوره عند التسليم', angle: '-1.5deg' },
+              ]).map((card: any, i: number) => (
                 <div
                   key={i}
                   style={{
@@ -228,12 +237,12 @@ export default function HomePage() {
                     borderRadius: 14,
                     padding: '20px 22px',
                     boxShadow: '0 4px 12px rgba(20,20,22,0.04)',
-                    transform: `rotate(${card.angle})`,
+                    transform: `rotate(${card.angle || (i % 2 === 0 ? '-1.5deg' : '1.5deg')})`,
                     transition: 'transform 0.2s ease',
                   }}
                 >
-                  <div style={{ fontSize: 16, fontWeight: 600, color: '#141416', letterSpacing: '-0.02em' }}>{card.title}</div>
-                  <div style={{ marginTop: 6, fontSize: 13.5, fontWeight: 300, color: '#47454A' }}>{card.sub}</div>
+                  <div style={{ fontSize: 16, fontWeight: 600, color: '#141416', letterSpacing: '-0.02em' }}>{isRtl ? (card.titleAr || card.title) : card.title}</div>
+                  <div style={{ marginTop: 6, fontSize: 13.5, fontWeight: 300, color: '#47454A' }}>{isRtl ? (card.subAr || card.sub) : card.sub}</div>
                 </div>
               ))}
             </div>
@@ -245,52 +254,68 @@ export default function HomePage() {
           <div style={{ maxWidth: 1280, margin: '0 auto', display: 'grid', gridTemplateColumns: 'minmax(0, 0.9fr) minmax(0, 1.1fr)', gap: 64, alignItems: 'start' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 18, position: 'sticky', top: 110 }}>
               <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#D10721' }}>
-                {isRtl ? 'هيكلية عملنا' : "How We're Built"}
+                {isRtl ? (cms?.howWereBuilt?.tagAr || 'هيكلية عملنا') : (cms?.howWereBuilt?.tag || "How We're Built")}
               </span>
-              <h2 style={{ margin: 0, fontSize: 40, lineHeight: 1.15, fontWeight: 600, letterSpacing: '-0.04em', color: '#141416' }}>
-                {isRtl ? 'تخصصات متكاملة.\nخط مسؤولية واحد.' : 'Different specialisms.\nOne accountability line.'}
+              <h2 style={{ margin: 0, fontSize: 40, lineHeight: 1.15, fontWeight: 600, letterSpacing: '-0.04em', color: '#141416', whiteSpace: 'pre-line' }}>
+                {isRtl ? (cms?.howWereBuilt?.titleAr || 'تخصصات متكاملة.\nخط مسؤولية واحد.') : (cms?.howWereBuilt?.title || 'Different specialisms.\nOne accountability line.')}
               </h2>
               <p style={{ margin: 0, maxWidth: 420, fontSize: 16, lineHeight: 1.68, fontWeight: 300, color: '#47454A' }}>
                 {isRtl
-                  ? 'نفس المتخصصين الذين توظفهم عادة بشكل منفصل، يعملون وفق خطة واحدة وجدول زمني موحد وبقيادة شريك واحد.'
-                  : 'The same specialists you would otherwise hire separately, working off one plan, one schedule and one owner.'}
+                  ? (cms?.howWereBuilt?.subtitleAr || 'نفس المتخصصين الذين توظفهم عادة بشكل منفصل، يعملون وفق خطة واحدة وجدول زمني موحد وبقيادة شريك واحد.')
+                  : (cms?.howWereBuilt?.subtitle || 'The same specialists you would otherwise hire separately, working off one plan, one schedule and one owner.')}
               </p>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14, position: 'relative', [isRtl ? 'paddingRight' : 'paddingLeft']: 24, [isRtl ? 'borderRight' : 'borderLeft']: '2px solid rgba(20,20,22,0.08)' }}>
-              {[
+              {(cms?.howWereBuilt?.units || [
                 {
-                  title: isRtl ? 'التسويق وبناء العلامة التجارية' : 'Marketing & Branding',
-                  was: isRtl ? 'بديل: وكالة التسويق المنفصلة' : 'was: the marketing agency',
-                  desc: isRtl ? 'بناء الهوية البصرية، إدارة الإعلانات الممولة، صناعة المحتوى، وإطلاق مسارات البيع.' : 'Branding, advertising, content, performance campaigns',
+                  title: 'Marketing & Branding',
+                  titleAr: 'التسويق وبناء العلامة التجارية',
+                  was: 'was: the marketing agency',
+                  wasAr: 'بديل: وكالة التسويق المنفصلة',
+                  desc: 'Branding, advertising, content, performance campaigns',
+                  descAr: 'بناء الهوية البصرية، إدارة الإعلانات الممولة، صناعة المحتوى، وإطلاق مسارات البيع.',
                   link: '/services?category=Marketing+%26+Ads&service=performance-ads#performance-ads',
-                  cta: isRtl ? 'تصفح باقات وخدمات التسويق ←' : 'View Marketing Packages →',
+                  cta: 'View Marketing Packages →',
+                  ctaAr: 'تصفح باقات وخدمات التسويق ←',
                 },
                 {
-                  title: isRtl ? 'تطوير البرمجيات والتكنولوجيا' : 'Software & Technology',
-                  was: isRtl ? 'بديل: شركة البرمجيات الخارجية' : 'was: the software house',
-                  desc: isRtl ? 'تطوير المنصات الرقمية، هندسة الأنظمة السحابية، وبناء البنية التحتية البرمجية المؤتمتة.' : 'Custom software platforms, modern API architectures, automated cloud infrastructure',
+                  title: 'Software & Technology',
+                  titleAr: 'تطوير البرمجيات والتكنولوجيا',
+                  was: 'was: the software house',
+                  wasAr: 'بديل: شركة البرمجيات الخارجية',
+                  desc: 'Custom software platforms, modern API architectures, automated cloud infrastructure',
+                  descAr: 'تطوير المنصات الرقمية، هندسة الأنظمة السحابية، وبناء البنية التحتية البرمجية المؤتمتة.',
                   link: '/services?category=Software+%26+Tech&service=web-platform-engineering#web-platform-engineering',
-                  cta: isRtl ? 'خدمات البرمجيات والتكنولوجيا ←' : 'Software & Tech Services →',
+                  cta: 'Software & Tech Services →',
+                  ctaAr: 'خدمات البرمجيات والتكنولوجيا ←',
                 },
                 {
-                  title: isRtl ? 'الاستراتيجية وإدارة الأعمال' : 'Business Strategy & Consulting',
-                  was: isRtl ? 'بديل: المستشار الذي يرحل' : 'was: the consultant who left',
-                  desc: isRtl ? 'الاستراتيجية، تطوير الأعمال، التسعير، والهيكلة المالية للمشاريع.' : 'Strategy, business development, partnerships & financial architecture',
+                  title: 'Business Strategy & Consulting',
+                  titleAr: 'الاستراتيجية وإدارة الأعمال',
+                  was: 'was: the consultant who left',
+                  wasAr: 'بديل: المستشار الذي يرحل',
+                  desc: 'Strategy, business development, partnerships & financial architecture',
+                  descAr: 'الاستراتيجية، تطوير الأعمال، التسعير، والهيكلة المالية للمشاريع.',
                   link: '/services?category=Strategy+%26+Advisory&service=consulting-session#consulting-session',
-                  cta: isRtl ? 'الجلسات الاستشارية وتطوير الأعمال ←' : 'Consulting Sessions →',
+                  cta: 'Consulting Sessions →',
+                  ctaAr: 'الجلسات الاستشارية وتطوير الأعمال ←',
                 },
                 {
-                  title: isRtl ? 'التدريب وتأهيل الفرق' : 'Team Training & Enablement',
-                  was: isRtl ? 'بديل: الفريق غير المدرب' : 'was: your untrained team',
-                  desc: isRtl ? 'التدريب العملي للشركات، ورش العمل التنفيذية، وتسليم الفرق للعمل المستقل.' : 'Professional training, workshops, operations and team handover',
+                  title: 'Team Training & Enablement',
+                  titleAr: 'التدريب وتأهيل الفرق',
+                  was: 'was: your untrained team',
+                  wasAr: 'بديل: الفريق غير المدرب',
+                  desc: 'Professional training, workshops, operations and team handover',
+                  descAr: 'التدريب العملي للشركات، ورش العمل التنفيذية، وتسليم الفرق للعمل المستقل.',
                   link: '/services?category=Corporate+Training&service=team-training-enablement#team-training-enablement',
-                  cta: isRtl ? 'ورش العمل والتدريب المؤسسي ←' : 'Workshops & Training →',
+                  cta: 'Workshops & Training →',
+                  ctaAr: 'ورش العمل والتدريب المؤسسي ←',
                 },
-              ].map((unit, i) => (
+              ]).map((unit: any, i: number) => (
                 <Link
                   key={i}
-                  href={unit.link}
+                  href={unit.link || '/services'}
                   style={{
                     display: 'block',
                     background: '#FFFFFF',
@@ -315,12 +340,12 @@ export default function HomePage() {
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 16 }}>
-                    <div style={{ fontSize: 18, fontWeight: 700, color: '#141416', letterSpacing: '-0.02em' }}>{unit.title}</div>
-                    <div style={{ fontSize: 12.5, fontWeight: 400, color: '#6B6970' }}>{unit.was}</div>
+                    <div style={{ fontSize: 18, fontWeight: 700, color: '#141416', letterSpacing: '-0.02em' }}>{isRtl ? (unit.titleAr || unit.title) : unit.title}</div>
+                    <div style={{ fontSize: 12.5, fontWeight: 400, color: '#6B6970' }}>{isRtl ? (unit.wasAr || unit.was) : unit.was}</div>
                   </div>
-                  <div style={{ marginTop: 6, fontSize: 14.5, fontWeight: 300, lineHeight: 1.6, color: '#47454A' }}>{unit.desc}</div>
+                  <div style={{ marginTop: 6, fontSize: 14.5, fontWeight: 300, lineHeight: 1.6, color: '#47454A' }}>{isRtl ? (unit.descAr || unit.desc) : unit.desc}</div>
                   <div style={{ marginTop: 14, display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13.5, fontWeight: 600, color: '#2C5F9E' }}>
-                    <span>{unit.cta}</span>
+                    <span>{isRtl ? (unit.ctaAr || unit.cta) : unit.cta}</span>
                   </div>
                 </Link>
               ))}
@@ -349,41 +374,33 @@ export default function HomePage() {
             {/* Left Side: Strategic Copy & CTA */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 24, zIndex: 1 }}>
               <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#FD9426' }}>
-                {isRtl ? 'سوابق الأعمال والمشاريع المنفذة' : 'Selected Work & Case Studies'}
+                {isRtl ? (cms?.projectsShowcase?.tagAr || 'سوابق الأعمال والمشاريع المنفذة') : (cms?.projectsShowcase?.tag || 'Selected Work & Case Studies')}
               </span>
 
-              <h2 style={{ margin: 0, fontSize: 'clamp(32px, 3.8vw, 42px)', lineHeight: 1.15, fontWeight: 700, letterSpacing: '-0.04em', color: '#FFFFFF' }}>
-                {isRtl ? 'منصات برمجية حقيقية.\nونتائج تجارية مثبتة بالأرقام.' : 'Production platforms.\nReal commercial impact.'}
+              <h2 style={{ margin: 0, fontSize: 'clamp(32px, 3.8vw, 42px)', lineHeight: 1.15, fontWeight: 700, letterSpacing: '-0.04em', color: '#FFFFFF', whiteSpace: 'pre-line' }}>
+                {isRtl ? (cms?.projectsShowcase?.titleAr || 'منصات برمجية حقيقية.\nونتائج تجارية مثبتة بالأرقام.') : (cms?.projectsShowcase?.title || 'Production platforms.\nReal commercial impact.')}
               </h2>
 
               <p style={{ margin: 0, maxWidth: 500, fontSize: 16, lineHeight: 1.68, fontWeight: 300, color: 'rgba(255,255,255,0.74)' }}>
                 {isRtl
-                  ? 'نحن لا نبني نماذج نظرية. من العيادات السحابية الذكية ومنصات التعليم المشفرة، إلى أنظمة أتمتة سلاسل الإمداد ومحركات نمو التجارة الرقمية، استكشف كيف نهندس ونطلق منصات تقود قطاعاتها في مصر والشرق الأوسط.'
-                  : 'We do not build theoretical prototypes. From cloud telehealth systems and DRM-protected EdTech portals to enterprise dispatch engines, explore the software platforms and growth systems we have engineered and scaled.'}
+                  ? (cms?.projectsShowcase?.subtitleAr || 'نحن لا نبني نماذج نظرية. من العيادات السحابية الذكية ومنصات التعليم المشفرة، إلى أنظمة أتمتة سلاسل الإمداد ومحركات نمو التجارة الرقمية، استكشف كيف نهندس ونطلق منصات تقود قطاعاتها في مصر والشرق الأوسط.')
+                  : (cms?.projectsShowcase?.subtitle || 'We do not build theoretical prototypes. From cloud telehealth systems and DRM-protected EdTech portals to enterprise dispatch engines, explore the software platforms and growth systems we have engineered and scaled.')}
               </p>
 
               {/* Fast Proof Metrics */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, maxWidth: 480, paddingTop: 6 }}>
-                <div style={{ borderLeft: isRtl ? 'none' : '2px solid rgba(255,255,255,0.15)', borderRight: isRtl ? '2px solid rgba(255,255,255,0.15)' : 'none', paddingLeft: isRtl ? 0 : 14, paddingRight: isRtl ? 14 : 0 }}>
-                  <div style={{ fontSize: 24, fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.02em' }}>38k+</div>
-                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', fontWeight: 400, marginTop: 2 }}>
-                    {isRtl ? 'مريض مسجل ومنتظم' : 'Patients Managed'}
+                {(cms?.projectsShowcase?.metrics || [
+                  { value: '38k+', label: 'Patients Managed', labelAr: 'مريض مسجل ومنتظم' },
+                  { value: '45k+', label: 'Enrolled Students', labelAr: 'طالب في المنصات' },
+                  { value: '99.95%', label: 'Platform Uptime', labelAr: 'استقرار وجاهزية' },
+                ]).map((m: any, idx: number) => (
+                  <div key={idx} style={{ borderLeft: isRtl ? 'none' : '2px solid rgba(255,255,255,0.15)', borderRight: isRtl ? '2px solid rgba(255,255,255,0.15)' : 'none', paddingLeft: isRtl ? 0 : 14, paddingRight: isRtl ? 14 : 0 }}>
+                    <div style={{ fontSize: 24, fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.02em' }}>{m.value}</div>
+                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', fontWeight: 400, marginTop: 2 }}>
+                      {isRtl ? (m.labelAr || m.label) : m.label}
+                    </div>
                   </div>
-                </div>
-
-                <div style={{ borderLeft: isRtl ? 'none' : '2px solid rgba(255,255,255,0.15)', borderRight: isRtl ? '2px solid rgba(255,255,255,0.15)' : 'none', paddingLeft: isRtl ? 0 : 14, paddingRight: isRtl ? 14 : 0 }}>
-                  <div style={{ fontSize: 24, fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.02em' }}>45k+</div>
-                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', fontWeight: 400, marginTop: 2 }}>
-                    {isRtl ? 'طالب في المنصات' : 'Enrolled Students'}
-                  </div>
-                </div>
-
-                <div style={{ borderLeft: isRtl ? 'none' : '2px solid rgba(255,255,255,0.15)', borderRight: isRtl ? '2px solid rgba(255,255,255,0.15)' : 'none', paddingLeft: isRtl ? 0 : 14, paddingRight: isRtl ? 14 : 0 }}>
-                  <div style={{ fontSize: 24, fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.02em' }}>99.95%</div>
-                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', fontWeight: 400, marginTop: 2 }}>
-                    {isRtl ? 'استقرار وجاهزية' : 'Platform Uptime'}
-                  </div>
-                </div>
+                ))}
               </div>
 
               {/* Action Buttons */}
@@ -408,7 +425,7 @@ export default function HomePage() {
                   onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
                   onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
                 >
-                  <span>{isRtl ? 'استكشف كافة المشاريع وسوابق الأعمال' : 'Explore All Projects & Case Studies'}</span>
+                  <span>{isRtl ? (cms?.projectsShowcase?.ctaLabelAr || 'استكشف كافة المشاريع وسوابق الأعمال') : (cms?.projectsShowcase?.ctaLabel || 'Explore All Projects & Case Studies')}</span>
                   <span>{isRtl ? '←' : '→'}</span>
                 </Link>
 
@@ -439,7 +456,7 @@ export default function HomePage() {
                     e.currentTarget.style.borderColor = 'rgba(255,255,255,0.22)';
                   }}
                 >
-                  <span>✉️</span>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                   <span>{isRtl ? 'ابدأ مشروعك معنا' : 'Start a Project'}</span>
                 </button>
               </div>

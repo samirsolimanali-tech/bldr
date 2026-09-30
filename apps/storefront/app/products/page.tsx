@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { BldrNav, BldrFooter, ProjectContactModal, tokens, formatEGP } from '@bldr/ui';
-import { PRODUCTS_CATALOG, ProductItem } from './data';
+import { PRODUCTS_CATALOG, ProductItem, ProductThumbnailIcon } from './data';
 
 export default function ProductsPage() {
   const [lang, setLang] = useState<'EN' | 'AR'>('EN');
@@ -180,9 +180,9 @@ export default function ProductsPage() {
 
                       {/* Big Icon / Visual Artwork */}
                       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <span style={{ fontSize: 56, filter: 'drop-shadow(0 6px 12px rgba(0,0,0,0.25))' }}>
-                          {prod.thumbnailIcon}
-                        </span>
+                        <div style={{ filter: 'drop-shadow(0 6px 12px rgba(0,0,0,0.25))' }}>
+                          <ProductThumbnailIcon icon={prod.thumbnailIcon} size={48} color="#FFFFFF" />
+                        </div>
                       </div>
 
                       {/* Rating & Social Proof */}
@@ -302,7 +302,6 @@ export default function ProductsPage() {
                           transition: 'background 0.15s ease',
                         }}
                       >
-                        <span>🎓</span>
                         <span>{isRtl ? 'سجل الآن' : 'Enroll Now'}</span>
                       </a>
                     ) : (
@@ -324,7 +323,6 @@ export default function ProductsPage() {
                           transition: 'background 0.15s ease',
                         }}
                       >
-                        <span>💳</span>
                         <span>{isRtl ? 'ادفع الآن' : 'Pay Now'}</span>
                       </Link>
                     )}
