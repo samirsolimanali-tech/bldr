@@ -12,6 +12,7 @@ const VENTURE_REGISTRY: Record<string, any> = {
     legalName: 'bldr Technologies LLC — Venture #1 Pilot',
     primaryColor: '#D10721',
     secondaryColor: '#12203C',
+    checkoutLayout: 'top-left',
     cardWalletGateway: 'geidea',
     fawryEnabled: true,
     logoUrl: '',
@@ -23,6 +24,7 @@ const VENTURE_REGISTRY: Record<string, any> = {
     legalName: 'Operated by Evolve bldr for Business Management',
     primaryColor: '#2E6F5E',
     secondaryColor: '#12203C',
+    checkoutLayout: 'top-left',
     cardWalletGateway: 'geidea',
     fawryEnabled: true,
     logoUrl: '',
@@ -34,6 +36,7 @@ const VENTURE_REGISTRY: Record<string, any> = {
     legalName: 'Apex Educational Services LLC',
     primaryColor: '#2C5F9E',
     secondaryColor: '#12203C',
+    checkoutLayout: 'top-center',
     cardWalletGateway: 'paymob',
     fawryEnabled: false,
     logoUrl: '',
@@ -45,6 +48,7 @@ const VENTURE_REGISTRY: Record<string, any> = {
     legalName: 'Al-Hesa for Digital Media and Learning Ltd',
     primaryColor: '#B8860B',
     secondaryColor: '#1B2A4A',
+    checkoutLayout: 'split-hero',
     cardWalletGateway: 'geidea',
     fawryEnabled: true,
     logoUrl: '',
@@ -56,6 +60,7 @@ const VENTURE_REGISTRY: Record<string, any> = {
     legalName: 'Career Hub Talent Accelerators Egypt',
     primaryColor: '#7A4CA0',
     secondaryColor: '#1B2A4A',
+    checkoutLayout: 'top-left',
     cardWalletGateway: 'geidea',
     fawryEnabled: false,
     logoUrl: '',
@@ -184,7 +189,9 @@ export default function CentralPaymentPage() {
   const activeBrandName = brandConfig.displayName || brandConfig.name;
   const activeLegalName = brandConfig.legalName;
   const brandPrimaryColor = brandConfig.primaryColor || '#D10721';
+  const brandSecondaryColor = brandConfig.secondaryColor || '#12203C';
   const brandLogoUrl = brandConfig.logoUrl || '';
+  const checkoutLayout: 'top-left' | 'top-center' | 'split-hero' = brandConfig.checkoutLayout || 'top-left';
 
   const activeProduct = sessionData?.productTitle || 'bldr Founder Edition — Lifetime Access';
   const activeOrderRef = sessionData?.orderRef || (linkId.startsWith('cs_') ? `Order ${linkId.slice(-8).toUpperCase()}` : 'Order bldr_pilot_2026');
@@ -325,123 +332,331 @@ export default function CentralPaymentPage() {
           </div>
         </div>
 
-        {/* ─── Header: bldr Logo + Brand Logo + Language ─── */}
-        <div
-          style={{
-            padding: '16px 24px',
-            background: '#FFFFFF',
-            borderBottom: '1px solid #E8EEF5',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 14,
-          }}
-        >
-          {/* bldr Payment Hub Badge */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: 8,
-                background: '#12203C',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 900,
-                color: '#FFFFFF',
-                fontSize: 14,
-                letterSpacing: '-0.03em',
-              }}
-            >
-              b.
+        {/* ─── Templated Layout Variant 1: Top-Center (Classic Academic) ─── */}
+        {checkoutLayout === 'top-center' && (
+          <div
+            style={{
+              padding: '20px 24px 18px',
+              background: '#FFFFFF',
+              borderBottom: '1px solid #E8EEF5',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              position: 'relative',
+              gap: 12,
+            }}
+          >
+            {/* Top Bar row: Hub trust on left, language on right */}
+            <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                <div
+                  style={{
+                    width: 22,
+                    height: 22,
+                    borderRadius: 6,
+                    background: '#12203C',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 900,
+                    color: '#FFFFFF',
+                    fontSize: 11,
+                  }}
+                >
+                  b.
+                </div>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#64748B' }}>
+                  bldr Secure Hosted Gateway
+                </span>
+              </div>
+
+              {/* Language Switcher */}
+              <div style={{ display: 'flex', padding: 2.5, background: '#EEF1F5', borderRadius: 6, gap: 2 }}>
+                <button
+                  type="button"
+                  onClick={() => setUiLang('en')}
+                  style={{
+                    fontSize: '10.5px',
+                    fontWeight: 700,
+                    padding: '3px 8px',
+                    borderRadius: 4,
+                    background: uiLang === 'en' ? '#fff' : 'transparent',
+                    color: uiLang === 'en' ? '#12203C' : '#8A94A6',
+                    border: 'none',
+                    cursor: 'pointer',
+                  }}
+                >
+                  EN
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setUiLang('ar')}
+                  style={{
+                    fontSize: '10.5px',
+                    fontWeight: 700,
+                    padding: '3px 8px',
+                    borderRadius: 4,
+                    background: uiLang === 'ar' ? '#fff' : 'transparent',
+                    color: uiLang === 'ar' ? '#12203C' : '#8A94A6',
+                    border: 'none',
+                    cursor: 'pointer',
+                  }}
+                >
+                  العربية
+                </button>
+              </div>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontSize: 13, fontWeight: 900, color: '#12203C', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
-                bldr
-              </span>
-              <span style={{ fontSize: 9, fontWeight: 700, color: '#8A94A6', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                Payment Hub
-              </span>
+
+            {/* Centered Brand Emblem & Heading */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, marginTop: 4 }}>
+              {brandLogoUrl ? (
+                <img
+                  src={brandLogoUrl}
+                  alt={activeBrandName}
+                  style={{ height: 46, maxWidth: 140, objectFit: 'contain' }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: 12,
+                    background: brandPrimaryColor,
+                    color: '#FFFFFF',
+                    fontSize: 19,
+                    fontWeight: 900,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+                  }}
+                >
+                  {activeBrandName.charAt(0).toUpperCase()}
+                </div>
+              )}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+                <span style={{ fontSize: 16, fontWeight: 900, color: '#12203C', letterSpacing: '-0.02em', textAlign: 'center' }}>
+                  {activeBrandName}
+                </span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '10.5px', fontWeight: 700, color: '#2E6F5E', background: '#E6EFEB', padding: '2px 9px', borderRadius: 999 }}>
+                  <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="3 8.5 6.5 12 13 4" />
+                  </svg>
+                  Verified Venture Academy
+                </span>
+              </div>
             </div>
           </div>
+        )}
 
-          {/* Divider */}
-          <div style={{ width: 1, height: 26, background: '#E3E8EF' }}></div>
+        {/* ─── Templated Layout Variant 2: Split-Hero (High-Impact Hero Banner) ─── */}
+        {checkoutLayout === 'split-hero' && (
+          <div
+            style={{
+              background: `linear-gradient(135deg, ${brandPrimaryColor} 0%, ${brandSecondaryColor || '#12203C'} 100%)`,
+              color: '#FFFFFF',
+              borderBottom: '3px solid rgba(255,255,255,0.18)',
+              padding: '18px 24px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 16,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              {brandLogoUrl ? (
+                <img
+                  src={brandLogoUrl}
+                  alt={activeBrandName}
+                  style={{ height: 38, maxWidth: 110, objectFit: 'contain', background: 'rgba(255,255,255,0.96)', padding: 4, borderRadius: 8 }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 10,
+                    background: 'rgba(255,255,255,0.22)',
+                    border: '1px solid rgba(255,255,255,0.3)',
+                    color: '#FFFFFF',
+                    fontSize: 16,
+                    fontWeight: 900,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {activeBrandName.charAt(0).toUpperCase()}
+                </div>
+              )}
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span style={{ fontSize: 16, fontWeight: 900, color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: 1.15 }}>
+                  {activeBrandName}
+                </span>
+                <span style={{ fontSize: 10.5, fontWeight: 600, color: 'rgba(255,255,255,0.88)' }}>
+                  Verified Checkout · Protected by bldr
+                </span>
+              </div>
+            </div>
 
-          {/* Brand Logo & Brand Display Name */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            {brandLogoUrl ? (
-              <img
-                src={brandLogoUrl}
-                alt={activeBrandName}
-                style={{ height: 28, maxWidth: 36, objectFit: 'contain' }}
-              />
-            ) : (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ display: 'flex', padding: 3, background: 'rgba(255,255,255,0.2)', borderRadius: 7, gap: 2 }}>
+                <button
+                  type="button"
+                  onClick={() => setUiLang('en')}
+                  style={{
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    padding: '4px 9px',
+                    borderRadius: 5,
+                    background: uiLang === 'en' ? '#FFFFFF' : 'transparent',
+                    color: uiLang === 'en' ? '#12203C' : '#FFFFFF',
+                    border: 'none',
+                    cursor: 'pointer',
+                  }}
+                >
+                  EN
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setUiLang('ar')}
+                  style={{
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    padding: '4px 9px',
+                    borderRadius: 5,
+                    background: uiLang === 'ar' ? '#FFFFFF' : 'transparent',
+                    color: uiLang === 'ar' ? '#12203C' : '#FFFFFF',
+                    border: 'none',
+                    cursor: 'pointer',
+                  }}
+                >
+                  العربية
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ─── Templated Layout Variant 3: Top-Left (Standard Modern Minimal - Default) ─── */}
+        {checkoutLayout === 'top-left' && (
+          <div
+            style={{
+              padding: '16px 24px',
+              background: '#FFFFFF',
+              borderBottom: '1px solid #E8EEF5',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 14,
+            }}
+          >
+            {/* bldr Payment Hub Badge */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <div
                 style={{
-                  width: 30,
-                  height: 30,
-                  borderRadius: 7,
-                  background: brandPrimaryColor,
-                  color: '#FFFFFF',
-                  fontSize: 13,
-                  fontWeight: 800,
+                  width: 32,
+                  height: 32,
+                  borderRadius: 8,
+                  background: '#12203C',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  fontWeight: 900,
+                  color: '#FFFFFF',
+                  fontSize: 14,
+                  letterSpacing: '-0.03em',
                 }}
               >
-                {activeBrandName.charAt(0).toUpperCase()}
+                b.
               </div>
-            )}
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontSize: 13.5, fontWeight: 800, color: '#12203C', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
-                {activeBrandName}
-              </span>
-              <span style={{ fontSize: 10, fontWeight: 600, color: '#2E6F5E' }}>
-                Verified Venture Store
-              </span>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span style={{ fontSize: 13, fontWeight: 900, color: '#12203C', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
+                  bldr
+                </span>
+                <span style={{ fontSize: 9, fontWeight: 700, color: '#8A94A6', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                  Payment Hub
+                </span>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div style={{ width: 1, height: 26, background: '#E3E8EF' }}></div>
+
+            {/* Brand Logo & Brand Display Name */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              {brandLogoUrl ? (
+                <img
+                  src={brandLogoUrl}
+                  alt={activeBrandName}
+                  style={{ height: 28, maxWidth: 36, objectFit: 'contain' }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: 30,
+                    height: 30,
+                    borderRadius: 7,
+                    background: brandPrimaryColor,
+                    color: '#FFFFFF',
+                    fontSize: 13,
+                    fontWeight: 800,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {activeBrandName.charAt(0).toUpperCase()}
+                </div>
+              )}
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span style={{ fontSize: 13.5, fontWeight: 800, color: '#12203C', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
+                  {activeBrandName}
+                </span>
+                <span style={{ fontSize: 10, fontWeight: 600, color: '#2E6F5E' }}>
+                  Verified Venture Store
+                </span>
+              </div>
+            </div>
+
+            <div style={{ flex: 1 }}></div>
+
+            {/* Language Switcher */}
+            <div style={{ display: 'flex', padding: 3, background: '#EEF1F5', borderRadius: 7, gap: 2 }}>
+              <button
+                type="button"
+                onClick={() => setUiLang('en')}
+                style={{
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  padding: '4px 10px',
+                  borderRadius: 5,
+                  background: uiLang === 'en' ? '#fff' : 'transparent',
+                  color: uiLang === 'en' ? '#12203C' : '#8A94A6',
+                  border: 'none',
+                  cursor: 'pointer',
+                }}
+              >
+                EN
+              </button>
+              <button
+                type="button"
+                onClick={() => setUiLang('ar')}
+                style={{
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  padding: '4px 10px',
+                  borderRadius: 5,
+                  background: uiLang === 'ar' ? '#fff' : 'transparent',
+                  color: uiLang === 'ar' ? '#12203C' : '#8A94A6',
+                  border: 'none',
+                  cursor: 'pointer',
+                }}
+              >
+                العربية
+              </button>
             </div>
           </div>
-
-          <div style={{ flex: 1 }}></div>
-
-          {/* Language Switcher */}
-          <div style={{ display: 'flex', padding: 3, background: '#EEF1F5', borderRadius: 7, gap: 2 }}>
-            <button
-              type="button"
-              onClick={() => setUiLang('en')}
-              style={{
-                fontSize: '11px',
-                fontWeight: 700,
-                padding: '4px 10px',
-                borderRadius: 5,
-                background: uiLang === 'en' ? '#fff' : 'transparent',
-                color: uiLang === 'en' ? '#12203C' : '#8A94A6',
-                border: 'none',
-                cursor: 'pointer',
-              }}
-            >
-              EN
-            </button>
-            <button
-              type="button"
-              onClick={() => setUiLang('ar')}
-              style={{
-                fontSize: '11px',
-                fontWeight: 700,
-                padding: '4px 10px',
-                borderRadius: 5,
-                background: uiLang === 'ar' ? '#fff' : 'transparent',
-                color: uiLang === 'ar' ? '#12203C' : '#8A94A6',
-                border: 'none',
-                cursor: 'pointer',
-              }}
-            >
-              العربية
-            </button>
-          </div>
-        </div>
+        )}
 
         {/* ─── Gateway Trust Banner ─── */}
         <div

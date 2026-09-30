@@ -20,6 +20,7 @@ const VENTURE_REGISTRY: Record<string, any> = {
     description: 'bldr house-brand storefront and educational platform. Flagship pilot venture for the Central Payment Hub.',
     primaryColor: '#D10721',
     secondaryColor: '#12203C',
+    checkoutLayout: 'top-left',
     integrationMode: 'NATIVE',
     cardWalletGateway: 'geidea',
     fawryEnabled: true,
@@ -56,6 +57,7 @@ const VENTURE_REGISTRY: Record<string, any> = {
     description: 'Secondary-school course platform. Sells individual courses and term subscriptions to students in Egypt.',
     primaryColor: '#2E6F5E',
     secondaryColor: '#12203C',
+    checkoutLayout: 'top-left',
     integrationMode: 'BOLT_ON',
     cardWalletGateway: 'geidea',
     fawryEnabled: true,
@@ -92,6 +94,7 @@ const VENTURE_REGISTRY: Record<string, any> = {
     description: 'Professional accreditation and corporate cohort training in Cairo and Alexandria.',
     primaryColor: '#2C5F9E',
     secondaryColor: '#1B2A4A',
+    checkoutLayout: 'top-center',
     integrationMode: 'BOLT_ON',
     cardWalletGateway: 'paymob',
     fawryEnabled: false,
@@ -127,6 +130,7 @@ const VENTURE_REGISTRY: Record<string, any> = {
     description: 'Egyptian National Curriculum prep center offering video lectures and live revision sessions.',
     primaryColor: '#B8860B',
     secondaryColor: '#12203C',
+    checkoutLayout: 'split-hero',
     integrationMode: 'BOLT_ON',
     cardWalletGateway: 'geidea',
     fawryEnabled: true,
@@ -162,6 +166,7 @@ const VENTURE_REGISTRY: Record<string, any> = {
     description: 'Short workshops and career coaching subscriptions for Egyptian professionals.',
     primaryColor: '#7A4CA0',
     secondaryColor: '#1B2A4A',
+    checkoutLayout: 'top-left',
     integrationMode: 'BOLT_ON',
     cardWalletGateway: 'geidea',
     fawryEnabled: false,
@@ -246,6 +251,7 @@ export default function VentureConfigPage() {
   const [description, setDescription] = useState('bldr house-brand storefront and educational platform.');
   const [primaryColor, setPrimaryColor] = useState('#D10721');
   const [secondaryColor, setSecondaryColor] = useState('#12203C');
+  const [checkoutLayout, setCheckoutLayout] = useState<'top-left' | 'top-center' | 'split-hero'>('top-left');
   const [logoUrl, setLogoUrl] = useState<string>('');
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -322,6 +328,7 @@ export default function VentureConfigPage() {
         setDescription(p.description || config.description);
         setPrimaryColor(p.primaryColor || config.primaryColor);
         setSecondaryColor(p.secondaryColor || config.secondaryColor);
+        setCheckoutLayout(p.checkoutLayout || config.checkoutLayout || 'top-left');
         setLogoUrl(p.logoUrl !== undefined ? p.logoUrl : (config.logoUrl || ''));
         setIntegrationMode(p.integrationMode || config.integrationMode);
         setCardWalletGateway(p.cardWalletGateway || config.cardWalletGateway);
@@ -357,6 +364,7 @@ export default function VentureConfigPage() {
     setDescription(config.description);
     setPrimaryColor(config.primaryColor);
     setSecondaryColor(config.secondaryColor);
+    setCheckoutLayout(config.checkoutLayout || 'top-left');
     setLogoUrl(config.logoUrl || '');
     setIntegrationMode(config.integrationMode);
     setCardWalletGateway(config.cardWalletGateway);
@@ -399,6 +407,7 @@ export default function VentureConfigPage() {
         description,
         primaryColor,
         secondaryColor,
+        checkoutLayout,
         logoUrl,
         integrationMode,
         cardWalletGateway,
@@ -697,14 +706,55 @@ export default function VentureConfigPage() {
                   </div>
                 </div>
 
-                {/* Branding Card */}
-                <div style={{ background: '#fff', border: '1px solid #E3E8EF', borderRadius: 10, padding: '17px 19px 19px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-                  <span style={{ fontSize: 13, fontWeight: 800, color: '#1B2A4A', letterSpacing: '-0.02em' }}>Branding</span>
-                  <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-                      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#8A94A6' }}>
-                        Logo
+                {/* Hosted Checkout Branding Card (Templated Customization Model) */}
+                <div style={{ background: '#fff', border: '1px solid #E3E8EF', borderRadius: 10, padding: '18px 20px 22px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ fontSize: 13.5, fontWeight: 800, color: '#1B2A4A', letterSpacing: '-0.02em' }}>
+                          Hosted Checkout Branding
+                        </span>
+                        <span style={{ fontSize: 10, fontWeight: 800, color: '#2E6F5E', background: '#E6EFEB', borderRadius: 4, padding: '2px 7px', letterSpacing: '0.04em' }}>
+                          TEMPLATED MODEL
+                        </span>
+                      </div>
+                      <span style={{ fontSize: 11.5, color: '#64748B' }}>
+                        Brand assets and layout for <code style={{ fontFamily: 'monospace', background: '#F1F5F9', padding: '1px 5px', borderRadius: 4, color: '#0F172A' }}>pay.bldrmanagement.com/pay/[sessionId]</code>
                       </span>
+                    </div>
+
+                    <span style={{ fontSize: 10, fontWeight: 700, color: '#1E3A8A', background: '#DBEAFE', borderRadius: 4, padding: '3px 8px' }}>
+                      PCI SAQ A / A-EP SCOPE SAFE
+                    </span>
+                  </div>
+
+                  {/* Architecture & PCI Guardrail Banner */}
+                  <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 8, padding: '12px 14px', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                    <div style={{ width: 22, height: 22, borderRadius: 5, background: '#12203C', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 11, fontWeight: 900 }}>
+                      b.
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                      <span style={{ fontSize: 11.5, fontWeight: 700, color: '#1E293B' }}>
+                        Templated Customization Boundary (Standard Industry Practice)
+                      </span>
+                      <p style={{ margin: 0, fontSize: 11, color: '#64748B', lineHeight: 1.45 }}>
+                        To satisfy PCI-DSS SAQ A / A-EP regulatory compliance (same as Stripe Checkout & Shopify), checkout pages provide <strong>fixed structure with swappable branding values</strong>. Raw HTML/CSS/JS editing and payment flow scripting are disallowed to ensure merchant iframe isolation and prevent cardholder data interference.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Section 1: Logo Asset */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#64748B' }}>
+                        1. Venture Brand Logo
+                      </span>
+                      <span style={{ fontSize: 10.5, color: '#94A3B8' }}>
+                        Recommended: SVG or PNG with transparent background
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
                       <input
                         ref={fileInputRef}
                         type="file"
@@ -722,27 +772,27 @@ export default function VentureConfigPage() {
                           if (e.dataTransfer.files?.[0]) handleLogoUpload(e.dataTransfer.files[0]);
                         }}
                         style={{
-                          width: 88,
-                          height: 88,
-                          border: isDragging ? '2px dashed #2E6F5E' : (logoUrl ? '1px solid #D0D7E2' : '1px dashed #C9D2DE'),
-                          borderRadius: 9,
-                          background: isDragging ? '#F0F6F4' : '#FAFBFD',
+                          width: 84,
+                          height: 84,
+                          border: isDragging ? '2px dashed #2E6F5E' : (logoUrl ? '1px solid #D0D7E2' : '1px dashed #CBD5E1'),
+                          borderRadius: 8,
+                          background: isDragging ? '#F0F6F4' : '#F8FAFC',
                           display: 'flex',
                           flexDirection: 'column',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          gap: 5,
                           cursor: 'pointer',
                           position: 'relative',
                           overflow: 'hidden',
                           padding: logoUrl ? 6 : 0,
+                          flexShrink: 0,
                         }}
                         title="Click or drag image to upload logo"
                       >
                         {logoUrl ? (
                           <>
                             <img src={logoUrl} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                            <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', opacity: 0, transition: 'opacity 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 10, fontWeight: 700 }} onMouseEnter={e => (e.currentTarget.style.opacity = '1')} onMouseLeave={e => (e.currentTarget.style.opacity = '0')}>
+                            <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', opacity: 0, transition: 'opacity 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 10, fontWeight: 700 }} onMouseEnter={e => (e.currentTarget.style.opacity = '1')} onMouseLeave={e => (e.currentTarget.style.opacity = '0')}>
                               Change
                             </div>
                           </>
@@ -751,56 +801,271 @@ export default function VentureConfigPage() {
                             <span style={{ width: 34, height: 34, borderRadius: 7, background: primaryColor, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFFFFF', fontSize: 12, fontWeight: 800 }}>
                               {topBarId}
                             </span>
-                            <span style={{ fontSize: 10, fontWeight: 700, color: '#2E6F5E' }}>Upload</span>
+                            <span style={{ fontSize: 9.5, fontWeight: 700, color: '#2E6F5E', marginTop: 4 }}>Upload</span>
                           </>
                         )}
                       </div>
+
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
+                        <div style={{ display: 'flex', gap: 8 }}>
+                          <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            style={{ padding: '6px 12px', fontSize: 11, fontWeight: 700, borderRadius: 6, border: '1px solid #CBD5E1', background: '#FFFFFF', color: '#1E293B', cursor: 'pointer' }}
+                          >
+                            Browse file...
+                          </button>
+                          {logoUrl && (
+                            <button
+                              type="button"
+                              onClick={() => setLogoUrl('')}
+                              style={{ padding: '6px 10px', fontSize: 11, fontWeight: 600, borderRadius: 6, border: '1px solid #FECACA', background: '#FEF2F2', color: '#DC2626', cursor: 'pointer' }}
+                            >
+                              Remove
+                            </button>
+                          )}
+                        </div>
+                        <span style={{ fontSize: 11, color: '#64748B' }}>
+                          Accepts PNG, SVG, JPG, WebP. Displayed prominently across hosted checkout pages and receipt emails.
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Section 2: Brand Colors (Primary & Secondary / Accent) */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, borderTop: '1px solid #F1F5F9', paddingTop: 14 }}>
+                    <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#64748B' }}>
+                      2. Brand Palette (Primary & Secondary Accent)
+                    </span>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                      <div style={{ background: '#FAFBFD', border: '1px solid #E2E8F0', borderRadius: 8, padding: '12px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                          <label style={{ fontSize: 11.5, fontWeight: 700, color: '#1E293B' }}>Primary Brand Color</label>
+                          <span style={{ fontSize: 9.5, fontWeight: 700, color: '#2E6F5E', background: '#E6EFEB', borderRadius: 3, padding: '1px 5px' }}>REQUIRED</span>
+                        </div>
+                        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                          <input
+                            type="color"
+                            value={primaryColor}
+                            onChange={e => setPrimaryColor(e.target.value)}
+                            style={{ width: 38, height: 34, border: '1px solid #CBD5E1', borderRadius: 6, cursor: 'pointer', padding: 2 }}
+                          />
+                          <input
+                            type="text"
+                            value={primaryColor}
+                            onChange={e => setPrimaryColor(e.target.value)}
+                            style={{ height: 34, border: '1px solid #CBD5E1', borderRadius: 6, padding: '0 8px', fontSize: 12, fontFamily: 'monospace', width: '100%', background: '#fff', color: '#0F172A', fontWeight: 600 }}
+                          />
+                        </div>
+                        <span style={{ display: 'block', fontSize: 10, color: '#64748B', marginTop: 6 }}>
+                          Applied to checkout header banner, active payment method ring, and CTA button.
+                        </span>
+                      </div>
+
+                      <div style={{ background: '#FAFBFD', border: '1px solid #E2E8F0', borderRadius: 8, padding: '12px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                          <label style={{ fontSize: 11.5, fontWeight: 700, color: '#1E293B' }}>Secondary / Accent Color</label>
+                          <span style={{ fontSize: 9.5, fontWeight: 700, color: '#64748B', background: '#F1F5F9', borderRadius: 3, padding: '1px 5px' }}>OPTIONAL</span>
+                        </div>
+                        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                          <input
+                            type="color"
+                            value={secondaryColor}
+                            onChange={e => setSecondaryColor(e.target.value)}
+                            style={{ width: 38, height: 34, border: '1px solid #CBD5E1', borderRadius: 6, cursor: 'pointer', padding: 2 }}
+                          />
+                          <input
+                            type="text"
+                            value={secondaryColor}
+                            onChange={e => setSecondaryColor(e.target.value)}
+                            style={{ height: 34, border: '1px solid #CBD5E1', borderRadius: 6, padding: '0 8px', fontSize: 12, fontFamily: 'monospace', width: '100%', background: '#fff', color: '#0F172A', fontWeight: 600 }}
+                          />
+                        </div>
+                        <span style={{ display: 'block', fontSize: 10, color: '#64748B', marginTop: 6 }}>
+                          Applied to badges, secondary trim stripes, and contrast hero gradients.
+                        </span>
+                      </div>
                     </div>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 5, flex: 1 }}>
-                      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#8A94A6' }}>
-                        Brand Colors
+                    {/* Quick Palettes */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
+                      <span style={{ fontSize: 10, fontWeight: 700, color: '#8A94A6', textTransform: 'uppercase' }}>Presets:</span>
+                      {[
+                        { label: 'bldr Red', p: '#D10721', s: '#12203C' },
+                        { label: 'StudyHub Green', p: '#2E6F5E', s: '#12203C' },
+                        { label: 'Apex Blue', p: '#2C5F9E', s: '#1B2A4A' },
+                        { label: 'El Hesa Gold', p: '#B8860B', s: '#12203C' },
+                        { label: 'Career Violet', p: '#7A4CA0', s: '#1B2A4A' },
+                      ].map((preset) => (
+                        <button
+                          key={preset.label}
+                          type="button"
+                          onClick={() => {
+                            setPrimaryColor(preset.p);
+                            setSecondaryColor(preset.s);
+                          }}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 5,
+                            fontSize: 10,
+                            fontWeight: 600,
+                            padding: '3px 8px',
+                            background: '#FFFFFF',
+                            border: '1px solid #E2E8F0',
+                            borderRadius: 5,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          <span style={{ width: 8, height: 8, borderRadius: '50%', background: preset.p }}></span>
+                          {preset.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Section 3: Pre-built Layout Variants */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10, borderTop: '1px solid #F1F5F9', paddingTop: 14 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#64748B' }}>
+                        3. Pre-Built Layout Variants (Curated Templated Selection)
                       </span>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                        <div>
-                          <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: '#64748B', marginBottom: 4 }}>Primary Color</label>
-                          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                            <input
-                              type="color"
-                              value={primaryColor}
-                              onChange={e => setPrimaryColor(e.target.value)}
-                              style={{ width: 36, height: 34, border: '1px solid #E3E8EF', borderRadius: 6, cursor: 'pointer', padding: 2 }}
-                            />
-                            <input
-                              type="text"
-                              value={primaryColor}
-                              onChange={e => setPrimaryColor(e.target.value)}
-                              style={{ height: 34, border: '1px solid #E3E8EF', borderRadius: 6, padding: '0 8px', fontSize: 11.5, fontFamily: 'monospace', width: '100%' }}
-                            />
-                          </div>
+                      <span style={{ fontSize: 10.5, color: '#2E6F5E', fontWeight: 700 }}>
+                        3 Curated Variants Available
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+                      {/* Variant A: Top-Left Modern */}
+                      <div
+                        onClick={() => setCheckoutLayout('top-left')}
+                        style={{
+                          border: checkoutLayout === 'top-left' ? '2px solid #2E6F5E' : '1px solid #E2E8F0',
+                          background: checkoutLayout === 'top-left' ? '#F6FAF8' : '#FAFBFD',
+                          borderRadius: 8,
+                          padding: '12px 14px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 8,
+                          position: 'relative',
+                          transition: 'all 0.15s ease',
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <span style={{ fontSize: 11.5, fontWeight: 800, color: checkoutLayout === 'top-left' ? '#2E6F5E' : '#1E293B' }}>
+                            Top-Left Modern
+                          </span>
+                          <span style={{ width: 14, height: 14, borderRadius: '50%', border: checkoutLayout === 'top-left' ? '4px solid #2E6F5E' : '2px solid #CBD5E1', background: '#fff' }}></span>
                         </div>
 
-                        <div>
-                          <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: '#64748B', marginBottom: 4 }}>Secondary / Accent</label>
-                          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                            <input
-                              type="color"
-                              value={secondaryColor}
-                              onChange={e => setSecondaryColor(e.target.value)}
-                              style={{ width: 36, height: 34, border: '1px solid #E3E8EF', borderRadius: 6, cursor: 'pointer', padding: 2 }}
-                            />
-                            <input
-                              type="text"
-                              value={secondaryColor}
-                              onChange={e => setSecondaryColor(e.target.value)}
-                              style={{ height: 34, border: '1px solid #E3E8EF', borderRadius: 6, padding: '0 8px', fontSize: 11.5, fontFamily: 'monospace', width: '100%' }}
-                            />
-                          </div>
+                        {/* Miniature layout diagram */}
+                        <div style={{ height: 42, background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 5, padding: '5px 7px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <div style={{ width: 12, height: 12, borderRadius: 3, background: primaryColor }}></div>
+                          <div style={{ width: 36, height: 6, background: '#CBD5E1', borderRadius: 2 }}></div>
+                          <div style={{ flex: 1 }}></div>
+                          <div style={{ width: 18, height: 6, background: '#E2E8F0', borderRadius: 2 }}></div>
                         </div>
+
+                        <span style={{ fontSize: 10.5, color: '#64748B', lineHeight: 1.35 }}>
+                          Clean minimal header with brand logo on the left and verified trust mark on the right.
+                        </span>
                       </div>
-                      <span style={{ fontSize: '10.5px', color: '#8A94A6', marginTop: 4 }}>
-                        Applied to the brand banner, payment buttons, and trust badges on hosted checkout.
+
+                      {/* Variant B: Top-Center Classic */}
+                      <div
+                        onClick={() => setCheckoutLayout('top-center')}
+                        style={{
+                          border: checkoutLayout === 'top-center' ? '2px solid #2E6F5E' : '1px solid #E2E8F0',
+                          background: checkoutLayout === 'top-center' ? '#F6FAF8' : '#FAFBFD',
+                          borderRadius: 8,
+                          padding: '12px 14px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 8,
+                          position: 'relative',
+                          transition: 'all 0.15s ease',
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <span style={{ fontSize: 11.5, fontWeight: 800, color: checkoutLayout === 'top-center' ? '#2E6F5E' : '#1E293B' }}>
+                            Top-Center Classic
+                          </span>
+                          <span style={{ width: 14, height: 14, borderRadius: '50%', border: checkoutLayout === 'top-center' ? '4px solid #2E6F5E' : '2px solid #CBD5E1', background: '#fff' }}></span>
+                        </div>
+
+                        {/* Miniature layout diagram */}
+                        <div style={{ height: 42, background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 5, padding: '5px 7px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
+                          <div style={{ width: 14, height: 14, borderRadius: 3, background: primaryColor }}></div>
+                          <div style={{ width: 44, height: 5, background: '#CBD5E1', borderRadius: 2 }}></div>
+                        </div>
+
+                        <span style={{ fontSize: 10.5, color: '#64748B', lineHeight: 1.35 }}>
+                          Centered prominent academy crest and centered title. Preferred for official universities & accredited institutes.
+                        </span>
+                      </div>
+
+                      {/* Variant C: Split-Hero Banner */}
+                      <div
+                        onClick={() => setCheckoutLayout('split-hero')}
+                        style={{
+                          border: checkoutLayout === 'split-hero' ? '2px solid #2E6F5E' : '1px solid #E2E8F0',
+                          background: checkoutLayout === 'split-hero' ? '#F6FAF8' : '#FAFBFD',
+                          borderRadius: 8,
+                          padding: '12px 14px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 8,
+                          position: 'relative',
+                          transition: 'all 0.15s ease',
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <span style={{ fontSize: 11.5, fontWeight: 800, color: checkoutLayout === 'split-hero' ? '#2E6F5E' : '#1E293B' }}>
+                            Split Hero Banner
+                          </span>
+                          <span style={{ width: 14, height: 14, borderRadius: '50%', border: checkoutLayout === 'split-hero' ? '4px solid #2E6F5E' : '2px solid #CBD5E1', background: '#fff' }}></span>
+                        </div>
+
+                        {/* Miniature layout diagram */}
+                        <div style={{ height: 42, background: `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`, border: '1px solid rgba(0,0,0,0.1)', borderRadius: 5, padding: '5px 7px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <div style={{ width: 12, height: 12, borderRadius: 3, background: '#fff' }}></div>
+                          <div style={{ width: 38, height: 6, background: 'rgba(255,255,255,0.85)', borderRadius: 2 }}></div>
+                          <div style={{ flex: 1 }}></div>
+                          <div style={{ width: 12, height: 6, background: 'rgba(255,255,255,0.4)', borderRadius: 2 }}></div>
+                        </div>
+
+                        <span style={{ fontSize: 10.5, color: '#64748B', lineHeight: 1.35 }}>
+                          Full-width hero header drenched in brand primary color with secondary color accent trim. Maximum visual presence.
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Scope Governance Checkbox Summary */}
+                  <div style={{ background: '#FAFBFD', border: '1px solid #E2E8F0', borderRadius: 8, padding: '12px 14px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                    <div>
+                      <span style={{ fontSize: 10, fontWeight: 800, color: '#2E6F5E', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                        Allowed in Brand Admin Scope
                       </span>
+                      <ul style={{ margin: '6px 0 0', paddingLeft: 16, fontSize: 11, color: '#475569', lineHeight: 1.5 }}>
+                        <li>Brand logo upload & positioning</li>
+                        <li>Primary & secondary color tokens</li>
+                        <li>3 vetted responsive layout variants</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <span style={{ fontSize: 10, fontWeight: 800, color: '#DC2626', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                        Excluded by Security Boundary
+                      </span>
+                      <ul style={{ margin: '6px 0 0', paddingLeft: 16, fontSize: 11, color: '#64748B', lineHeight: 1.5 }}>
+                        <li>No raw HTML / JS / stylesheet injection</li>
+                        <li>No custom page structure beyond variants</li>
+                        <li>Zero tampering with gateway checkout flow</li>
+                      </ul>
                     </div>
                   </div>
                 </div>
@@ -840,33 +1105,99 @@ export default function VentureConfigPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <div style={{ background: '#fff', border: '1px solid #E3E8EF', borderRadius: 10, padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: 13, fontWeight: 800, color: '#1B2A4A' }}>Live Checkout Card Preview</span>
-                    <span style={{ fontSize: 10, fontWeight: 700, color: '#2E6F5E', background: '#E6EFEB', borderRadius: 4, padding: '2px 6px' }}>REAL-TIME</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 13, fontWeight: 800, color: '#1B2A4A' }}>Live Checkout Card Preview</span>
+                      <span style={{ fontSize: 9.5, fontWeight: 700, color: '#2E6F5E', background: '#E6EFEB', borderRadius: 4, padding: '2px 6px' }}>REAL-TIME</span>
+                    </div>
+                    <span style={{ fontSize: 10, fontWeight: 700, color: '#1B2A4A', background: '#F1F5F9', borderRadius: 4, padding: '2px 6px', textTransform: 'capitalize' }}>
+                      {checkoutLayout.replace('-', ' ')}
+                    </span>
                   </div>
                   <p style={{ margin: 0, fontSize: 11.5, color: '#64748B' }}>
-                    How your brand logo, name, and primary accent render for students on the 1st checkout page.
+                    Real-time simulation of the student-facing hosted checkout page with your chosen brand tokens and layout variant.
                   </p>
 
+                  {/* Browser Mock Preview Container */}
                   <div style={{ border: '1px solid #E2E8F0', borderRadius: 12, overflow: 'hidden', boxShadow: '0 4px 14px rgba(0,0,0,0.06)' }}>
-                    <div style={{ background: primaryColor, padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    {/* Simulated URL bar */}
+                    <div style={{ height: 26, background: '#EDF2F7', borderBottom: '1px solid #E2E8F0', display: 'flex', alignItems: 'center', padding: '0 10px', gap: 6 }}>
+                      <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#EF4444' }}></span>
+                      <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#F59E0B' }}></span>
+                      <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10B981' }}></span>
+                      <div style={{ flex: 1, background: '#FFFFFF', height: 16, borderRadius: 8, display: 'flex', alignItems: 'center', padding: '0 8px', gap: 4 }}>
+                        <svg width="8" height="8" viewBox="0 0 16 16" fill="none" stroke="#2E6F5E" strokeWidth="2"><path d="M4 7V5a4 4 0 018 0v2M3 7h10v7H3z"/></svg>
+                        <span style={{ fontSize: 9, fontFamily: 'monospace', color: '#64748B' }}>
+                          pay.bldrmanagement.com/pay/{ventureCode}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Variant A: Top-Center Preview */}
+                    {checkoutLayout === 'top-center' && (
+                      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E2E8F0', padding: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                        <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ fontSize: 9.5, fontWeight: 700, color: '#8A94A6' }}>bldr Secure Gateway</span>
+                          <span style={{ fontSize: 9.5, fontWeight: 700, color: '#2E6F5E' }}>EN · العربية</span>
+                        </div>
                         {logoUrl ? (
-                          <img src={logoUrl} alt="Logo" style={{ height: 24, width: 'auto', borderRadius: 4, background: '#fff', padding: 2 }} />
+                          <img src={logoUrl} alt="Logo" style={{ height: 32, width: 'auto', objectFit: 'contain' }} />
                         ) : (
-                          <div style={{ width: 24, height: 24, borderRadius: 5, background: '#fff', color: primaryColor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 11 }}>
+                          <div style={{ width: 34, height: 34, borderRadius: 8, background: primaryColor, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 13 }}>
                             {topBarId}
                           </div>
                         )}
-                        <span style={{ fontWeight: 800, color: '#fff', fontSize: 13 }}>{displayName}</span>
+                        <span style={{ fontWeight: 800, color: '#1E293B', fontSize: 13, textAlign: 'center' }}>{displayName}</span>
+                        <span style={{ fontSize: 9, fontWeight: 700, color: '#2E6F5E', background: '#E6EFEB', borderRadius: 999, padding: '1px 7px' }}>
+                          Verified Academy Checkout
+                        </span>
                       </div>
-                      <span style={{ fontSize: 9.5, fontWeight: 700, color: 'rgba(255,255,255,0.85)', background: 'rgba(0,0,0,0.2)', padding: '2px 6px', borderRadius: 4 }}>
-                        Powered by {cardWalletGateway === 'paymob' ? 'Paymob' : 'Geidea'}
-                      </span>
-                    </div>
+                    )}
 
+                    {/* Variant B: Split-Hero Preview */}
+                    {checkoutLayout === 'split-hero' && (
+                      <div style={{ background: `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`, borderBottom: '2px solid rgba(255,255,255,0.2)', padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          {logoUrl ? (
+                            <img src={logoUrl} alt="Logo" style={{ height: 26, width: 'auto', borderRadius: 4, background: '#fff', padding: 2 }} />
+                          ) : (
+                            <div style={{ width: 26, height: 26, borderRadius: 6, background: 'rgba(255,255,255,0.2)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 11, border: '1px solid rgba(255,255,255,0.3)' }}>
+                              {topBarId}
+                            </div>
+                          )}
+                          <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <span style={{ fontWeight: 800, color: '#fff', fontSize: 13, lineHeight: 1.1 }}>{displayName}</span>
+                            <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.85)' }}>Verified Checkout · bldr</span>
+                          </div>
+                        </div>
+                        <span style={{ fontSize: 9, fontWeight: 700, color: '#FFFFFF', background: 'rgba(255,255,255,0.2)', padding: '2px 6px', borderRadius: 4 }}>
+                          {cardWalletGateway === 'paymob' ? 'Paymob' : 'Geidea'}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Variant C: Top-Left Preview (Default) */}
+                    {checkoutLayout === 'top-left' && (
+                      <div style={{ background: primaryColor, padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          {logoUrl ? (
+                            <img src={logoUrl} alt="Logo" style={{ height: 24, width: 'auto', borderRadius: 4, background: '#fff', padding: 2 }} />
+                          ) : (
+                            <div style={{ width: 24, height: 24, borderRadius: 5, background: '#fff', color: primaryColor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 11 }}>
+                              {topBarId}
+                            </div>
+                          )}
+                          <span style={{ fontWeight: 800, color: '#fff', fontSize: 13 }}>{displayName}</span>
+                        </div>
+                        <span style={{ fontSize: 9.5, fontWeight: 700, color: 'rgba(255,255,255,0.85)', background: 'rgba(0,0,0,0.2)', padding: '2px 6px', borderRadius: 4 }}>
+                          Powered by {cardWalletGateway === 'paymob' ? 'Paymob' : 'Geidea'}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Common Checkout Order Summary & Methods Body */}
                     <div style={{ padding: '16px', background: '#FFFFFF', display: 'flex', flexDirection: 'column', gap: 10 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px dashed #E2E8F0', paddingBottom: 8 }}>
-                        <span style={{ fontSize: 12, color: '#64748B' }}>Math Cohort 2026</span>
+                        <span style={{ fontSize: 12, color: '#64748B' }}>Cohort Access — Term 1</span>
                         <strong style={{ fontSize: 13, color: '#0F172A' }}>750.00 EGP</strong>
                       </div>
                       <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
@@ -882,7 +1213,25 @@ export default function VentureConfigPage() {
                           </div>
                         )}
                       </div>
+
+                      {/* Pay CTA Button Simulation */}
+                      <div style={{ marginTop: 6, background: primaryColor, borderRadius: 6, padding: '8px', textAlign: 'center', color: '#FFFFFF', fontSize: 11, fontWeight: 800 }}>
+                        Pay 750.00 EGP Securely
+                      </div>
                     </div>
+                  </div>
+
+                  {/* Open Live Hosted Checkout Link */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #F1F5F9', paddingTop: 10 }}>
+                    <span style={{ fontSize: 11, color: '#64748B' }}>Want to test this live in browser?</span>
+                    <a
+                      href={`/pay/cs_preview_${ventureCode}?venture=${ventureCode}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ fontSize: 11, fontWeight: 700, color: '#2E6F5E', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}
+                    >
+                      Open Live Checkout Page &rarr;
+                    </a>
                   </div>
                 </div>
               </div>
