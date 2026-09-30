@@ -14,6 +14,8 @@ import {
   SettingsIcon,
 } from './Icons';
 
+import { resolveVentureForEmail } from '../lib/venture';
+
 interface NavItem {
   href: string;
   Icon: React.FC<{ size?: number; color?: string }>;
@@ -37,15 +39,25 @@ const GROUPS = ['Main', 'Financials', 'Tools', 'Settings'];
 export default function ProviderSidebar() {
   const path = usePathname();
 
-  const [providerName, setProviderName] = React.useState('StudyHub Academy');
-  const [providerEmail, setProviderEmail] = React.useState('team@studyhub.eg');
+  const [providerName, setProviderName] = React.useState('bldr (Storefront Pilot)');
+  const [providerEmail, setProviderEmail] = React.useState('team@bldr.io');
 
   React.useEffect(() => {
     try {
-      const storedName = localStorage.getItem('bldr_venture_name');
       const storedEmail = localStorage.getItem('bldr_provider_email');
-      if (storedName) setProviderName(storedName);
-      if (storedEmail) setProviderEmail(storedEmail);
+      const storedName = localStorage.getItem('bldr_venture_name');
+      const storedId = localStorage.getItem('bldr_venture_id');
+
+      if (storedEmail) {
+        setProviderEmail(storedEmail);
+        const resolved = resolveVentureForEmail(storedEmail, storedName, storedId);
+        setProviderName(resolved.name);
+        // Ensure localStorage reflects the resolved venture name & id
+        localStorage.setItem('bldr_venture_name', resolved.name);
+        localStorage.setItem('bldr_venture_id', resolved.id);
+      } else if (storedName) {
+        setProviderName(storedName);
+      }
     } catch (e) {}
   }, []);
 

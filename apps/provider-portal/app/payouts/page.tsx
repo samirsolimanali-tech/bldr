@@ -14,6 +14,15 @@ const totalSettled = PAYOUTS.filter(p => p.status === 'Settled').reduce((s, p) =
 const totalPending = PAYOUTS.filter(p => p.status === 'Pending').reduce((s, p) => s + p.amount, 0);
 
 export default function ProviderPayoutsPage() {
+  const [accountName, setAccountName] = React.useState('bldr Direct LLC');
+
+  React.useEffect(() => {
+    try {
+      const v = localStorage.getItem('bldr_venture_name');
+      if (v) setAccountName(`${v} LLC`);
+    } catch (e) {}
+  }, []);
+
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-canvas)' }}>
       <ProviderSidebar />
@@ -47,7 +56,7 @@ export default function ProviderPayoutsPage() {
               {[
                 { label: 'Method', val: 'Egyptian Bank Transfer (ACH)' },
                 { label: 'IBAN', val: 'EG38 0010 0023 •••• •••• 4492 (CIB)' },
-                { label: 'Account Name', val: 'StudyHub Egypt LLC' },
+                { label: 'Account Name', val: accountName },
                 { label: 'Schedule', val: 'Bi-monthly (1st & 15th)' },
               ].map(f => (
                 <div key={f.label}>

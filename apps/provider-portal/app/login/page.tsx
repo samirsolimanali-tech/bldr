@@ -4,6 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { tokens } from '@bldr/ui';
+import { resolveVentureForEmail } from '../../lib/venture';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -40,7 +41,7 @@ function LoginForm() {
     if (syncEmail) {
       const formattedEmail = syncEmail.trim().toLowerCase();
       const formattedPass = (syncPass || '').trim();
-      const vInfo = (syncVenture && VENTURE_MAP[syncVenture.toLowerCase()]) || { id: syncVenture || 'studyhub', name: syncVenture || 'Brand Partner' };
+      const vInfo = resolveVentureForEmail(formattedEmail, syncVenture, syncVenture);
 
       setForm({
         email: formattedEmail,
@@ -56,7 +57,7 @@ function LoginForm() {
           list.unshift({
             email: formattedEmail,
             password: formattedPass,
-            name: syncName || formattedEmail.split('@')[0],
+            name: syncName || vInfo.userName || formattedEmail.split('@')[0],
             ventureId: vInfo.id,
             ventureName: vInfo.name,
             role: syncRole || 'Brand Financial Admin',
@@ -69,7 +70,7 @@ function LoginForm() {
       if (isAuto) {
         localStorage.setItem('bldr_token', `tok_prov_${Date.now()}_${Math.random().toString(36).slice(2)}`);
         localStorage.setItem('bldr_provider_email', formattedEmail);
-        localStorage.setItem('bldr_provider_name', syncName || formattedEmail.split('@')[0]);
+        localStorage.setItem('bldr_provider_name', syncName || vInfo.userName || formattedEmail.split('@')[0]);
         localStorage.setItem('bldr_venture_name', vInfo.name);
         localStorage.setItem('bldr_venture_id', vInfo.id);
         localStorage.setItem('bldr_provider_role', syncRole || 'Brand Financial Admin');
@@ -94,8 +95,13 @@ function LoginForm() {
 
         if (res.ok) {
           const { accessToken } = await res.json();
+          const vInfo = resolveVentureForEmail(form.email);
           localStorage.setItem('bldr_token', accessToken);
-          localStorage.setItem('bldr_provider_email', form.email);
+          localStorage.setItem('bldr_provider_email', form.email.trim().toLowerCase());
+          localStorage.setItem('bldr_provider_name', vInfo.userName);
+          localStorage.setItem('bldr_venture_name', vInfo.name);
+          localStorage.setItem('bldr_venture_id', vInfo.id);
+          localStorage.setItem('bldr_provider_role', 'Brand Financial Admin');
           window.location.href = '/dashboard';
           return;
         }
@@ -156,12 +162,14 @@ function LoginForm() {
           throw new Error('This brand administrator account has been suspended by Central Payment Hub.');
         }
 
+        const vInfo = resolveVentureForEmail(matched.email, matched.ventureName, matched.ventureId);
+
         // Successfully authenticated
         localStorage.setItem('bldr_token', `tok_prov_${Date.now()}_${Math.random().toString(36).slice(2)}`);
-        localStorage.setItem('bldr_provider_email', matched.email);
-        localStorage.setItem('bldr_provider_name', matched.name || matched.email.split('@')[0]);
-        localStorage.setItem('bldr_venture_name', matched.ventureName || 'Brand Partner');
-        localStorage.setItem('bldr_venture_id', matched.ventureId || 'studyhub');
+        localStorage.setItem('bldr_provider_email', matched.email.trim().toLowerCase());
+        localStorage.setItem('bldr_provider_name', matched.name || vInfo.userName);
+        localStorage.setItem('bldr_venture_name', vInfo.name);
+        localStorage.setItem('bldr_venture_id', vInfo.id);
         localStorage.setItem('bldr_provider_role', matched.role || 'Brand Financial Admin');
 
         window.location.href = '/dashboard';
@@ -435,6 +443,30 @@ function LoginForm() {
             Quick Brand Logins
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <button
+              type="button"
+              onClick={() => {
+                setForm({ email: 'team@bldr.io', password: 'Provider@bldr2024!' });
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '6px 10px',
+                borderRadius: '6px',
+                background: form.email === 'team@bldr.io' ? '#FEE2E2' : '#F8FAFC',
+                border: form.email === 'team@bldr.io' ? '1px solid #D10721' : '1px solid #E2E8F0',
+                cursor: 'pointer',
+                textAlign: 'left',
+              }}
+            >
+              <div>
+                <div style={{ fontSize: '11.5px', fontWeight: 700, color: '#1B2A4A' }}>bldr Store Team (Venture Pilot)</div>
+                <div style={{ fontSize: '10px', color: '#64748B' }}>team@bldr.io · bldr (Storefront Pilot)</div>
+              </div>
+              <span style={{ fontSize: '10px', fontWeight: 700, color: '#D10721', background: '#FFFFFF', padding: '2px 6px', borderRadius: '4px', border: '1px solid #CBD5E1' }}>Fill</span>
+            </button>
+
             <button
               type="button"
               onClick={() => {

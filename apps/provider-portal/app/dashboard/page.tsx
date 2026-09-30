@@ -6,18 +6,25 @@ import ProviderSidebar from '../../components/Sidebar';
 import { PayoutIcon, CalendarIcon, UsersIcon, TrendUpIcon } from '../../components/Icons';
 
 /* ─── Mock Data ─────────────────────────────────────────────── */
-const KPIS = [
+const STUDYHUB_KPIS = [
   { label: 'Total Revenue',     value: 'EGP 312,000', change: '+14.2%', up: true,  Icon: TrendUpIcon,  bg: '#EFF6FF', color: '#1E3A8A' },
   { label: 'This Month',        value: 'EGP 48,000',  change: '+8.1%',  up: true,  Icon: CalendarIcon, bg: '#ECFDF5', color: '#065F46' },
   { label: 'Pending Payout',    value: 'EGP 28,400',  change: 'Due Sep 30', up: false, Icon: PayoutIcon, bg: '#FFFBEB', color: '#92400E' },
   { label: 'Enrolled Students', value: '1,240',       change: '+82 this month', up: true, Icon: UsersIcon, bg: '#F5F3FF', color: '#5B21B6' },
 ];
 
+const BLDR_KPIS = [
+  { label: 'Total Revenue',     value: 'EGP 580,000', change: '+18.5%', up: true,  Icon: TrendUpIcon,  bg: '#EFF6FF', color: '#1E3A8A' },
+  { label: 'This Month',        value: 'EGP 82,500',  change: '+11.4%', up: true,  Icon: CalendarIcon, bg: '#ECFDF5', color: '#065F46' },
+  { label: 'Pending Payout',    value: 'EGP 42,000',  change: 'Due Sep 30', up: false, Icon: PayoutIcon, bg: '#FFFBEB', color: '#92400E' },
+  { label: 'Paid Customers',    value: '840',         change: '+64 this month', up: true, Icon: UsersIcon, bg: '#F5F3FF', color: '#5B21B6' },
+];
+
 const MONTHLY = [180, 230, 280, 340, 390, 480];
 const MONTHS = ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'];
 const MAX_VAL = Math.max(...MONTHLY);
 
-const RECENT_STUDENTS = [
+const STUDYHUB_STUDENTS = [
   { name: 'أحمد حسن (Ahmed Hassan)', email: 'ahmed@email.com', product: 'Full-Stack Bootcamp', amount: 4800, source: 'Fawry Code', date: '2026-09-26' },
   { name: 'سارة محمود (Sara Mahmoud)',   email: 'sara@email.com',  product: 'Full-Stack Bootcamp', amount: 4800, source: 'Vodafone Cash', date: '2026-09-26' },
   { name: 'عمر فاروق (Omar Farouk)',     email: 'omar@email.com',  product: 'Advanced React Cohort', amount: 3200, source: 'Meeza Card', date: '2026-09-25' },
@@ -25,7 +32,29 @@ const RECENT_STUDENTS = [
   { name: 'يوسف الأمين (Youssef El-Amin)', email: 'youssef@email.com', product: 'Advanced React Cohort', amount: 3200, source: 'Orange Money', date: '2026-09-24' },
 ];
 
+const BLDR_CUSTOMERS = [
+  { name: 'طارق محمود (Tarek Mahmoud)', email: 'tarek@edtech.eg', product: 'Education Solutions (Enterprise)', amount: 25000, source: 'Bank Transfer', date: '2026-09-26' },
+  { name: 'نور الدين (Nour El-Din)',     email: 'nour@alphamedia.com', product: 'Media Production Sprint', amount: 15000, source: 'Card (Geidea)', date: '2026-09-26' },
+  { name: 'كريم زكي (Karim Zaki)',       email: 'karim@zaki.eg', product: 'Business Consulting Retainer', amount: 12000, source: 'Card (Geidea)', date: '2026-09-25' },
+  { name: 'منى سليمان (Mona Soliman)',   email: 'mona@learnpro.io', product: 'Tutor Marketing Package', amount: 6500, source: 'InstaPay', date: '2026-09-24' },
+  { name: 'حازم شريف (Hazem Sherif)',   email: 'hazem@growth.eg', product: 'Corporate Training Workshop', amount: 18000, source: 'Fawry Code', date: '2026-09-23' },
+];
+
 export default function ProviderDashboard() {
+  const [isBldr, setIsBldr] = React.useState(false);
+
+  React.useEffect(() => {
+    try {
+      const email = localStorage.getItem('bldr_provider_email') || '';
+      const vId = localStorage.getItem('bldr_venture_id') || '';
+      if (email.includes('bldr') || vId === 'bldr') {
+        setIsBldr(true);
+      }
+    } catch (e) {}
+  }, []);
+
+  const kpis = isBldr ? BLDR_KPIS : STUDYHUB_KPIS;
+  const recentItems = isBldr ? BLDR_CUSTOMERS : STUDYHUB_STUDENTS;
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-canvas)' }}>
       <ProviderSidebar />
@@ -44,7 +73,7 @@ export default function ProviderDashboard() {
         <main style={{ flex: 1, padding: '28px' }}>
           {/* KPIs */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 28 }}>
-            {KPIS.map(k => (
+            {kpis.map(k => (
               <div key={k.label} style={{ background: 'white', borderRadius: 12, border: '1px solid var(--border)', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
                 <div style={{ width: 40, height: 40, borderRadius: 10, background: k.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}>
                   <k.Icon size={18} color={k.color} />
@@ -103,20 +132,22 @@ export default function ProviderDashboard() {
           {/* Recent Paid Users */}
           <div style={{ background: 'white', borderRadius: 12, border: '1px solid var(--border)', overflow: 'hidden' }}>
             <div style={{ padding: '18px 24px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>Recent Paid Users</h2>
+              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>
+                {isBldr ? 'Recent Orders & Clients' : 'Recent Paid Users'}
+              </h2>
               <Link href="/students" style={{ fontSize: 13, color: 'var(--brand)', fontWeight: 600, textDecoration: 'none' }}>View All →</Link>
             </div>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ background: 'var(--bg-canvas)', borderBottom: '1px solid var(--border)' }}>
-                  {['Student', 'Product', 'Amount', 'Source', 'Date'].map(h => (
+                  {['Customer / Client', 'Service / Plan', 'Amount', 'Source', 'Date'].map(h => (
                     <th key={h} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {RECENT_STUDENTS.map((s, i) => (
-                  <tr key={i} style={{ borderBottom: i < RECENT_STUDENTS.length - 1 ? '1px solid var(--border)' : 'none' }}>
+                {recentItems.map((s, i) => (
+                  <tr key={i} style={{ borderBottom: i < recentItems.length - 1 ? '1px solid var(--border)' : 'none' }}>
                     <td style={{ padding: '13px 16px' }}>
                       <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>{s.name}</div>
                       <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{s.email}</div>
