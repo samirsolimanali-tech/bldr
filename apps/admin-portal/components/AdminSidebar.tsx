@@ -11,6 +11,8 @@ interface NavItem {
   isExternal?: boolean;
 }
 
+const FINANCIAL_PORTAL_URL = process.env.NEXT_PUBLIC_PROVIDER_PORTAL_URL || 'http://localhost:3001';
+
 const NAV: NavItem[] = [
   // Main
   { href: '/dashboard',        icon: '▦',  label: 'Overview',              group: 'Main' },
@@ -27,7 +29,7 @@ const NAV: NavItem[] = [
   { href: '/cms',              icon: '▤',  label: 'CMS & Storefront',      group: 'Storefront' },
   { href: '/analytics',        icon: '◎',  label: 'Analytics & P&L',       group: 'Storefront' },
   // Brand Financial Portal
-  { href: 'http://localhost:3001/login', icon: '⊛', label: 'Financials', group: 'Finance', isExternal: true },
+  { href: `${FINANCIAL_PORTAL_URL}/login`, icon: '⊛', label: 'Financials', group: 'Finance', isExternal: true },
 ];
 
 const GROUPS = ['Main', 'Catalog', 'CRM & Ops', 'Storefront', 'Finance'];
