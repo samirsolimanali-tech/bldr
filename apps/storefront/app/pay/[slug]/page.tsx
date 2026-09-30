@@ -3,7 +3,21 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { tokens, formatEGP } from '@bldr/ui';
+import {
+  tokens,
+  formatEGP,
+  FawryLogo,
+  VodafoneCashLogo,
+  InstaPayLogo,
+  MeezaLogo,
+  VisaLogo,
+  MastercardLogo,
+  GeideaLogo,
+  PaymobLogo,
+  CbeComplianceBadge,
+  PciDssBadge,
+  SslBadge,
+} from '@bldr/ui';
 
 interface PaymentDetails {
   slug: string;
@@ -665,9 +679,41 @@ function CentralPaymentContent() {
                 </span>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 9 }}>
                   {[
-                    { id: 'CARD' as const, labelEn: 'Card', labelAr: 'بطاقة بنكية', subEn: 'Visa, Mastercard, Meeza', subAr: 'فيزا، ماستركارد، ميزة' },
-                    { id: 'WALLET' as const, labelEn: 'Mobile Wallet', labelAr: 'محفظة إلكترونية', subEn: 'Vodafone, Orange, WE', subAr: 'فودافون، أورنج، وي' },
-                    { id: 'KIOSK' as const, labelEn: 'Kiosk', labelAr: 'فوري كاش', subEn: 'Cash at any branch', subAr: 'ادفع نقداً عبر فوري' },
+                    {
+                      id: 'CARD' as const,
+                      labelEn: 'Card',
+                      labelAr: 'بطاقة بنكية',
+                      subEn: 'Visa, Mastercard, Meeza',
+                      subAr: 'فيزا، ماستركارد، ميزة',
+                      logos: (
+                        <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                          <MeezaLogo height={18} />
+                          <VisaLogo height={18} />
+                          <MastercardLogo height={18} />
+                        </div>
+                      ),
+                    },
+                    {
+                      id: 'WALLET' as const,
+                      labelEn: 'Mobile Wallet',
+                      labelAr: 'محفظة إلكترونية',
+                      subEn: 'Vodafone, InstaPay, Orange, WE',
+                      subAr: 'فودافون، إنستاباي، أورنج، وي',
+                      logos: (
+                        <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                          <VodafoneCashLogo height={18} />
+                          <InstaPayLogo height={18} />
+                        </div>
+                      ),
+                    },
+                    {
+                      id: 'KIOSK' as const,
+                      labelEn: 'Kiosk',
+                      labelAr: 'فوري كاش',
+                      subEn: 'Cash at 300K+ branches',
+                      subAr: 'ادفع نقداً عبر فوري',
+                      logos: <FawryLogo height={20} />,
+                    },
                   ].map((m) => {
                     const active = method === m.id;
                     return (
@@ -681,24 +727,29 @@ function CentralPaymentContent() {
                           padding: '12px 10px',
                           display: 'flex',
                           flexDirection: 'column',
-                          gap: 6,
+                          gap: 8,
                           cursor: 'pointer',
                           transition: 'all 0.15s ease',
                         }}
                       >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                          <span
-                            style={{
-                              width: 12,
-                              height: 12,
-                              borderRadius: '50%',
-                              border: active ? '3px solid #2E6F5E' : '1.5px solid #C9D2DE',
-                              background: '#FFFFFF',
-                            }}
-                          />
-                          <span style={{ fontSize: 12, fontWeight: 700, color: '#12203C' }}>
-                            {isRtl ? m.labelAr : m.labelEn}
-                          </span>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <span
+                              style={{
+                                width: 12,
+                                height: 12,
+                                borderRadius: '50%',
+                                border: active ? '3px solid #2E6F5E' : '1.5px solid #C9D2DE',
+                                background: '#FFFFFF',
+                              }}
+                            />
+                            <span style={{ fontSize: 12, fontWeight: 700, color: '#12203C' }}>
+                              {isRtl ? m.labelAr : m.labelEn}
+                            </span>
+                          </div>
+                        </div>
+                        <div>
+                          {m.logos}
                         </div>
                         <span style={{ fontSize: 10, color: '#5A6A80' }}>
                           {isRtl ? m.subAr : m.subEn}
@@ -963,23 +1014,13 @@ function CentralPaymentContent() {
               {/* Gateway Security Badge */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span style={{ fontSize: 11.5, color: '#64748B' }}>Secured payment by:</span>
-                <div
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 6,
-                    padding: '4px 10px',
-                    borderRadius: 6,
-                    background: method === 'KIOSK' ? '#FEF3C7' : method === 'WALLET' ? '#EFF6FF' : '#FEE2E2',
-                    color: method === 'KIOSK' ? '#92400E' : method === 'WALLET' ? '#1E40AF' : '#991B1B',
-                    fontWeight: 800,
-                    fontSize: 11.5,
-                    border: `1px solid ${method === 'KIOSK' ? '#FDE68A' : method === 'WALLET' ? '#BFDBFE' : '#FECACA'}`,
-                  }}
-                >
-                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: method === 'KIOSK' ? '#F59E0B' : method === 'WALLET' ? '#2563EB' : '#DC2626', display: 'inline-block' }} />
-                  <span>{method === 'KIOSK' ? 'Fawry Pay' : method === 'WALLET' ? 'Paymob (Accept)' : 'Geidea'}</span>
-                </div>
+                {method === 'KIOSK' ? (
+                  <FawryLogo height={26} />
+                ) : method === 'WALLET' ? (
+                  <PaymobLogo height={26} />
+                ) : (
+                  <GeideaLogo height={26} />
+                )}
               </div>
             </div>
 
@@ -987,27 +1028,23 @@ function CentralPaymentContent() {
             <div
               style={{
                 borderTop: '1px dashed #CBD5E1',
-                paddingTop: 10,
+                paddingTop: 12,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                fontSize: 10.5,
-                color: '#64748B',
                 flexWrap: 'wrap',
-                gap: 8,
+                gap: 10,
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                <span>256-Bit SSL Encryption</span>
-                <span>·</span>
-                <span>Central Bank of Egypt Compliant Rails</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                <SslBadge />
+                <CbeComplianceBadge />
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                <span>PCI DSS Level 1</span>
-                <span>·</span>
-                <span>3D Secure 2.0</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                <PciDssBadge />
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#475569', background: '#F1F5F9', border: '1px solid #CBD5E1', padding: '3px 8px', borderRadius: 6 }}>
+                  3D Secure 2.0
+                </span>
               </div>
             </div>
           </div>

@@ -1,13 +1,32 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import ProviderSidebar from '../../components/Sidebar';
+import {
+  FawryLogo,
+  VodafoneCashLogo,
+  InstaPayLogo,
+  OrangeCashLogo,
+  EtisalatCashLogo,
+  WePayLogo,
+  MeezaLogo,
+  VisaLogo,
+  MastercardLogo,
+  GeideaLogo,
+  PaymobLogo,
+  CbeComplianceBadge,
+  PciDssBadge,
+  SslBadge,
+  BRAND_LOGO_PRESETS,
+  BrandLogoPreset,
+} from '../../components/PaymentLogos';
 
 /* ─── Interfaces ─── */
 interface MasterCheckoutTemplate {
   providerName: string;
   providerLogoText: string;
   providerLogoUrl?: string;
+  showLogoInHero?: boolean;
   providerSlug: string;
   accentColor: string;
   bannerStyle: 'solid' | 'gradient' | 'dark';
@@ -84,12 +103,14 @@ const CMS_COURSES: CourseItem[] = [
 const INITIAL_MASTER_TEMPLATE: MasterCheckoutTemplate = {
   providerName: 'StudyHub Egypt',
   providerLogoText: 'SH',
+  providerLogoUrl: BRAND_LOGO_PRESETS[0].svgDataUri,
+  showLogoInHero: true,
   providerSlug: 'studyhub-egypt',
   accentColor: '#0EA5E9',
   bannerStyle: 'gradient',
   supportPhone: '+20 10 1234 5678',
   supportEmail: 'admissions@studyhub.eg',
-  gateway: 'Fawry Pay',
+  gateway: 'Geidea',
   methods: {
     fawry: true,
     wallet: true,
@@ -117,6 +138,10 @@ export default function MasterCheckoutStudioPage() {
   const [embedCopied, setEmbedCopied] = useState(false);
   const [saveToast, setSaveToast] = useState(false);
 
+  // Brand Logo Customization State
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [customLogoUrl, setCustomLogoUrl] = useState('');
+
   // Live Interactive Student Preview State
   const [selectedMethod, setSelectedMethod] = useState<'FAWRY' | 'WALLET' | 'CARD'>('FAWRY');
   const [studentName, setStudentName] = useState('أحمد كمال (Ahmed Kamal)');
@@ -133,6 +158,26 @@ export default function MasterCheckoutStudioPage() {
   // Updaters
   const updateTemplate = <K extends keyof MasterCheckoutTemplate>(key: K, value: MasterCheckoutTemplate[K]) => {
     setTemplate(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const result = event.target?.result as string;
+        if (result) {
+          updateTemplate('providerLogoUrl', result);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleApplyPreset = (preset: BrandLogoPreset) => {
+    updateTemplate('providerLogoUrl', preset.svgDataUri);
+    updateTemplate('providerName', preset.name);
+    updateTemplate('providerLogoText', preset.name.slice(0, 2).toUpperCase());
   };
 
   const updateMethod = (method: 'fawry' | 'wallet' | 'card', enabled: boolean) => {
@@ -304,9 +349,177 @@ export default function MasterCheckoutStudioPage() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                   {/* Section 1: Provider Identity & Header */}
                   <div style={{ background: 'white', borderRadius: 12, border: '1px solid var(--border)', padding: '20px 22px' }}>
-                    <h3 style={{ fontSize: 14, fontWeight: 800, margin: '0 0 14px', color: 'var(--text-primary)' }}>
-                      Provider Logo & Top Brand Header
-                    </h3>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+                      <h3 style={{ fontSize: 14, fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>
+                        Provider Logo & Brand Identity
+                      </h3>
+                      <span style={{ fontSize: 10.5, fontWeight: 700, padding: '2px 8px', borderRadius: 6, background: '#EFF6FF', color: '#1D4ED8', border: '1px solid #BFDBFE' }}>
+                        Custom Branding
+                      </span>
+                    </div>
+
+                    {/* Logo Selector / Uploader Box */}
+                    <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 10, padding: '14px', marginBottom: 16 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 12 }}>
+                        {/* Current Active Logo Preview */}
+                        <div
+                          style={{
+                            width: 52,
+                            height: 52,
+                            borderRadius: 12,
+                            background: 'white',
+                            border: '2px solid #CBD5E1',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            overflow: 'hidden',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                            flexShrink: 0,
+                            padding: 4,
+                            boxSizing: 'border-box',
+                          }}
+                        >
+                          {template.providerLogoUrl ? (
+                            <img
+                              src={template.providerLogoUrl}
+                              alt={template.providerName}
+                              style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                            />
+                          ) : (
+                            <span style={{ fontSize: 18, fontWeight: 900, color: template.accentColor }}>
+                              {template.providerLogoText}
+                            </span>
+                          )}
+                        </div>
+
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: '#0F172A', marginBottom: 2 }}>
+                            Active Brand Logo
+                          </div>
+                          <div style={{ fontSize: 11, color: '#64748B', marginBottom: 8 }}>
+                            Displays in checkout header and student payment portal
+                          </div>
+                          
+                          {/* Upload Button + File Input */}
+                          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                            <input
+                              type="file"
+                              ref={fileInputRef}
+                              onChange={handleLogoUpload}
+                              accept="image/*"
+                              style={{ display: 'none' }}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => fileInputRef.current?.click()}
+                              style={{
+                                padding: '6px 12px',
+                                borderRadius: 6,
+                                background: 'var(--brand)',
+                                color: 'white',
+                                fontSize: 11.5,
+                                fontWeight: 700,
+                                border: 'none',
+                                cursor: 'pointer',
+                              }}
+                            >
+                              Upload Brand Logo
+                            </button>
+                            {template.providerLogoUrl && (
+                              <button
+                                type="button"
+                                onClick={() => updateTemplate('providerLogoUrl', undefined)}
+                                style={{
+                                  padding: '6px 10px',
+                                  borderRadius: 6,
+                                  background: 'white',
+                                  color: '#64748B',
+                                  fontSize: 11.5,
+                                  fontWeight: 600,
+                                  border: '1px solid #CBD5E1',
+                                  cursor: 'pointer',
+                                }}
+                              >
+                                Reset to Monogram
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Custom URL Input */}
+                      <div style={{ marginBottom: 12 }}>
+                        <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 4 }}>
+                          Or Paste Logo Image URL (PNG, SVG, WebP):
+                        </label>
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          <input
+                            type="url"
+                            value={customLogoUrl}
+                            onChange={e => setCustomLogoUrl(e.target.value)}
+                            placeholder="https://example.com/logo.png"
+                            style={{ flex: 1, padding: '7px 10px', border: '1px solid #CBD5E1', borderRadius: 6, fontSize: 12 }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (customLogoUrl.trim()) {
+                                updateTemplate('providerLogoUrl', customLogoUrl.trim());
+                                setCustomLogoUrl('');
+                              }
+                            }}
+                            style={{ padding: '7px 12px', background: '#0F172A', color: 'white', border: 'none', borderRadius: 6, fontSize: 11.5, fontWeight: 700, cursor: 'pointer' }}
+                          >
+                            Apply URL
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Curated Presets */}
+                      <div>
+                        <span style={{ display: 'block', fontSize: 10.5, fontWeight: 700, color: '#64748B', marginBottom: 6 }}>
+                          Quick Brand Presets:
+                        </span>
+                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                          {BRAND_LOGO_PRESETS.map(preset => (
+                            <button
+                              key={preset.id}
+                              type="button"
+                              onClick={() => handleApplyPreset(preset)}
+                              style={{
+                                padding: '4px 8px',
+                                borderRadius: 6,
+                                background: 'white',
+                                border: template.providerLogoUrl === preset.svgDataUri ? '2px solid var(--brand)' : '1px solid #CBD5E1',
+                                color: '#1E293B',
+                                fontSize: 11,
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 6,
+                              }}
+                            >
+                              <img src={preset.svgDataUri} alt={preset.name} style={{ width: 16, height: 16, borderRadius: 4 }} />
+                              <span>{preset.name}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Toggle: Show Logo in Hero */}
+                      <div style={{ marginTop: 12, paddingTop: 10, borderTop: '1px dashed #CBD5E1', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: 11.5, fontWeight: 600, color: '#334155' }}>
+                          Show Brand Logo in Course Banner Header
+                        </span>
+                        <input
+                          type="checkbox"
+                          checked={template.showLogoInHero !== false}
+                          onChange={e => updateTemplate('showLogoInHero', e.target.checked)}
+                          style={{ width: 16, height: 16, cursor: 'pointer' }}
+                        />
+                      </div>
+                    </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 12, marginBottom: 12 }}>
                       <div>
@@ -444,10 +657,10 @@ export default function MasterCheckoutStudioPage() {
 
                     <div style={{ marginBottom: 14 }}>
                       <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 8 }}>
-                        Provider Routing Gateway (Will display security badge in footer):
+                        Provider Routing Gateway (Displays authentic logo in checkout footer):
                       </label>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-                        {(['Fawry Pay', 'Paymob (Accept)', 'Geidea'] as const).map(gw => (
+                        {(['Geidea', 'Fawry Pay', 'Paymob (Accept)'] as const).map(gw => (
                           <button
                             key={gw}
                             onClick={() => updateTemplate('gateway', gw)}
@@ -463,11 +676,17 @@ export default function MasterCheckoutStudioPage() {
                               display: 'flex',
                               flexDirection: 'column',
                               alignItems: 'center',
-                              gap: 2,
+                              gap: 6,
                             }}
                           >
-                            <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)' }}>Gateway</span>
-                            <span>{gw}</span>
+                            {gw === 'Geidea' ? (
+                              <GeideaLogo height={20} />
+                            ) : gw === 'Fawry Pay' ? (
+                              <FawryLogo height={20} />
+                            ) : (
+                              <PaymobLogo height={20} />
+                            )}
+                            <span style={{ fontSize: 10.5, fontWeight: 600, color: 'var(--text-secondary)' }}>{gw}</span>
                           </button>
                         ))}
                       </div>
@@ -479,9 +698,34 @@ export default function MasterCheckoutStudioPage() {
                       </label>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                         {[
-                          { key: 'fawry' as const, label: 'كود دفع فوري (Fawry Reference Code)', desc: '48h cash code at 300K+ POS kiosks & myFawry' },
-                          { key: 'wallet' as const, label: 'المحافظ الإلكترونية (Vodafone Cash, Orange, WE, InstaPay)', desc: 'Instant mobile wallet prompt authorization' },
-                          { key: 'card' as const, label: 'البطاقات البنكية وكروت ميزة (Meeza / Visa / Mastercard)', desc: '3D Secure 2.0 direct gateway integration' },
+                          {
+                            key: 'fawry' as const,
+                            label: 'كود دفع فوري (Fawry Reference Code)',
+                            desc: '48h cash code at 300K+ POS kiosks & myFawry',
+                            logo: <FawryLogo height={20} />,
+                          },
+                          {
+                            key: 'wallet' as const,
+                            label: 'المحافظ الإلكترونية (Vodafone Cash, Orange, WE, InstaPay)',
+                            desc: 'Instant mobile wallet prompt authorization',
+                            logo: (
+                              <div style={{ display: 'flex', gap: 3 }}>
+                                <VodafoneCashLogo height={18} />
+                                <InstaPayLogo height={18} />
+                              </div>
+                            ),
+                          },
+                          {
+                            key: 'card' as const,
+                            label: 'البطاقات البنكية وكروت ميزة (Meeza / Visa / Mastercard)',
+                            desc: '3D Secure 2.0 direct gateway integration',
+                            logo: (
+                              <div style={{ display: 'flex', gap: 3 }}>
+                                <MeezaLogo height={18} />
+                                <VisaLogo height={18} />
+                              </div>
+                            ),
+                          },
                         ].map(m => (
                           <div
                             key={m.key}
@@ -494,21 +738,25 @@ export default function MasterCheckoutStudioPage() {
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'space-between',
+                              gap: 10,
                               cursor: 'pointer',
                             }}
                           >
-                            <div>
+                            <div style={{ flex: 1 }}>
                               <div style={{ fontSize: 12, fontWeight: 700, color: template.methods[m.key] ? 'var(--text-primary)' : 'var(--text-muted)' }}>
                                 {m.label}
                               </div>
                               <div style={{ fontSize: 10.5, color: 'var(--text-muted)' }}>{m.desc}</div>
                             </div>
-                            <input
-                              type="checkbox"
-                              checked={template.methods[m.key]}
-                              onChange={() => {}}
-                              style={{ width: 16, height: 16, cursor: 'pointer' }}
-                            />
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                              {m.logo}
+                              <input
+                                type="checkbox"
+                                checked={template.methods[m.key]}
+                                onChange={() => {}}
+                                style={{ width: 16, height: 16, cursor: 'pointer' }}
+                              />
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -752,25 +1000,42 @@ export default function MasterCheckoutStudioPage() {
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    {/* Provider Logo Avatar */}
-                    <div
-                      style={{
-                        width: 42,
-                        height: 42,
-                        borderRadius: 10,
-                        background: template.accentColor,
-                        color: 'white',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontWeight: 900,
-                        fontSize: 16,
-                        boxShadow: `0 4px 12px ${template.accentColor}40`,
-                        letterSpacing: '0.05em',
-                      }}
-                    >
-                      {template.providerLogoText}
-                    </div>
+                    {/* Provider Logo Avatar or Custom Image */}
+                    {template.providerLogoUrl ? (
+                      <img
+                        src={template.providerLogoUrl}
+                        alt={template.providerName}
+                        style={{
+                          width: 44,
+                          height: 44,
+                          borderRadius: 10,
+                          objectFit: 'contain',
+                          background: 'white',
+                          border: '1px solid #E2E8F0',
+                          padding: 3,
+                          boxShadow: `0 2px 8px rgba(0,0,0,0.08)`,
+                        }}
+                      />
+                    ) : (
+                      <div
+                        style={{
+                          width: 44,
+                          height: 44,
+                          borderRadius: 10,
+                          background: template.accentColor,
+                          color: 'white',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontWeight: 900,
+                          fontSize: 16,
+                          boxShadow: `0 4px 12px ${template.accentColor}40`,
+                          letterSpacing: '0.05em',
+                        }}
+                      >
+                        {template.providerLogoText}
+                      </div>
+                    )}
 
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -811,30 +1076,96 @@ export default function MasterCheckoutStudioPage() {
                 <div
                   style={{
                     background: getBannerBackground(),
-                    padding: '20px 24px',
+                    padding: '22px 24px',
                     color: 'white',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
+                    gap: 16,
                   }}
                 >
-                  <div>
-                    {activeCourse.badge && (
-                      <span
-                        style={{
-                          display: 'inline-block',
-                          fontSize: 10.5,
-                          fontWeight: 700,
-                          padding: '3px 8px',
-                          background: 'rgba(255,255,255,0.18)',
-                          backdropFilter: 'blur(4px)',
-                          borderRadius: 6,
-                          marginBottom: 8,
-                        }}
-                      >
-                        {activeCourse.badge}
-                      </span>
+                  <div style={{ flex: 1 }}>
+                    {/* Brand Logo & Provider Header in Hero Banner */}
+                    {template.showLogoInHero !== false && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+                        {template.providerLogoUrl ? (
+                          <img
+                            src={template.providerLogoUrl}
+                            alt={template.providerName}
+                            style={{
+                              width: 38,
+                              height: 38,
+                              objectFit: 'contain',
+                              borderRadius: 8,
+                              background: 'white',
+                              padding: 3,
+                              boxShadow: '0 3px 10px rgba(0,0,0,0.25)',
+                              border: '1px solid rgba(255,255,255,0.4)',
+                              flexShrink: 0,
+                            }}
+                          />
+                        ) : (
+                          <div
+                            style={{
+                              width: 38,
+                              height: 38,
+                              borderRadius: 8,
+                              background: 'rgba(255,255,255,0.2)',
+                              backdropFilter: 'blur(6px)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontWeight: 900,
+                              fontSize: 14,
+                              color: 'white',
+                              border: '1px solid rgba(255,255,255,0.3)',
+                              flexShrink: 0,
+                            }}
+                          >
+                            {template.providerLogoText}
+                          </div>
+                        )}
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <span style={{ fontSize: 13, fontWeight: 800, color: 'white', letterSpacing: '-0.01em' }}>
+                              {template.providerName}
+                            </span>
+                            <span
+                              style={{
+                                fontSize: 9.5,
+                                fontWeight: 800,
+                                padding: '1px 6px',
+                                background: 'rgba(255,255,255,0.22)',
+                                backdropFilter: 'blur(4px)',
+                                borderRadius: 4,
+                                color: 'white',
+                              }}
+                            >
+                              Verified
+                            </span>
+                          </div>
+                          <span style={{ fontSize: 10, opacity: 0.85, color: '#F1F5F9' }}>
+                            بوابة السداد الرسمية
+                          </span>
+                        </div>
+                        {activeCourse.badge && (
+                          <span
+                            style={{
+                              marginRight: 'auto',
+                              fontSize: 10,
+                              fontWeight: 700,
+                              padding: '3px 8px',
+                              background: 'rgba(255,255,255,0.18)',
+                              backdropFilter: 'blur(4px)',
+                              borderRadius: 6,
+                            }}
+                          >
+                            {activeCourse.badge}
+                          </span>
+                        )}
+                      </div>
                     )}
+
                     <h2 style={{ fontSize: 17, fontWeight: 800, margin: '0 0 4px', letterSpacing: '-0.02em', color: 'white' }}>
                       {activeCourse.title}
                     </h2>
@@ -911,31 +1242,41 @@ export default function MasterCheckoutStudioPage() {
                               onClick={() => setSelectedMethod('FAWRY')}
                               style={{
                                 padding: '14px 16px',
-                                borderRadius: 10,
+                                borderRadius: 12,
                                 border: selectedMethod === 'FAWRY' ? '2px solid #F59E0B' : '1px solid #E2E8F0',
                                 background: selectedMethod === 'FAWRY' ? '#FFFBEB' : 'white',
                                 cursor: 'pointer',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'space-between',
-                                transition: 'all 0.15s',
+                                gap: 14,
+                                transition: 'all 0.15s ease-in-out',
+                                boxShadow: selectedMethod === 'FAWRY' ? '0 4px 12px rgba(245, 158, 11, 0.12)' : 'none',
                               }}
                             >
-                              <div>
-                                <div style={{ fontSize: 13, fontWeight: 800, color: '#0F172A' }}>
-                                  كود دفع فوري (Fawry Reference Code)
+                              <div style={{ flex: 1 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
+                                  <div style={{ fontSize: 13.5, fontWeight: 800, color: '#0F172A' }}>
+                                    كود دفع فوري (Fawry Reference Code)
+                                  </div>
+                                  <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 4, background: '#FEF3C7', color: '#92400E' }}>
+                                    فوري Kiosk
+                                  </span>
                                 </div>
                                 <div style={{ fontSize: 11, color: '#64748B' }}>
-                                  احصل على رقم دفع لسداده نقداً عبر أي فرع فوري أو تطبيق myFawry
+                                  احصل على رقم دفع لسداده نقداً عبر أي منفذ فوري أو تطبيق myFawry
                                 </div>
                               </div>
-                              <input
-                                type="radio"
-                                name="method"
-                                checked={selectedMethod === 'FAWRY'}
-                                onChange={() => setSelectedMethod('FAWRY')}
-                                style={{ width: 18, height: 18, accentColor: '#F59E0B', cursor: 'pointer' }}
-                              />
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                <FawryLogo height={28} />
+                                <input
+                                  type="radio"
+                                  name="method"
+                                  checked={selectedMethod === 'FAWRY'}
+                                  onChange={() => setSelectedMethod('FAWRY')}
+                                  style={{ width: 18, height: 18, accentColor: '#F59E0B', cursor: 'pointer' }}
+                                />
+                              </div>
                             </div>
                           )}
 
@@ -945,31 +1286,47 @@ export default function MasterCheckoutStudioPage() {
                               onClick={() => setSelectedMethod('WALLET')}
                               style={{
                                 padding: '14px 16px',
-                                borderRadius: 10,
+                                borderRadius: 12,
                                 border: selectedMethod === 'WALLET' ? '2px solid #0EA5E9' : '1px solid #E2E8F0',
                                 background: selectedMethod === 'WALLET' ? '#F0F9FF' : 'white',
                                 cursor: 'pointer',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'space-between',
-                                transition: 'all 0.15s',
+                                gap: 14,
+                                transition: 'all 0.15s ease-in-out',
+                                boxShadow: selectedMethod === 'WALLET' ? '0 4px 12px rgba(14, 165, 233, 0.12)' : 'none',
                               }}
                             >
-                              <div>
-                                <div style={{ fontSize: 13, fontWeight: 800, color: '#0F172A' }}>
-                                  المحافظ الإلكترونية وإنستاباي (Wallets & InstaPay)
+                              <div style={{ flex: 1 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
+                                  <div style={{ fontSize: 13.5, fontWeight: 800, color: '#0F172A' }}>
+                                    المحافظ الإلكترونية وإنستاباي (Wallets & InstaPay)
+                                  </div>
+                                  <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 4, background: '#E0F2FE', color: '#0369A1' }}>
+                                    خصم فوري
+                                  </span>
                                 </div>
                                 <div style={{ fontSize: 11, color: '#64748B' }}>
-                                  فودافون كاش، أورنج، اتصالات، وي باي، إنستاباي بخصم فوري
+                                  فودافون كاش، إنستاباي، أورنج، اتصالات، وي باي
                                 </div>
                               </div>
-                              <input
-                                type="radio"
-                                name="method"
-                                checked={selectedMethod === 'WALLET'}
-                                onChange={() => setSelectedMethod('WALLET')}
-                                style={{ width: 18, height: 18, accentColor: '#0EA5E9', cursor: 'pointer' }}
-                              />
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap', justifyContent: 'flex-end', maxWidth: 280 }}>
+                                  <VodafoneCashLogo height={22} />
+                                  <InstaPayLogo height={22} />
+                                  <OrangeCashLogo height={22} />
+                                  <EtisalatCashLogo height={22} />
+                                  <WePayLogo height={22} />
+                                </div>
+                                <input
+                                  type="radio"
+                                  name="method"
+                                  checked={selectedMethod === 'WALLET'}
+                                  onChange={() => setSelectedMethod('WALLET')}
+                                  style={{ width: 18, height: 18, accentColor: '#0EA5E9', cursor: 'pointer' }}
+                                />
+                              </div>
                             </div>
                           )}
 
@@ -979,31 +1336,45 @@ export default function MasterCheckoutStudioPage() {
                               onClick={() => setSelectedMethod('CARD')}
                               style={{
                                 padding: '14px 16px',
-                                borderRadius: 10,
+                                borderRadius: 12,
                                 border: selectedMethod === 'CARD' ? '2px solid #7C3AED' : '1px solid #E2E8F0',
                                 background: selectedMethod === 'CARD' ? '#FAF5FF' : 'white',
                                 cursor: 'pointer',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'space-between',
-                                transition: 'all 0.15s',
+                                gap: 14,
+                                transition: 'all 0.15s ease-in-out',
+                                boxShadow: selectedMethod === 'CARD' ? '0 4px 12px rgba(124, 58, 237, 0.12)' : 'none',
                               }}
                             >
-                              <div>
-                                <div style={{ fontSize: 13, fontWeight: 800, color: '#0F172A' }}>
-                                  البطاقات البنكية وكروت ميزة (Meeza & Cards)
+                              <div style={{ flex: 1 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
+                                  <div style={{ fontSize: 13.5, fontWeight: 800, color: '#0F172A' }}>
+                                    البطاقات البنكية وكروت ميزة (Meeza & Cards)
+                                  </div>
+                                  <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 4, background: '#F3E8FF', color: '#6B21A8' }}>
+                                    دفع مشفر
+                                  </span>
                                 </div>
                                 <div style={{ fontSize: 11, color: '#64748B' }}>
-                                  كروت ميزة المصرية، فيزا، وماستركارد بخصم آمن مشفر
+                                  كروت ميزة المصرية، فيزا، وماستركارد بخصم آمن مشفر 3D Secure
                                 </div>
                               </div>
-                              <input
-                                type="radio"
-                                name="method"
-                                checked={selectedMethod === 'CARD'}
-                                onChange={() => setSelectedMethod('CARD')}
-                                style={{ width: 18, height: 18, accentColor: '#7C3AED', cursor: 'pointer' }}
-                              />
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                                  <MeezaLogo height={22} />
+                                  <VisaLogo height={22} />
+                                  <MastercardLogo height={22} />
+                                </div>
+                                <input
+                                  type="radio"
+                                  name="method"
+                                  checked={selectedMethod === 'CARD'}
+                                  onChange={() => setSelectedMethod('CARD')}
+                                  style={{ width: 18, height: 18, accentColor: '#7C3AED', cursor: 'pointer' }}
+                                />
+                              </div>
                             </div>
                           )}
                         </div>
@@ -1039,6 +1410,9 @@ export default function MasterCheckoutStudioPage() {
                     <div style={{ textAlign: 'center', padding: '16px 0' }}>
                       {selectedMethod === 'FAWRY' && (
                         <div style={{ background: '#FFFBEB', border: '2px solid #F59E0B', borderRadius: 12, padding: '24px 20px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
+                            <FawryLogo height={32} />
+                          </div>
                           <h3 style={{ fontSize: 18, fontWeight: 800, margin: '0 0 4px', color: '#92400E' }}>
                             كود دفع فوري الخاص بك
                           </h3>
@@ -1082,29 +1456,35 @@ export default function MasterCheckoutStudioPage() {
                       {selectedMethod === 'WALLET' && (
                         <div style={{ background: '#F0F9FF', border: '2px solid #0EA5E9', borderRadius: 12, padding: '24px 20px' }}>
                           <h3 style={{ fontSize: 18, fontWeight: 800, margin: '0 0 4px', color: '#0369A1' }}>
-                            الدفع عبر المحفظة الإلكترونية
+                            الدفع عبر المحفظة الإلكترونية وإنستاباي
                           </h3>
                           <p style={{ fontSize: 12, color: '#0284C7', marginBottom: 16 }}>
-                            اختر مزود المحفظة وسيصلك إشعار فوري على هاتفك لتأكيد الخصم بالرقم السري
+                            اختر شبكة المحفظة وسيصلك إشعار فوري على هاتفك لتأكيد الخصم
                           </p>
 
-                          <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginBottom: 14 }}>
-                            {(['Vodafone Cash', 'InstaPay', 'Orange Money', 'Etisalat Cash', 'WE Pay'] as const).map(w => (
+                          <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginBottom: 14, flexWrap: 'wrap' }}>
+                            {[
+                              { id: 'Vodafone Cash' as const, logo: <VodafoneCashLogo height={24} /> },
+                              { id: 'InstaPay' as const, logo: <InstaPayLogo height={24} /> },
+                              { id: 'Orange Money' as const, logo: <OrangeCashLogo height={24} /> },
+                              { id: 'Etisalat Cash' as const, logo: <EtisalatCashLogo height={24} /> },
+                              { id: 'WE Pay' as const, logo: <WePayLogo height={24} /> },
+                            ].map(w => (
                               <button
-                                key={w}
-                                onClick={() => setWalletProvider(w)}
+                                key={w.id}
+                                onClick={() => setWalletProvider(w.id)}
                                 style={{
                                   padding: '6px 10px',
-                                  borderRadius: 6,
-                                  fontSize: 11,
-                                  fontWeight: 700,
-                                  border: walletProvider === w ? '2px solid #0284C7' : '1px solid #CBD5E1',
-                                  background: walletProvider === w ? 'white' : '#E0F2FE',
-                                  color: '#0369A1',
+                                  borderRadius: 8,
+                                  border: walletProvider === w.id ? '2px solid #0284C7' : '1px solid #CBD5E1',
+                                  background: walletProvider === w.id ? '#EFF6FF' : 'white',
                                   cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  boxShadow: walletProvider === w.id ? '0 2px 6px rgba(2, 132, 199, 0.15)' : 'none',
                                 }}
                               >
-                                {w}
+                                {w.logo}
                               </button>
                             ))}
                           </div>
@@ -1141,11 +1521,16 @@ export default function MasterCheckoutStudioPage() {
                           <h3 style={{ fontSize: 18, fontWeight: 800, margin: '0 0 4px', color: '#6D28D9' }}>
                             الدفع عبر البطاقة وكروت ميزة
                           </h3>
-                          <p style={{ fontSize: 12, color: '#7C3AED', marginBottom: 16 }}>
+                          <p style={{ fontSize: 12, color: '#7C3AED', marginBottom: 14 }}>
                             معاملة آمنة مشفرة عبر بوابة <strong>{template.gateway}</strong>
                           </p>
 
                           <div style={{ maxWidth: 360, margin: '0 auto 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                            <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginBottom: 4 }}>
+                              <MeezaLogo height={24} />
+                              <VisaLogo height={24} />
+                              <MastercardLogo height={24} />
+                            </div>
                             <input
                               type="text"
                               placeholder="رقم البطاقة (Card Number / Meeza)"
@@ -1235,22 +1620,13 @@ export default function MasterCheckoutStudioPage() {
                     {/* Gateway Security Badge */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <span style={{ fontSize: 11.5, color: '#64748B' }}>Secured payment by:</span>
-                      <div
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: 6,
-                          padding: '4px 10px',
-                          borderRadius: 6,
-                          background: template.gateway === 'Fawry Pay' ? '#FEF3C7' : template.gateway === 'Paymob (Accept)' ? '#EFF6FF' : '#FEE2E2',
-                          color: template.gateway === 'Fawry Pay' ? '#92400E' : template.gateway === 'Paymob (Accept)' ? '#1E40AF' : '#991B1B',
-                          fontWeight: 800,
-                          fontSize: 11.5,
-                          border: `1px solid ${template.gateway === 'Fawry Pay' ? '#FDE68A' : template.gateway === 'Paymob (Accept)' ? '#BFDBFE' : '#FECACA'}`,
-                        }}
-                      >
-                        <span>{template.gateway}</span>
-                      </div>
+                      {template.gateway === 'Geidea' ? (
+                        <GeideaLogo height={28} />
+                      ) : template.gateway === 'Fawry Pay' ? (
+                        <FawryLogo height={28} />
+                      ) : (
+                        <PaymobLogo height={28} />
+                      )}
                     </div>
                   </div>
 
@@ -1258,21 +1634,23 @@ export default function MasterCheckoutStudioPage() {
                   <div
                     style={{
                       borderTop: '1px dashed #CBD5E1',
-                      paddingTop: 10,
+                      paddingTop: 12,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      fontSize: 10.5,
-                      color: '#64748B',
                       flexWrap: 'wrap',
-                      gap: 8,
+                      gap: 10,
                     }}
                   >
-                    <div>
-                      256-Bit SSL Encryption · Central Bank of Egypt Compliant Rails
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                      <SslBadge />
+                      <CbeComplianceBadge />
                     </div>
-                    <div>
-                      PCI DSS Level 1 Certified · 3D Secure 2.0
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                      <PciDssBadge />
+                      <span style={{ fontSize: 11, fontWeight: 700, color: '#475569', background: '#F1F5F9', border: '1px solid #CBD5E1', padding: '3px 8px', borderRadius: 6 }}>
+                        3D Secure 2.0
+                      </span>
                     </div>
                   </div>
                 </div>
