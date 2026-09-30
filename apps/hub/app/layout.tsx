@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import HubAuthGuard from '../components/HubAuthGuard';
 
 export const metadata: Metadata = {
   title: {
@@ -12,7 +13,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <HubAuthGuard>{children}</HubAuthGuard>
+      </body>
     </html>
   );
 }

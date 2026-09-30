@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import ProviderAuthGuard from '../components/ProviderAuthGuard';
 
 export const metadata: Metadata = {
   title: { default: 'Provider Portal — bldr', template: '%s | Provider Portal' },
@@ -10,7 +11,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <ProviderAuthGuard>{children}</ProviderAuthGuard>
+      </body>
     </html>
   );
 }

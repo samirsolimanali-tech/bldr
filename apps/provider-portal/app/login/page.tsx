@@ -96,13 +96,14 @@ function LoginForm() {
         if (res.ok) {
           const { accessToken } = await res.json();
           const vInfo = resolveVentureForEmail(form.email);
+          try { sessionStorage.removeItem('bldr_provider_logged_out'); } catch (e) {}
           localStorage.setItem('bldr_token', accessToken);
           localStorage.setItem('bldr_provider_email', form.email.trim().toLowerCase());
           localStorage.setItem('bldr_provider_name', vInfo.userName);
           localStorage.setItem('bldr_venture_name', vInfo.name);
           localStorage.setItem('bldr_venture_id', vInfo.id);
           localStorage.setItem('bldr_provider_role', 'Brand Financial Admin');
-          window.location.href = '/dashboard';
+          window.location.replace('/dashboard');
           return;
         }
       } catch (e) {
@@ -165,6 +166,7 @@ function LoginForm() {
         const vInfo = resolveVentureForEmail(matched.email, matched.ventureName, matched.ventureId);
 
         // Successfully authenticated
+        try { sessionStorage.removeItem('bldr_provider_logged_out'); } catch (e) {}
         localStorage.setItem('bldr_token', `tok_prov_${Date.now()}_${Math.random().toString(36).slice(2)}`);
         localStorage.setItem('bldr_provider_email', matched.email.trim().toLowerCase());
         localStorage.setItem('bldr_provider_name', matched.name || vInfo.userName);
@@ -172,7 +174,7 @@ function LoginForm() {
         localStorage.setItem('bldr_venture_id', vInfo.id);
         localStorage.setItem('bldr_provider_role', matched.role || 'Brand Financial Admin');
 
-        window.location.href = '/dashboard';
+        window.location.replace('/dashboard');
         return;
       }
 

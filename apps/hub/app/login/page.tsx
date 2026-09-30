@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { loginHubUser } from '../../lib/auth';
 
 export default function HubLoginPage() {
   const [email, setEmail] = useState('admin@bldr.io');
@@ -23,15 +24,8 @@ export default function HubLoginPage() {
         return;
       }
       
-      // Store financial session token
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('bldr_hub_session', JSON.stringify({
-          email,
-          scope: selectedVenture,
-          authenticatedAt: new Date().toISOString(),
-        }));
-        window.location.href = selectedVenture === 'all' ? '/' : `/?venture=${selectedVenture}`;
-      }
+      const targetUrl = selectedVenture === 'all' ? '/' : `/?venture=${selectedVenture}`;
+      loginHubUser({ email, scope: selectedVenture }, targetUrl);
     }, 600);
   };
 

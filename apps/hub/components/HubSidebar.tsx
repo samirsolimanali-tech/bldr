@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { logoutHubUser } from '../lib/auth';
 
 export interface NavItemDef {
   label: string;
@@ -107,10 +108,7 @@ export default function HubSidebar({ active }: { active?: string }) {
   }, []);
 
   const handleLogout = () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('bldr_hub_session');
-      window.location.href = '/login';
-    }
+    logoutHubUser();
   };
 
   return (

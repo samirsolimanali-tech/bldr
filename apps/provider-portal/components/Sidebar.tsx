@@ -15,6 +15,7 @@ import {
 } from './Icons';
 
 import { resolveVentureForEmail } from '../lib/venture';
+import { logoutProvider } from '../lib/auth';
 
 interface NavItem {
   href: string;
@@ -62,14 +63,7 @@ export default function ProviderSidebar() {
   }, []);
 
   const handleSignOut = () => {
-    try {
-      localStorage.removeItem('bldr_token');
-      localStorage.removeItem('bldr_provider_email');
-      localStorage.removeItem('bldr_provider_name');
-      localStorage.removeItem('bldr_venture_name');
-      localStorage.removeItem('bldr_venture_id');
-    } catch (e) {}
-    window.location.href = '/login';
+    logoutProvider();
   };
 
   return (

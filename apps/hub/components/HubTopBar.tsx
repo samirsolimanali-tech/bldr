@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { logoutHubUser } from '../lib/auth';
 
 export interface HubTopBarProps {
   title: string;
@@ -474,10 +475,7 @@ export default function HubTopBar({
         <button
           type="button"
           onClick={() => {
-            if (typeof window !== 'undefined') {
-              localStorage.removeItem('bldr_hub_session');
-              window.location.href = '/login';
-            }
+            logoutHubUser();
           }}
           title="Sign out of Central Hub"
           style={{
