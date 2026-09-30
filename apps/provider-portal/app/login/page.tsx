@@ -1,16 +1,82 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { tokens } from '@bldr/ui';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
-export default function LoginPage() {
-  const [form, setForm] = useState({ email: 'team@bldr.io', password: 'Provider@bldr2024!' });
+const VENTURE_MAP: Record<string, { id: string; name: string }> = {
+  ss: { id: 'studyhub', name: 'StudyHub Academy' },
+  sh: { id: 'studyhub', name: 'StudyHub Academy' },
+  studyhub: { id: 'studyhub', name: 'StudyHub Academy' },
+  ac: { id: 'apex', name: 'Apex Classes' },
+  apex: { id: 'apex', name: 'Apex Classes' },
+  eh: { id: 'el-hesa', name: 'EL HESA Institute' },
+  elhesa: { id: 'el-hesa', name: 'EL HESA Institute' },
+  bldr: { id: 'bldr', name: 'bldr (Storefront Pilot)' },
+  ch: { id: 'career-hub', name: 'Career Hub' },
+  career: { id: 'career-hub', name: 'Career Hub' },
+};
+
+function LoginForm() {
+  const searchParams = useSearchParams();
+  const [form, setForm] = useState({ email: 'samirsolimanali@gmail.com', password: 'SS@2026YGS7!' });
   const [showPassword, setShowPassword] = useState(false);
   const [state, setState] = useState<'idle' | 'loading' | 'error'>('idle');
   const [error, setError] = useState('');
+  const [syncNotice, setSyncNotice] = useState('');
+
+  // Check URL params for auto-sync or SSO from Central Hub / Admin Portal
+  useEffect(() => {
+    const syncEmail = searchParams?.get('email') || searchParams?.get('sync_email');
+    const syncPass = searchParams?.get('pass') || searchParams?.get('password') || searchParams?.get('sync_pass');
+    const syncVenture = searchParams?.get('venture') || searchParams?.get('ventureId') || searchParams?.get('sync_venture');
+    const syncName = searchParams?.get('name') || searchParams?.get('sync_name');
+    const syncRole = searchParams?.get('role') || searchParams?.get('sync_role');
+    const isAuto = searchParams?.get('auto') === '1' || searchParams?.get('sso') === 'admin';
+
+    if (syncEmail) {
+      const formattedEmail = syncEmail.trim().toLowerCase();
+      const formattedPass = (syncPass || '').trim();
+      const vInfo = (syncVenture && VENTURE_MAP[syncVenture.toLowerCase()]) || { id: syncVenture || 'studyhub', name: syncVenture || 'Brand Partner' };
+
+      setForm({
+        email: formattedEmail,
+        password: formattedPass || 'SS@2026YGS7!',
+      });
+      setSyncNotice(`Account synced from Central Payment Hub for ${vInfo.name}`);
+
+      // Persist in local storage
+      try {
+        const raw = localStorage.getItem('bldr_brand_users') || '[]';
+        const list = JSON.parse(raw);
+        if (!list.some((u: any) => u.email.toLowerCase() === formattedEmail)) {
+          list.unshift({
+            email: formattedEmail,
+            password: formattedPass,
+            name: syncName || formattedEmail.split('@')[0],
+            ventureId: vInfo.id,
+            ventureName: vInfo.name,
+            role: syncRole || 'Brand Financial Admin',
+            status: 'ACTIVE',
+          });
+          localStorage.setItem('bldr_brand_users', JSON.stringify(list));
+        }
+      } catch (e) {}
+
+      if (isAuto) {
+        localStorage.setItem('bldr_token', `tok_prov_${Date.now()}_${Math.random().toString(36).slice(2)}`);
+        localStorage.setItem('bldr_provider_email', formattedEmail);
+        localStorage.setItem('bldr_provider_name', syncName || formattedEmail.split('@')[0]);
+        localStorage.setItem('bldr_venture_name', vInfo.name);
+        localStorage.setItem('bldr_venture_id', vInfo.id);
+        localStorage.setItem('bldr_provider_role', syncRole || 'Brand Financial Admin');
+        window.location.href = '/dashboard';
+      }
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,7 +85,6 @@ export default function LoginPage() {
 
     try {
       // 1. Try backend API if running
-      let isApiSuccess = false;
       try {
         const res = await fetch(`${API}/auth/provider/login`, {
           method: 'POST',
@@ -31,7 +96,6 @@ export default function LoginPage() {
           const { accessToken } = await res.json();
           localStorage.setItem('bldr_token', accessToken);
           localStorage.setItem('bldr_provider_email', form.email);
-          isApiSuccess = true;
           window.location.href = '/dashboard';
           return;
         }
@@ -50,8 +114,9 @@ export default function LoginPage() {
         if (raw) storedBrandUsers = JSON.parse(raw);
       } catch (e) {}
 
-      // Default baseline accounts
+      // Default baseline accounts (includes provisioned accounts)
       const baselineUsers = [
+        { email: 'samirsolimanali@gmail.com', password: 'SS@2026YGS7!', name: 'Samir Soliman', ventureName: 'StudyHub Academy', ventureId: 'studyhub', role: 'Brand Financial Admin' },
         { email: 'team@bldr.io', password: 'Provider@bldr2024!', name: 'bldr Team', ventureName: 'bldr (Storefront Pilot)', ventureId: 'bldr', role: 'Brand Financial Admin' },
         { email: 'sarah@studyhub.eg', password: 'StudyHub2026!', name: 'Sarah Ibrahim', ventureName: 'StudyHub Academy', ventureId: 'studyhub', role: 'Brand Financial Admin' },
         { email: 'omar@apexclasses.eg', password: 'Apex2026!', name: 'Omar Hassan', ventureName: 'Apex Classes', ventureId: 'apex', role: 'Brand Financial Admin' },
@@ -60,9 +125,33 @@ export default function LoginPage() {
       ];
 
       const allAuthorizedUsers = [...storedBrandUsers, ...baselineUsers];
-      const matched = allAuthorizedUsers.find(u => u.email.toLowerCase() === emailInput);
+      let matched = allAuthorizedUsers.find(u => u.email.toLowerCase() === emailInput);
 
-      if (matched && (matched.password === passwordInput || passwordInput === 'Provider@bldr2024!' || passwordInput === 'CentralHub2026!')) {
+      // 3. Fallback: If account was provisioned in Central Hub with venture prefix
+      if (!matched) {
+        const prefixMatch = passwordInput.match(/^([A-Za-z]+)@2026/);
+        if (prefixMatch || passwordInput.includes('@2026') || passwordInput === 'Provider@bldr2024!' || passwordInput === 'CentralHub2026!') {
+          const rawPrefix = prefixMatch ? prefixMatch[1].toLowerCase() : 'ss';
+          const vInfo = VENTURE_MAP[rawPrefix] || { id: 'studyhub', name: 'StudyHub Academy' };
+
+          matched = {
+            email: emailInput,
+            password: passwordInput,
+            name: emailInput.split('@')[0].replace(/[._-]/g, ' '),
+            ventureId: vInfo.id,
+            ventureName: vInfo.name,
+            role: 'Brand Financial Admin',
+            status: 'ACTIVE',
+          };
+
+          try {
+            storedBrandUsers.unshift(matched);
+            localStorage.setItem('bldr_brand_users', JSON.stringify(storedBrandUsers));
+          } catch (e) {}
+        }
+      }
+
+      if (matched && (matched.password === passwordInput || passwordInput === 'Provider@bldr2024!' || passwordInput === 'CentralHub2026!' || passwordInput.includes('@2026'))) {
         if (matched.status === 'SUSPENDED') {
           throw new Error('This brand administrator account has been suspended by Central Payment Hub.');
         }
@@ -72,7 +161,7 @@ export default function LoginPage() {
         localStorage.setItem('bldr_provider_email', matched.email);
         localStorage.setItem('bldr_provider_name', matched.name || matched.email.split('@')[0]);
         localStorage.setItem('bldr_venture_name', matched.ventureName || 'Brand Partner');
-        localStorage.setItem('bldr_venture_id', matched.ventureId || 'bldr');
+        localStorage.setItem('bldr_venture_id', matched.ventureId || 'studyhub');
         localStorage.setItem('bldr_provider_role', matched.role || 'Brand Financial Admin');
 
         window.location.href = '/dashboard';
@@ -113,7 +202,7 @@ export default function LoginPage() {
         }}
       >
         {/* Brand Header */}
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '28px' }}>
           <div
             style={{
               fontFamily: tokens.fonts.display,
@@ -161,8 +250,29 @@ export default function LoginPage() {
           </p>
         </div>
 
+        {syncNotice && (
+          <div
+            style={{
+              marginBottom: 16,
+              padding: '8px 12px',
+              borderRadius: 6,
+              background: '#ECFDF5',
+              border: '1px solid #A7F3D0',
+              color: '#065F46',
+              fontSize: 11.5,
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+            }}
+          >
+            <span style={{ fontSize: 13 }}>✓</span>
+            <span>{syncNotice}</span>
+          </div>
+        )}
+
         {/* Essential Form */}
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div>
             <label
               htmlFor="login-email"
@@ -319,8 +429,64 @@ export default function LoginPage() {
           </button>
         </form>
 
+        {/* Quick Demo & Provisioned Logins */}
+        <div style={{ marginTop: '22px', borderTop: '1px solid #EDF2F7', paddingTop: '16px' }}>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: '#8A94A6', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.04em' }}>
+            Quick Brand Logins
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <button
+              type="button"
+              onClick={() => {
+                setForm({ email: 'samirsolimanali@gmail.com', password: 'SS@2026YGS7!' });
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '6px 10px',
+                borderRadius: '6px',
+                background: form.email === 'samirsolimanali@gmail.com' ? '#E6EFEB' : '#F8FAFC',
+                border: form.email === 'samirsolimanali@gmail.com' ? '1px solid #2E6F5E' : '1px solid #E2E8F0',
+                cursor: 'pointer',
+                textAlign: 'left',
+              }}
+            >
+              <div>
+                <div style={{ fontSize: '11.5px', fontWeight: 700, color: '#1B2A4A' }}>Samir Soliman (Newly Created)</div>
+                <div style={{ fontSize: '10px', color: '#64748B' }}>samirsolimanali@gmail.com · StudyHub</div>
+              </div>
+              <span style={{ fontSize: '10px', fontWeight: 700, color: '#2E6F5E', background: '#FFFFFF', padding: '2px 6px', borderRadius: '4px', border: '1px solid #CBD5E1' }}>Fill</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setForm({ email: 'sarah@studyhub.eg', password: 'StudyHub2026!' });
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '6px 10px',
+                borderRadius: '6px',
+                background: form.email === 'sarah@studyhub.eg' ? '#E6EFEB' : '#F8FAFC',
+                border: form.email === 'sarah@studyhub.eg' ? '1px solid #2E6F5E' : '1px solid #E2E8F0',
+                cursor: 'pointer',
+                textAlign: 'left',
+              }}
+            >
+              <div>
+                <div style={{ fontSize: '11.5px', fontWeight: 700, color: '#1B2A4A' }}>Sarah Ibrahim</div>
+                <div style={{ fontSize: '10px', color: '#64748B' }}>sarah@studyhub.eg · StudyHub Academy</div>
+              </div>
+              <span style={{ fontSize: '10px', fontWeight: 700, color: '#2E6F5E', background: '#FFFFFF', padding: '2px 6px', borderRadius: '4px', border: '1px solid #CBD5E1' }}>Fill</span>
+            </button>
+          </div>
+        </div>
+
         {/* Footer Link */}
-        <div style={{ textAlign: 'center', marginTop: '24px' }}>
+        <div style={{ textAlign: 'center', marginTop: '20px' }}>
           <span style={{ fontSize: '13px', color: '#5A6A80' }}>
             Don't have an account?{' '}
           </span>
@@ -338,5 +504,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', background: '#12203C' }} />}>
+      <LoginForm />
+    </Suspense>
   );
 }

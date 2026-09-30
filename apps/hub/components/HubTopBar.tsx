@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 export interface HubTopBarProps {
   title: string;
@@ -428,6 +429,88 @@ export default function HubTopBar({
             }}
           />
         )}
+      </div>
+
+      {/* Vertical separator */}
+      <div style={{ width: 1, height: 26, background: '#E3E8EF' }} />
+
+      {/* User Session & Logout in TopBar */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <Link
+          href="/login"
+          title="Switch Account / View Login Screen"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 7,
+            padding: '4px 8px 4px 5px',
+            borderRadius: 8,
+            border: '1px solid #E3E8EF',
+            background: '#F8FAFC',
+            textDecoration: 'none',
+          }}
+        >
+          <div
+            style={{
+              width: 24,
+              height: 24,
+              borderRadius: '50%',
+              background: '#2E6F5E',
+              color: '#FFFFFF',
+              fontSize: 10,
+              fontWeight: 800,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            MG
+          </div>
+          <span style={{ fontSize: 11.5, fontWeight: 700, color: '#1B2A4A' }}>
+            Login / Switch
+          </span>
+        </Link>
+
+        <button
+          type="button"
+          onClick={() => {
+            if (typeof window !== 'undefined') {
+              localStorage.removeItem('bldr_hub_session');
+              window.location.href = '/login';
+            }
+          }}
+          title="Sign out of Central Hub"
+          style={{
+            height: 32,
+            padding: '0 10px',
+            borderRadius: 7,
+            border: '1px solid #FEE2E2',
+            background: '#FEF2F2',
+            color: '#DC2626',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 5,
+            fontSize: 11,
+            fontWeight: 700,
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = '#FEE2E2';
+            e.currentTarget.style.color = '#B91C1C';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = '#FEF2F2';
+            e.currentTarget.style.color = '#DC2626';
+          }}
+        >
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M6 14H3.3a1.3 1.3 0 01-1.3-1.3V3.3A1.3 1.3 0 013.3 2H6" />
+            <path d="M10.7 11.3L14 8l-3.3-3.3" />
+            <path d="M14 8H6" />
+          </svg>
+          <span>Logout</span>
+        </button>
       </div>
     </header>
   );

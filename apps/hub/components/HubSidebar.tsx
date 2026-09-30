@@ -88,6 +88,31 @@ const NAV_ITEMS: NavItemDef[] = [
 export default function HubSidebar({ active }: { active?: string }) {
   const pathname = usePathname();
 
+  const [userName, setUserName] = React.useState('Mohammad Gamal');
+  const [userRole, setUserRole] = React.useState('Super Admin');
+  const [userEmail, setUserEmail] = React.useState('admin@bldr.io');
+
+  React.useEffect(() => {
+    try {
+      const raw = localStorage.getItem('bldr_hub_session');
+      if (raw) {
+        const sess = JSON.parse(raw);
+        if (sess.email) {
+          setUserEmail(sess.email);
+          const namePart = sess.email.split('@')[0];
+          setUserName(namePart.charAt(0).toUpperCase() + namePart.slice(1).replace('.', ' '));
+        }
+      }
+    } catch (e) {}
+  }, []);
+
+  const handleLogout = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('bldr_hub_session');
+      window.location.href = '/login';
+    }
+  };
+
   return (
     <aside
       style={{
@@ -193,42 +218,113 @@ export default function HubSidebar({ active }: { active?: string }) {
         })}
       </nav>
 
-      {/* User Profile Card */}
+      {/* User Profile & Authentication Card */}
       <div
         style={{
           margin: '0 10px 14px',
-          padding: 11,
+          padding: '10px 12px',
           borderRadius: 9,
-          background: 'rgba(255,255,255,0.05)',
+          background: 'rgba(255,255,255,0.06)',
+          border: '1px solid rgba(255,255,255,0.08)',
           display: 'flex',
-          alignItems: 'center',
-          gap: 10,
+          flexDirection: 'column',
+          gap: 8,
         }}
       >
-        <div
-          style={{
-            width: 28,
-            height: 28,
-            borderRadius: '50%',
-            background: '#2E6F5E',
-            color: '#FFFFFF',
-            fontSize: 10.5,
-            fontWeight: 700,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flex: 'none',
-          }}
-        >
-          MG
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div
+            style={{
+              width: 30,
+              height: 30,
+              borderRadius: '50%',
+              background: '#2E6F5E',
+              color: '#FFFFFF',
+              fontSize: 11,
+              fontWeight: 800,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flex: 'none',
+            }}
+          >
+            {userName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'MG'}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.25, minWidth: 0, flex: 1 }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#FFFFFF', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {userName}
+            </span>
+            <span style={{ fontSize: 10, color: '#7E8DA8', fontWeight: 600 }}>
+              {userRole}
+            </span>
+          </div>
+
+          {/* Quick Logout Button */}
+          <button
+            type="button"
+            onClick={handleLogout}
+            title="Sign out / Logout"
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: '#A9B5C9',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '6px',
+              borderRadius: '6px',
+              transition: 'all 0.15s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = '#EF4444';
+              e.currentTarget.style.background = 'rgba(239, 68, 68, 0.18)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = '#A9B5C9';
+              e.currentTarget.style.background = 'none';
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 14H3.3a1.3 1.3 0 01-1.3-1.3V3.3A1.3 1.3 0 013.3 2H6" />
+              <path d="M10.7 11.3L14 8l-3.3-3.3" />
+              <path d="M14 8H6" />
+            </svg>
+          </button>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.25, minWidth: 0 }}>
-          <span style={{ fontSize: 11.5, fontWeight: 700, color: '#FFFFFF', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            Mohammad Gamal
-          </span>
-          <span style={{ fontSize: 10, color: '#7E8DA8', fontWeight: 600 }}>
-            Super Admin
-          </span>
+
+        {/* Quick Action Links: Switch User / Login Page & Explicit Logout */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 7 }}>
+          <Link
+            href="/login"
+            style={{
+              fontSize: 10.5,
+              fontWeight: 600,
+              color: '#7E8DA8',
+              textDecoration: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = '#7E8DA8')}
+          >
+            <span>Login Page &rarr;</span>
+          </Link>
+          <button
+            type="button"
+            onClick={handleLogout}
+            style={{
+              background: 'none',
+              border: 'none',
+              fontSize: 10.5,
+              fontWeight: 700,
+              color: '#EF4444',
+              cursor: 'pointer',
+              padding: 0,
+            }}
+          >
+            Logout
+          </button>
         </div>
       </div>
     </aside>

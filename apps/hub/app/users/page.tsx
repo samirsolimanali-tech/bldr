@@ -969,7 +969,7 @@ export default function UsersPage() {
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: 10 }}>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 <button
                   onClick={() => handleCopyCredentials(createdUser)}
                   style={{
@@ -982,15 +982,38 @@ export default function UsersPage() {
                     fontSize: 13,
                     fontWeight: 700,
                     cursor: 'pointer',
+                    whiteSpace: 'nowrap',
                   }}
                 >
-                  Copy Credentials to Share
+                  Copy Credentials
                 </button>
+                <a
+                  href={`http://localhost:3001/login?sync_email=${encodeURIComponent(createdUser.email)}&sync_pass=${encodeURIComponent(createdUser.password || '')}&sync_venture=${encodeURIComponent(createdUser.ventureId)}&sync_name=${encodeURIComponent(createdUser.name)}&auto=1`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    height: 42,
+                    padding: '0 16px',
+                    borderRadius: 8,
+                    background: '#12203C',
+                    color: '#FFFFFF',
+                    textDecoration: 'none',
+                    fontSize: 13,
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 6,
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  <span>Open Portal & Sign In &rarr;</span>
+                </a>
                 <button
                   onClick={() => setCreatedUser(null)}
                   style={{
                     height: 42,
-                    padding: '0 20px',
+                    padding: '0 16px',
                     borderRadius: 8,
                     background: '#FFFFFF',
                     border: '1px solid #D3DAE4',
