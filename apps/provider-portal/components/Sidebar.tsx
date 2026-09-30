@@ -37,6 +37,29 @@ const GROUPS = ['Main', 'Financials', 'Tools', 'Settings'];
 export default function ProviderSidebar() {
   const path = usePathname();
 
+  const [providerName, setProviderName] = React.useState('StudyHub Academy');
+  const [providerEmail, setProviderEmail] = React.useState('team@studyhub.eg');
+
+  React.useEffect(() => {
+    try {
+      const storedName = localStorage.getItem('bldr_venture_name');
+      const storedEmail = localStorage.getItem('bldr_provider_email');
+      if (storedName) setProviderName(storedName);
+      if (storedEmail) setProviderEmail(storedEmail);
+    } catch (e) {}
+  }, []);
+
+  const handleSignOut = () => {
+    try {
+      localStorage.removeItem('bldr_token');
+      localStorage.removeItem('bldr_provider_email');
+      localStorage.removeItem('bldr_provider_name');
+      localStorage.removeItem('bldr_venture_name');
+      localStorage.removeItem('bldr_venture_id');
+    } catch (e) {}
+    window.location.href = '/login';
+  };
+
   return (
     <aside style={{
       width: 232,
@@ -59,18 +82,22 @@ export default function ProviderSidebar() {
           </div>
           <div>
             <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 14, color: 'var(--text-primary)', lineHeight: 1.2 }}>bldr</div>
-            <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--brand)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Provider</div>
+            <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--brand)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Financial Portal</div>
           </div>
         </div>
       </div>
 
       {/* Provider info badge */}
       <div style={{ margin: '8px 0', background: 'var(--bg-elevated)', borderRadius: 8, padding: '10px 12px', border: '1px solid var(--border)' }}>
-        <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>
-          Provider Account
+        <div style={{ fontSize: 10.5, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>
+          Brand Account
         </div>
-        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>StudyHub Academy</div>
-        <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>ahmed@studyhub.io</div>
+        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {providerName}
+        </div>
+        <div style={{ fontSize: 11, color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {providerEmail}
+        </div>
       </div>
 
       {/* Navigation */}
@@ -121,7 +148,7 @@ export default function ProviderSidebar() {
       {/* Footer */}
       <div style={{ paddingTop: 16, borderTop: '1px solid var(--border)' }}>
         <button
-          onClick={() => window.location.href = '/login'}
+          onClick={handleSignOut}
           style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: 'var(--danger)', fontWeight: 500, padding: '8px 12px', borderRadius: 8 }}
         >
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
