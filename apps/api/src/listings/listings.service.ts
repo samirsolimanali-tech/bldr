@@ -53,7 +53,7 @@ export class ListingsService {
     return this.prisma.listing.create({
       data: {
         ...dto,
-        currency: dto.currency || 'USD',
+        currency: dto.currency || 'EGP',
         providerId,
       },
     });

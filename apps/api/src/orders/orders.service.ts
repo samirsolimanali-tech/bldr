@@ -166,7 +166,7 @@ export class OrdersService {
         customerEmail: dto.customerEmail || 'customer@redirect-sale.com',
         customerName: dto.customerName,
         amount: dto.amount,
-        currency: trackingEvent.listing.currency || 'USD',
+        currency: trackingEvent.listing.currency || 'EGP',
         status: OrderStatus.PENDING_VERIFICATION,
         source: OrderSource.REDIRECT,
         externalReference: dto.externalReference || dto.clickId,

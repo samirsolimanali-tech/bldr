@@ -171,7 +171,7 @@ async function main() {
       await prisma.listing.create({
         data: {
           ...listing,
-          currency: 'USD',
+          currency: 'EGP',
           isPublished: true,
           providerId: houseBrand.id,
         },
@@ -276,7 +276,7 @@ async function main() {
       await prisma.listing.create({
         data: {
           ...listing,
-          currency: 'USD',
+          currency: 'EGP',
           isPublished: true,
           providerId: sampleProvider.id,
         },

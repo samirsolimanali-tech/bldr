@@ -146,7 +146,7 @@ export class AdminService {
         title: dto.title,
         description: dto.description || '',
         price: dto.price || 0,
-        currency: dto.currency || 'USD',
+        currency: dto.currency || 'EGP',
         category: dto.category || 'General',
         tags: Array.isArray(dto.tags) ? dto.tags : (dto.tags ? dto.tags.split(',').map((t: string) => t.trim()) : []),
         mediaUrls: dto.mediaUrls || [],

@@ -15,13 +15,37 @@ export async function POST(request: Request) {
     // ── PRICE & CATALOG SECURITY ──────────────────────────────────────────────
     // Checkout must NEVER take price from client request body or URL parameters.
     // Price, currency, title, and owning venture MUST be resolved strictly on the server.
-    const matchedProduct = PRODUCTS_CATALOG.find(
+    let matchedProduct: any = PRODUCTS_CATALOG.find(
       (p) => p.id === productId || p.slug === productId || p.paySlug === productId
     );
 
+    // Fall back to database API if not found in static catalog
+    if (!matchedProduct && productId) {
+      try {
+        const dbRes = await fetch(`${API_BASE}/listings/${productId}`);
+        if (dbRes.ok) {
+          const item = await dbRes.json();
+          if (item) {
+            matchedProduct = {
+              id: item.id,
+              slug: item.id,
+              paySlug: item.id,
+              title: item.title,
+              priceEGP: Number(item.price),
+              provider: item.provider?.name || 'bldr Partner',
+              providerCode: item.provider?.slug?.toUpperCase() || 'BLDR',
+              ventureId: item.provider?.slug?.toUpperCase() || 'BLDR',
+            };
+          }
+        }
+      } catch {
+        // Fallback continues
+      }
+    }
+
     if (!matchedProduct) {
       return NextResponse.json(
-        { error: `Invalid product or listing ID "${productId}". Product not found in catalog.` },
+        { error: `Invalid product or listing ID "${productId}". Product not found in catalog or database.` },
         { status: 400 }
       );
     }
