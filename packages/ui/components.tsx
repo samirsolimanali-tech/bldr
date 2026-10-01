@@ -235,6 +235,7 @@ export function BldrNav({ lang = 'EN', onLanguageChange, onStartProject }: BldrN
             textDecoration: 'none',
           }}
         >
+          <div style={{ width: 34, height: 34, borderRadius: 8, background: '#D10721', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 800 }}>b/</div>
           <span style={{ fontSize: 22, fontWeight: 800, letterSpacing: -0.5, color: '#14141A' }}>bldr</span>
         </a>
 
@@ -817,29 +818,9 @@ export function BldrFooter({ lang = 'EN' }: { lang?: 'EN' | 'AR' } = {}) {
         {/* Divider */}
         <div style={{ height: 1, background: `linear-gradient(90deg, ${tokens.colors.gradientStart}, ${tokens.colors.gradientEnd})`, margin: '40px 0 24px' }} />
 
-        {/* Payment and Compliance Badges */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
-            {['VISA', 'Mastercard', 'Meeza', 'Mobile Wallets', 'Fawry Pay', 'Geidea'].map((badge) => (
-              <span key={badge} style={{
-                height: 26,
-                padding: '0 10px',
-                border: '1px solid rgba(255,255,255,0.18)',
-                borderRadius: 6,
-                display: 'inline-flex',
-                alignItems: 'center',
-                fontSize: 10.5,
-                fontWeight: 500,
-                letterSpacing: '0.04em',
-                color: 'rgba(255,255,255,0.7)',
-              }}>
-                {badge}
-              </span>
-            ))}
-          </div>
-          <div style={{ fontSize: 12, fontWeight: 300, color: 'rgba(255,255,255,0.5)' }}>
-            © {new Date().getFullYear()} bldr. Operated by Evolve bldr for Business Management, Giza, Egypt.
-          </div>
+        {/* Copyright */}
+        <div style={{ fontSize: 12, fontWeight: 300, color: 'rgba(255,255,255,0.5)', textAlign: 'center' }}>
+          © {new Date().getFullYear()} bldr. Operated by Evolve bldr for Business Management, Giza, Egypt.
         </div>
       </div>
     </footer>

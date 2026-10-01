@@ -98,14 +98,7 @@ export default function Footer() {
         <div style={{ height: 1, background: 'linear-gradient(90deg, #D10721, #FD9426)', margin: '40px 0 24px' }} />
 
         {/* Bottom */}
-        <div className="bldr-footer-bottom" style={{ display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-            {['VISA', 'Mastercard', 'Meeza', 'Mobile Wallets', 'Fawry Pay', 'Geidea'].map((badge) => (
-              <span key={badge} style={{ height: 24, padding: '0 8px', border: '1px solid rgba(255,255,255,0.18)', borderRadius: 4, display: 'inline-flex', alignItems: 'center', fontSize: 10, color: 'rgba(255,255,255,0.7)' }}>
-                {badge}
-              </span>
-            ))}
-          </div>
+        <div className="bldr-footer-bottom" style={{ textAlign: 'center' }}>
           <p style={{ margin: 0, fontSize: 12, color: 'rgba(255, 255, 255, 0.5)' }}>
             &copy; {new Date().getFullYear()} bldr. Operated by Evolve bldr for Business Management, Giza, Egypt.
           </p>
