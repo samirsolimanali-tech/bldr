@@ -295,6 +295,147 @@ async function main() {
     console.log(`  [OK] Sample listing: ${listing.title} (${listing.purchaseType})`);
   }
 
+  // ─── Seed Authoritative PostgreSQL Products (Single Source of Truth) ────────
+  console.log('\n[bldr] Seeding authoritative products table...');
+
+  // 1. StudyHub Venture
+  const studyhub = await prisma.provider.upsert({
+    where: { slug: 'studyhub' },
+    update: { cardWalletGateway: CardWalletGateway.GEIDEA, fawryEnabled: true },
+    create: {
+      slug: 'studyhub',
+      name: 'StudyHub',
+      tagline: 'Tech Bootcamps & Professional Engineering Cohorts',
+      status: ProviderStatus.APPROVED,
+      isHouseBrand: true,
+      cardWalletGateway: CardWalletGateway.GEIDEA,
+      fawryEnabled: true,
+    },
+  });
+
+  // 2. Apex Classes Venture
+  const apexClasses = await prisma.provider.upsert({
+    where: { slug: 'apexclasses' },
+    update: { cardWalletGateway: CardWalletGateway.GEIDEA, fawryEnabled: true },
+    create: {
+      slug: 'apexclasses',
+      name: 'Apex Classes',
+      tagline: 'Premier Secondary Science & Mathematics Academy',
+      status: ProviderStatus.APPROVED,
+      isHouseBrand: true,
+      cardWalletGateway: CardWalletGateway.GEIDEA,
+      fawryEnabled: true,
+    },
+  });
+
+  // 3. EL HESA Venture
+  const elHesa = await prisma.provider.upsert({
+    where: { slug: 'elhesa' },
+    update: { cardWalletGateway: CardWalletGateway.GEIDEA, fawryEnabled: true },
+    create: {
+      slug: 'elhesa',
+      name: 'EL HESA',
+      tagline: 'IGCSE & International Qualifications Excellence Hub',
+      status: ProviderStatus.APPROVED,
+      isHouseBrand: true,
+      cardWalletGateway: CardWalletGateway.GEIDEA,
+      fawryEnabled: true,
+    },
+  });
+
+  // 4. CareerHub Venture
+  const careerHub = await prisma.provider.upsert({
+    where: { slug: 'careerhub' },
+    update: { cardWalletGateway: CardWalletGateway.GEIDEA, fawryEnabled: true },
+    create: {
+      slug: 'careerhub',
+      name: 'CareerHub',
+      tagline: 'Executive Finance, Strategy & Leadership Accelerators',
+      status: ProviderStatus.APPROVED,
+      isHouseBrand: true,
+      cardWalletGateway: CardWalletGateway.GEIDEA,
+      fawryEnabled: true,
+    },
+  });
+
+  const authoritativeProducts = [
+    {
+      ventureId: studyhub.id,
+      slug: 'sh-8k2m9q',
+      title_en: 'Full-Stack Web Engineering Bootcamp (12 Weeks)',
+      title_ar: 'معسكر هندسة وتطوير الويب الشامل (١٢ أسبوع)',
+      description: 'Intensive engineering bootcamp with live instruction, code reviews, and enterprise React/Node/Postgres curriculum.',
+      priceMinor: 480000, // 4,800.00 EGP
+      currency: 'EGP',
+      saleMode: 'DIRECT',
+      status: 'ACTIVE',
+    },
+    {
+      ventureId: studyhub.id,
+      slug: 'sh-uiux-01',
+      title_en: 'UI/UX Design Systems & Product Strategy',
+      title_ar: 'تصميم واجهات وتجربة المستخدم واستراتيجية المنتج',
+      description: 'Master Figma design systems, usability benchmarking, and modern product prototyping.',
+      priceMinor: 320000, // 3,200.00 EGP
+      currency: 'EGP',
+      saleMode: 'DIRECT',
+      status: 'ACTIVE',
+    },
+    {
+      ventureId: apexClasses.id,
+      slug: 'ac-4p9x1y',
+      title_en: 'Advanced Thanawiya Amma Physics Prep Cohort',
+      title_ar: 'المعسكر المكثف لفيزياء الثانوية العامة مع مستر أحمد',
+      description: 'Comprehensive exam preparation covering modern physics, electromagnetism, and problem-solving workshops.',
+      priceMinor: 120000, // 1,200.00 EGP
+      currency: 'EGP',
+      saleMode: 'DIRECT',
+      status: 'ACTIVE',
+    },
+    {
+      ventureId: apexClasses.id,
+      slug: 'ac-math-02',
+      title_en: 'Thanawiya Amma Pure & Applied Mathematics Mastery',
+      title_ar: 'شرح وتدريبات الرياضيات البحتة والتطبيقية للثانوية العامة',
+      description: 'In-depth calculus, algebra, and mechanics training tailored to Egyptian national curriculum examinations.',
+      priceMinor: 150000, // 1,500.00 EGP
+      currency: 'EGP',
+      saleMode: 'DIRECT',
+      status: 'ACTIVE',
+    },
+    {
+      ventureId: elHesa.id,
+      slug: 'eh-9w3z8t',
+      title_en: 'Executive IGCSE Business Management Intensive',
+      title_ar: 'دورة إدارة الأعمال المكثفة لشهادة الـ IGCSE الدولية',
+      description: 'Cambridge & Edexcel accredited revision sprint with past-paper breakdown and case-study analysis.',
+      priceMinor: 220000, // 2,200.00 EGP
+      currency: 'EGP',
+      saleMode: 'DIRECT',
+      status: 'ACTIVE',
+    },
+    {
+      ventureId: careerHub.id,
+      slug: 'ch-fin-04',
+      title_en: 'Corporate Financial Modeling & Valuation Associate',
+      title_ar: 'برنامج النمذجة والتقييم المالي الاحترافي للشركات',
+      description: 'Wall Street-grade DCF, LBO, and 3-statement modeling applied to MENA capital markets.',
+      priceMinor: 390000, // 3,900.00 EGP
+      currency: 'EGP',
+      saleMode: 'DIRECT',
+      status: 'ACTIVE',
+    },
+  ];
+
+  for (const prod of authoritativeProducts) {
+    const p = await (prisma as any).product.upsert({
+      where: { slug: prod.slug },
+      update: prod,
+      create: prod,
+    });
+    console.log(`  [OK] Authoritative Product: ${p.title_en} (${p.slug}) -> EGP ${(p.priceMinor / 100).toFixed(2)}`);
+  }
+
 
   console.log('\n[bldr] Seeding complete!');
   console.log('─'.repeat(50));

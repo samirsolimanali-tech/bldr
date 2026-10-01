@@ -17,6 +17,7 @@ import { AdminModule } from './admin/admin.module';
 import { SimulationModule } from './simulation/simulation.module';
 import { CheckoutModule } from './checkout/checkout.module';
 import { ActivationCodesModule } from './activation-codes/activation-codes.module';
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { ActivationCodesModule } from './activation-codes/activation-codes.modul
     SimulationModule,
     CheckoutModule,   // Model B: external checkout-session API (POST /v1/checkout/sessions)
     ActivationCodesModule, // Single-use hashed activation code redemption & failure audit
+    ProductsModule,   // PostgreSQL single source of truth product catalog & audit
   ],
 })
 export class AppModule {}

@@ -353,27 +353,35 @@ export class CheckoutSessionsService {
     // 2. Upsert Order in database so ledger / balances / settlement statement include it
     try {
       const existingOrder = await this.prisma.order.findUnique({ where: { id: orderId } });
+      const meta = (session.metadata || {}) as Record<string, any>;
+      const lineItems = (session.lineItems as any[]) || [];
+      const firstItem = lineItems[0] || {};
+      const productId = meta.product_id || null;
+      const productTitle = meta.product_title || firstItem.title || 'Course / Offering';
+      const productPriceMinor = session.amountPiasters;
+
       if (!existingOrder) {
         const listing = await this.prisma.listing.findFirst({
           where: { providerId: venture?.id },
         });
 
-        if (listing) {
-          await this.prisma.order.create({
-            data: {
-              id: orderId,
-              listingId: listing.id,
-              providerId: venture?.id || session.providerId,
-              customerEmail: session.customerEmail,
-              customerName: session.customerName || 'Valued Learner',
-              amount: amountEgp,
-              currency: session.currency || 'EGP',
-              status: 'PAID',
-              gatewayUsed: paymentMethod === 'kiosk' ? 'FAWRY' : 'GEIDEA',
-              checkoutSessionId: session.id,
-            },
-          });
-        }
+        await (this.prisma as any).order.create({
+          data: {
+            id: orderId,
+            listingId: listing?.id || null,
+            productId: productId || null,
+            productTitle: productTitle || null,
+            productPriceMinor: productPriceMinor || null,
+            providerId: venture?.id || session.providerId,
+            customerEmail: session.customerEmail,
+            customerName: session.customerName || 'Valued Learner',
+            amount: amountEgp,
+            currency: session.currency || 'EGP',
+            status: 'PAID',
+            gatewayUsed: paymentMethod === 'kiosk' ? 'FAWRY' : 'GEIDEA',
+            checkoutSessionId: session.id,
+          },
+        });
       } else {
         await this.prisma.order.update({
           where: { id: orderId },
@@ -544,16 +552,54 @@ export class CheckoutSessionsService {
   // ─── Central Authoritative Catalog Resolution (One Checkout Service) ─────────
   async resolveCheckoutProduct(query: { slug?: string; productId?: string }) {
     const { slug, productId } = query;
+
+    // 1. Authoritative PostgreSQL Products table
+    if (this.prisma && (this.prisma as any).product) {
+      const product = await (this.prisma as any).product.findFirst({
+        where: {
+          OR: [
+            ...(productId ? [{ id: productId }, { slug: productId.toLowerCase() }] : []),
+            ...(slug ? [{ id: slug }, { slug: slug.toLowerCase() }] : []),
+          ],
+        },
+        include: { provider: true },
+      });
+
+      if (product) {
+        const venture = product.provider;
+        return {
+          found: true,
+          productId: product.id,
+          slug: product.slug,
+          title: product.title_en,
+          titleAr: product.title_ar,
+          priceEGP: product.priceMinor / 100,
+          currency: product.currency,
+          amountPiasters: product.priceMinor,
+          ventureId: venture?.id || product.ventureId,
+          ventureCode: venture?.slug?.toUpperCase() || product.ventureId,
+          ventureName: venture?.name || 'bldr',
+          cardWalletGateway: (venture?.cardWalletGateway?.toLowerCase() as 'geidea' | 'paymob') ?? 'geidea',
+          fawryEnabled: venture?.fawryEnabled ?? true,
+          codeActivationEnabled: venture?.codeActivationEnabled ?? true,
+          saleMode: product.saleMode || 'DIRECT',
+          redirectUrl: product.redirectUrl || null,
+          ctaLabel: 'Enroll Now',
+          ctaLabelAr: 'سجل الآن',
+        };
+      }
+    }
+
     let listing: any = null;
 
-    if (productId) {
+    if (productId && this.prisma.listing) {
       listing = await this.prisma.listing.findUnique({
         where: { id: productId },
         include: { provider: true },
       });
     }
 
-    if (!listing && slug) {
+    if (!listing && slug && this.prisma.listing) {
       listing = await this.prisma.listing.findFirst({
         where: {
           OR: [

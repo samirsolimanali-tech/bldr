@@ -199,4 +199,120 @@ describe('PayoutsService & Controller - Dual Control Settlement Security', () =>
     assert.equal(auditLogs[1].action, 'POST_JOURNAL');
     assert.equal(auditLogs[0].actorId, secondApproverId);
   });
+
+  test('role required: non-approver role is strictly rejected by RolesGuard', async () => {
+    const { RolesGuard } = await import('../auth/guards/roles.guard');
+    const { Reflector } = await import('@nestjs/core');
+
+    const reflector = new Reflector();
+    const guard = new RolesGuard(reflector);
+
+    const nonApproverContext = {
+      getHandler: () => PayoutsController.prototype.approveBatch,
+      getClass: () => PayoutsController,
+      switchToHttp: () => ({
+        getRequest: () => ({
+          user: { sub: 'creator@bldr.io', role: UserRole.PROVIDER },
+        }),
+      }),
+    } as any;
+
+    assert.throws(
+      () => guard.canActivate(nonApproverContext),
+      (err: any) => {
+        assert.ok(err instanceof ForbiddenException);
+        assert.match(err.message, /Required role: APPROVER/);
+        return true;
+      },
+    );
+
+    const approverContext = {
+      getHandler: () => PayoutsController.prototype.approveBatch,
+      getClass: () => PayoutsController,
+      switchToHttp: () => ({
+        getRequest: () => ({
+          user: { sub: 'approver@bldr.io', role: UserRole.APPROVER },
+        }),
+      }),
+    } as any;
+
+    assert.equal(guard.canActivate(approverContext), true);
+  });
+
+  test('interim single-operator override allows self-approval in non-production and writes an OVERRIDE audit record', async () => {
+    const origEnv = process.env.ALLOW_SINGLE_OPERATOR_DUAL_CONTROL;
+    const origNodeEnv = process.env.NODE_ENV;
+    process.env.ALLOW_SINGLE_OPERATOR_DUAL_CONTROL = 'true';
+    process.env.NODE_ENV = 'development';
+
+    try {
+      const creatorId = 'solo_dev@bldr.io';
+      const batchId = 'batch-override-dev-001';
+
+      batchesDb.set(batchId, {
+        id: batchId,
+        providerId: 'prov-1',
+        grossAmount: 10000,
+        netAmount: 9500,
+        status: 'PENDING',
+        note: JSON.stringify({
+          batchRef: 'STL-2026-DEV',
+          createdBy: creatorId,
+        }),
+      });
+
+      const res = await payoutsService.approveAndPostSettlementBatch(batchId, creatorId);
+      assert.equal(res.success, true);
+      assert.equal(res.approvedBy, creatorId);
+
+      const logs = payoutsService.getAuditLogs();
+      const overrideLog = logs.find((l) => l.action === 'OVERRIDE');
+      assert.ok(overrideLog, 'Audit log must contain an OVERRIDE entry');
+      assert.equal(overrideLog?.actorId, creatorId);
+      assert.equal(overrideLog?.details.policy, 'INTERIM_SINGLE_OPERATOR');
+      assert.equal(overrideLog?.details.risk, 'HIGH_RISK_OVERRIDE');
+    } finally {
+      process.env.ALLOW_SINGLE_OPERATOR_DUAL_CONTROL = origEnv;
+      process.env.NODE_ENV = origNodeEnv;
+    }
+  });
+
+  test('single-operator override is strictly blocked in production even when flag is set', async () => {
+    const origEnv = process.env.ALLOW_SINGLE_OPERATOR_DUAL_CONTROL;
+    const origNodeEnv = process.env.NODE_ENV;
+    process.env.ALLOW_SINGLE_OPERATOR_DUAL_CONTROL = 'true';
+    process.env.NODE_ENV = 'production';
+
+    try {
+      const creatorId = 'solo_dev_prod@bldr.io';
+      const batchId = 'batch-override-prod-002';
+
+      batchesDb.set(batchId, {
+        id: batchId,
+        providerId: 'prov-1',
+        grossAmount: 10000,
+        netAmount: 9500,
+        status: 'PENDING',
+        note: JSON.stringify({
+          batchRef: 'STL-2026-PROD',
+          createdBy: creatorId,
+        }),
+      });
+
+      await assert.rejects(
+        async () => {
+          await payoutsService.approveAndPostSettlementBatch(batchId, creatorId);
+        },
+        (err: any) => {
+          assert.ok(err instanceof ForbiddenException);
+          assert.match(err.message, /strictly prohibited in production/i);
+          return true;
+        },
+      );
+    } finally {
+      process.env.ALLOW_SINGLE_OPERATOR_DUAL_CONTROL = origEnv;
+      process.env.NODE_ENV = origNodeEnv;
+    }
+  });
 });
+

@@ -315,7 +315,7 @@ export default function AdminProductsPage() {
         <header style={{ position: 'sticky', top: 0, zIndex: 40, background: 'white', borderBottom: '1px solid var(--border)', padding: '0 32px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
             <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 700, color: 'var(--text-primary)' }}>
-              Catalog & Aggregated Marketplace
+              Multi-Brand Venture Catalog
             </h1>
           </div>
           <button onClick={() => setShowAdd(true)} style={{ background: 'var(--brand)', color: 'white', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -324,7 +324,7 @@ export default function AdminProductsPage() {
         </header>
 
         <main style={{ flex: 1, padding: '32px' }}>
-          {/* Aggregator Authority & RBAC Isolation Notice */}
+          {/* Multi-Brand Authority & RBAC Isolation Notice */}
           <div
             style={{
               background: '#F0F9FF',
@@ -338,7 +338,7 @@ export default function AdminProductsPage() {
             }}
           >
             <div style={{ fontSize: 13, color: '#0369A1', lineHeight: 1.5 }}>
-              <strong>bldr Store Catalog Aggregator:</strong> The bldr store admin can curate both first-party listings and cross-brand courses originating from partner ventures (e.g. StudyHub, EL HESA, Apex Classes) to feature on the central marketplace surface.
+              <strong>Multi-Brand Venture Showcase:</strong> The bldr store admin can curate both first-party offerings and cross-brand programs originating from internal ventures (e.g. StudyHub, EL HESA, Apex Classes, CareerHub) to showcase across official storefront surfaces.
             </div>
             <div style={{ fontSize: 12, color: '#0284C7' }}>
               <strong>Strict RBAC Isolation (ADR-001):</strong> Catalog visibility is strictly content-level. Partner brands' financial statements, settlement balances, and gateway credentials remain protected and isolated inside the Central Payment Hub.
@@ -349,7 +349,7 @@ export default function AdminProductsPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 28 }}>
             {[
               { label: 'Total Catalog Listings', val: products.length, sub: `${firstPartyCount} 1st-party • ${partnerCount} partner` },
-              { label: 'Live on bldr Storefront', val: aggregatedCount, sub: 'Showcased to marketplace students' },
+              { label: 'Live on bldr Storefront', val: aggregatedCount, sub: 'Showcased across storefronts' },
               { label: 'Spotlight Featured', val: products.filter(p => p.featuredOnBldr).length, sub: 'Featured on bldr homepage banner' },
               { label: 'Total Enrolled Learners', val: products.reduce((s, p) => s + p.enrolled, 0).toLocaleString(), sub: 'Across all listed programs' },
             ].map(s => (

@@ -30,23 +30,21 @@ async function ensureAdminToken(): Promise<string | null> {
 
 type Tab =
   | 'content'
-  | 'products'
-  | 'providers'
   | 'orders'
   | 'leads'
+  | 'providers'
   | 'commissions'
   | 'payouts'
   | 'settings';
 
 const TABS: { id: Tab; label: string; icon: string; desc: string }[] = [
-  { id: 'content',     label: 'Storefront CMS',    icon: '◈',  desc: 'Hero copy, project carousel, specialisms, brand messaging' },
-  { id: 'products',    label: 'Products & Services', icon: '⊞', desc: 'Create, edit, price, and publish catalog offerings' },
-  { id: 'providers',   label: 'Providers',         icon: '▦',  desc: 'Approve, suspend, and manage partner accounts' },
-  { id: 'orders',      label: 'Orders & Audit',    icon: '≡',  desc: 'Audit, settle, and approve platform and referral sales' },
-  { id: 'leads',       label: 'Leads & Inquiries', icon: '◎',  desc: 'Inbound quote requests and client CRM leads' },
-  { id: 'commissions', label: 'Commissions',       icon: '▲',  desc: 'Global and per-provider platform revenue rates' },
-  { id: 'payouts',     label: 'Payouts',           icon: '⊛',  desc: 'Provider payout settlements and banking records' },
-  { id: 'settings',    label: 'Platform Settings', icon: '⊙',  desc: 'Simulation mode, API keys, and environment config' },
+  { id: 'content',     label: 'Storefront CMS',        icon: '◈', desc: 'Hero copy, project carousel, specialisms, brand messaging' },
+  { id: 'orders',      label: 'Orders & Audit',        icon: '≡', desc: 'Authoritative transaction ledger in Admin Orders' },
+  { id: 'leads',       label: 'Leads & Inquiries',     icon: '◎', desc: 'Client CRM leads in Admin Leads' },
+  { id: 'providers',   label: 'Providers',             icon: '▦', desc: 'Partner accounts in Admin Providers' },
+  { id: 'commissions', label: 'Commissions',           icon: '▲', desc: 'Fee schedules managed in Central Payment Hub' },
+  { id: 'payouts',     label: 'Settlements & Payouts', icon: '⊛', desc: 'Dual-control settlements managed in Central Payment Hub' },
+  { id: 'settings',    label: 'Platform Settings',     icon: '⊙', desc: 'Venture & gateway config in Central Payment Hub' },
 ];
 
 // ─── Shared helpers ───────────────────────────────────────────────────────────
@@ -505,1090 +503,200 @@ function ContentTab() {
   );
 }
 
-// ─── TAB: Products & Services (Full CRUD Studio) ──────────────────────────────
-function ProductsTab() {
-  const [products, setProducts] = useState<any[]>([]);
-  const [providers, setProviders] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('');
-  const [typeFilter, setTypeFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
-  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
-  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
-
-  // Modal State
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState({
-    title: '',
-    description: '',
-    price: 1500,
-    currency: 'USD',
-    category: 'Education',
-    tags: '',
-    purchaseType: 'NATIVE',
-    engagementType: 'BUY_NOW',
-    redirectUrl: '',
-    providerId: '',
-    isPublished: true,
-    isFeatured: false,
-  });
-
-  const fetchProducts = async () => {
-    const token = await ensureAdminToken();
-    setLoading(true);
-    try {
-      const res = await fetch(`${API}/admin/listings`, {
-        headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setProducts(data || []);
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchProviders = async () => {
-    const token = await ensureAdminToken();
-    try {
-      const res = await fetch(`${API}/admin/providers?limit=50`, {
-        headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setProviders(data.data || []);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  useEffect(() => {
-    fetchProducts();
-    fetchProviders();
-  }, []);
-
-  const openCreateModal = () => {
-    const defaultProvider = providers.find(p => p.isHouseBrand) || providers[0];
-    setForm({
-      title: '',
-      description: '',
-      price: 2500,
-      currency: 'USD',
-      category: 'Education',
-      tags: '',
-      purchaseType: 'NATIVE',
-      engagementType: 'BUY_NOW',
-      redirectUrl: '',
-      providerId: defaultProvider?.id || '',
-      isPublished: true,
-      isFeatured: false,
-    });
-    setEditingId(null);
-    setIsModalOpen(true);
-  };
-
-  const openEditModal = (p: any) => {
-    setForm({
-      title: p.title || '',
-      description: p.description || '',
-      price: Number(p.price) || 0,
-      currency: p.currency || 'USD',
-      category: p.category || 'Education',
-      tags: Array.isArray(p.tags) ? p.tags.join(', ') : (p.tags || ''),
-      purchaseType: p.purchaseType || 'NATIVE',
-      engagementType: p.engagementType || 'BUY_NOW',
-      redirectUrl: p.redirectUrl || '',
-      providerId: p.providerId || '',
-      isPublished: p.isPublished ?? true,
-      isFeatured: p.isFeatured ?? false,
-    });
-    setEditingId(p.id);
-    setIsModalOpen(true);
-  };
-
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const token = await ensureAdminToken();
-    const payload = {
-      ...form,
-      price: Number(form.price),
-      tags: form.tags.split(',').map((t: string) => t.trim()).filter(Boolean),
-      redirectUrl: form.purchaseType === 'REDIRECT' ? form.redirectUrl : null,
-    };
-
-    try {
-      const url = editingId ? `${API}/admin/listings/${editingId}` : `${API}/admin/listings`;
-      const method = editingId ? 'PATCH' : 'POST';
-      const res = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.message || 'Failed to save product');
-      }
-
-      setFeedback({
-        type: 'success',
-        message: editingId ? 'Product updated successfully.' : 'New product created and live in catalog.',
-      });
-      setIsModalOpen(false);
-      fetchProducts();
-      setTimeout(() => setFeedback(null), 4000);
-    } catch (err: any) {
-      setFeedback({ type: 'error', message: err.message || 'Error saving product' });
-    }
-  };
-
-  const handleTogglePublish = async (id: string) => {
-    const token = await ensureAdminToken();
-    setActionLoadingId(id);
-    try {
-      const res = await fetch(`${API}/admin/listings/${id}/toggle-publish`, {
-        method: 'PATCH',
-        headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-      });
-      if (res.ok) {
-        fetchProducts();
-      }
-    } finally {
-      setActionLoadingId(null);
-    }
-  };
-
-  const handleToggleFeatured = async (id: string) => {
-    const token = await ensureAdminToken();
-    setActionLoadingId(id);
-    try {
-      const res = await fetch(`${API}/admin/listings/${id}/toggle-featured`, {
-        method: 'PATCH',
-        headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-      });
-      if (res.ok) {
-        fetchProducts();
-      }
-    } finally {
-      setActionLoadingId(null);
-    }
-  };
-
-  const handleDelete = async (id: string, title: string) => {
-    if (!confirm(`Are you sure you want to delete "${title}"? This action cannot be undone.`)) return;
-    const token = await ensureAdminToken();
-    setActionLoadingId(id);
-    try {
-      const res = await fetch(`${API}/admin/listings/${id}`, {
-        method: 'DELETE',
-        headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-      });
-      if (res.ok) {
-        setFeedback({ type: 'success', message: `Product "${title}" removed.` });
-        fetchProducts();
-        setTimeout(() => setFeedback(null), 3000);
-      }
-    } finally {
-      setActionLoadingId(null);
-    }
-  };
-
-  // Filtered list
-  const filtered = products.filter(p => {
-    if (categoryFilter && p.category?.toLowerCase() !== categoryFilter.toLowerCase()) return false;
-    if (typeFilter && p.purchaseType !== typeFilter) return false;
-    if (statusFilter === 'PUBLISHED' && !p.isPublished) return false;
-    if (statusFilter === 'DRAFT' && p.isPublished) return false;
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      const match =
-        p.title?.toLowerCase().includes(q) ||
-        p.description?.toLowerCase().includes(q) ||
-        p.category?.toLowerCase().includes(q) ||
-        p.provider?.name?.toLowerCase().includes(q);
-      if (!match) return false;
-    }
-    return true;
-  });
-
-  const categories = Array.from(new Set(products.map(p => p.category).filter(Boolean)));
-  const totalCount = products.length;
-  const publishedCount = products.filter(p => p.isPublished).length;
-  const nativeCount = products.filter(p => p.purchaseType === 'NATIVE').length;
-  const redirectCount = products.filter(p => p.purchaseType === 'REDIRECT').length;
-
+// ─── Shared Read-Only Owning Page Nav Card ────────────────────────────────────
+function ReadOnlyNavCard({
+  title,
+  icon,
+  badgeText,
+  owningSystem,
+  targetUrl,
+  actionLabel,
+  description,
+  features,
+}: {
+  title: string;
+  icon: string;
+  badgeText: string;
+  owningSystem: string;
+  targetUrl: string;
+  actionLabel: string;
+  description: string;
+  features: string[];
+}) {
   return (
-    <div>
-      {/* 4 KPI Summary Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
-        <div className="stat-card">
-          <div className="stat-card-label">Total Offerings</div>
-          <div className="stat-card-value">{totalCount}</div>
-          <div className="stat-card-sub">Active catalog listings</div>
+    <div style={{ maxWidth: 780, margin: '24px auto', padding: '36px 32px', background: 'white', borderRadius: 16, border: '1px solid var(--border)', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ width: 44, height: 44, borderRadius: 10, background: '#F0F9FF', color: 'var(--brand)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 700 }}>
+            {icon}
+          </div>
+          <div>
+            <h2 style={{ fontSize: 19, fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
+              {title}
+            </h2>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
+              Authoritative Owner: <strong style={{ color: 'var(--text-primary)' }}>{owningSystem}</strong>
+            </div>
+          </div>
         </div>
-        <div className="stat-card">
-          <div className="stat-card-label">Live on Storefront</div>
-          <div className="stat-card-value" style={{ color: 'var(--success)' }}>{publishedCount}</div>
-          <div className="stat-card-sub">Published to customers</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-card-label">Native Checkout</div>
-          <div className="stat-card-value" style={{ color: 'var(--brand)' }}>{nativeCount}</div>
-          <div className="stat-card-sub">Direct Geidea / Fawry</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-card-label">External Referrals</div>
-          <div className="stat-card-value" style={{ color: 'var(--accent)' }}>{redirectCount}</div>
-          <div className="stat-card-sub">HMAC tracked webhooks</div>
-        </div>
+        <span style={{ fontSize: 11, fontWeight: 700, padding: '4px 10px', borderRadius: 999, background: '#EFF6FF', color: '#1D4ED8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          {badgeText}
+        </span>
       </div>
 
-      {feedback && (
-        <div style={{
-          padding: '12px 18px',
-          borderRadius: 8,
-          marginBottom: 20,
-          fontSize: 14,
-          fontWeight: 600,
-          background: feedback.type === 'success' ? 'var(--success-bg)' : 'var(--danger-bg)',
-          color: feedback.type === 'success' ? 'var(--success)' : 'var(--danger)',
-          border: `1px solid ${feedback.type === 'success' ? '#C2E4D2' : '#F8CCC5'}`,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <span>{feedback.message}</span>
-          <button onClick={() => setFeedback(null)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'inherit', fontWeight: 700 }}>✕</button>
-        </div>
-      )}
+      <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.6, margin: '0 0 24px' }}>
+        {description}
+      </p>
 
-      {/* Filter and Action Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 14, marginBottom: 20, flexWrap: 'wrap' }}>
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', flex: 1 }}>
-          <input
-            className="form-input"
-            placeholder="Search by title, provider, tag…"
-            style={{ maxWidth: 280 }}
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-          />
-          <select
-            className="form-input"
-            style={{ maxWidth: 170 }}
-            value={categoryFilter}
-            onChange={e => setCategoryFilter(e.target.value)}
-          >
-            <option value="">All Categories</option>
-            {categories.map((c: any) => (
-              <option key={c} value={c}>{c}</option>
-            ))}
-          </select>
-          <select
-            className="form-input"
-            style={{ maxWidth: 150 }}
-            value={typeFilter}
-            onChange={e => setTypeFilter(e.target.value)}
-          >
-            <option value="">All Flow Types</option>
-            <option value="NATIVE">Native Checkout</option>
-            <option value="REDIRECT">Redirect / Referral</option>
-          </select>
-          <select
-            className="form-input"
-            style={{ maxWidth: 140 }}
-            value={statusFilter}
-            onChange={e => setStatusFilter(e.target.value)}
-          >
-            <option value="">All Statuses</option>
-            <option value="PUBLISHED">Published</option>
-            <option value="DRAFT">Draft / Hidden</option>
-          </select>
+      <div style={{ background: '#F8FAFC', borderRadius: 12, padding: '18px 20px', marginBottom: 28, border: '1px solid #E2E8F0' }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 10 }}>
+          Governed Functions & Capabilities
         </div>
+        <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, color: '#475569', lineHeight: 1.7 }}>
+          {features.map((f, i) => (
+            <li key={i}>{f}</li>
+          ))}
+        </ul>
+      </div>
 
-        <button
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12 }}>
+        <a
+          href={targetUrl}
           className="btn btn-primary"
-          onClick={openCreateModal}
-          style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 20px', fontWeight: 700 }}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            padding: '12px 24px',
+            fontSize: 14,
+            fontWeight: 600,
+            borderRadius: 8,
+            textDecoration: 'none',
+          }}
         >
-          <span style={{ fontSize: 16 }}>+</span> Add New Product / Service
-        </button>
+          <span>{actionLabel}</span>
+          <span>→</span>
+        </a>
       </div>
-
-      {/* Products Table */}
-      <div className="table-wrap">
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>Product / Service</th>
-              <th>Provider</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th>Flow</th>
-              <th>Engagement</th>
-              <th>Featured</th>
-              <th>Status</th>
-              <th style={{ textAlign: 'right' }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr><td colSpan={9} style={{ textAlign: 'center', padding: 40, color: 'var(--text-muted)' }}>Loading products catalog…</td></tr>
-            ) : filtered.length === 0 ? (
-              <tr>
-                <td colSpan={9}>
-                  <div className="empty-state">
-                    <p style={{ fontWeight: 600, fontSize: 15, marginBottom: 8 }}>No products match your criteria</p>
-                    <button className="btn btn-secondary btn-sm" onClick={() => { setSearchQuery(''); setCategoryFilter(''); setTypeFilter(''); setStatusFilter(''); }}>
-                      Reset Filters
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ) : (
-              filtered.map(p => (
-                <tr key={p.id}>
-                  <td style={{ maxWidth: 260 }}>
-                    <div style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2 }}>{p.title}</div>
-                    <div style={{ fontSize: 12, color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 240 }}>
-                      {p.description || 'No description provided'}
-                    </div>
-                  </td>
-                  <td>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <span style={{ fontWeight: 600, fontSize: 13 }}>{p.provider?.name || 'bldr'}</span>
-                      {p.provider?.isHouseBrand && (
-                        <span className="badge badge-blue" style={{ fontSize: 9, padding: '2px 6px' }}>House</span>
-                      )}
-                    </div>
-                  </td>
-                  <td>
-                    <span className="badge badge-muted" style={{ fontWeight: 600 }}>{p.category}</span>
-                  </td>
-                  <td className="tabular-nums" style={{ fontWeight: 700 }}>
-                    {formatCurrency(p.price, p.currency || 'USD')}
-                  </td>
-                  <td>
-                    <span className={`badge ${p.purchaseType === 'NATIVE' ? 'badge-blue' : 'badge-accent'}`}>
-                      {p.purchaseType === 'NATIVE' ? 'Native' : 'Referral'}
-                    </span>
-                  </td>
-                  <td>
-                    <span className="badge badge-muted">
-                      {p.engagementType === 'BUY_NOW' ? 'Buy Now' : 'Quote / Call'}
-                    </span>
-                  </td>
-                  <td>
-                    <button
-                      onClick={() => handleToggleFeatured(p.id)}
-                      disabled={actionLoadingId === p.id}
-                      style={{
-                        background: 'transparent',
-                        border: 'none',
-                        cursor: 'pointer',
-                        fontSize: 16,
-                        opacity: p.isFeatured ? 1 : 0.35,
-                        transition: 'opacity 0.15s ease'
-                      }}
-                      title={p.isFeatured ? 'Featured on Showcase (Click to unfeature)' : 'Click to feature'}
-                    >
-                      <span style={{ fontSize: 13, fontWeight: 700, color: p.isFeatured ? '#D97706' : '#94A3B8' }}>{p.isFeatured ? '★' : '☆'}</span>
-                    </button>
-                  </td>
-                  <td>
-                    <button
-                      onClick={() => handleTogglePublish(p.id)}
-                      disabled={actionLoadingId === p.id}
-                      className={`badge ${p.isPublished ? 'badge-green' : 'badge-amber'}`}
-                      style={{ border: 'none', cursor: 'pointer' }}
-                      title="Click to toggle publish status"
-                    >
-                      {p.isPublished ? '● Live' : '○ Draft'}
-                    </button>
-                  </td>
-                  <td style={{ textAlign: 'right' }}>
-                    <div style={{ display: 'inline-flex', gap: 8, alignItems: 'center' }}>
-                      <button
-                        className="btn btn-secondary btn-sm"
-                        onClick={() => openEditModal(p)}
-                        title="Edit product"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="btn btn-danger btn-sm"
-                        onClick={() => handleDelete(p.id, p.title)}
-                        disabled={actionLoadingId === p.id}
-                        title="Delete product"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Add / Edit Product Modal */}
-      {isModalOpen && (
-        <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
-          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 650 }}>
-            <div className="modal-header">
-              <h2 className="modal-title">
-                {editingId ? 'Edit Product / Service Offering' : 'Add New Product / Service Offering'}
-              </h2>
-              <button className="modal-close" onClick={() => setIsModalOpen(false)}>✕</button>
-            </div>
-
-            <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <div className="form-group">
-                <label className="form-label">Product / Service Title *</label>
-                <input
-                  className="form-input"
-                  required
-                  placeholder="e.g. Full-Stack Web Development Retainer"
-                  value={form.title}
-                  onChange={e => setForm({ ...form, title: e.target.value })}
-                />
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-                <div className="form-group">
-                  <label className="form-label">Category *</label>
-                  <input
-                    className="form-input"
-                    required
-                    placeholder="e.g. Education, Media, Consulting"
-                    value={form.category}
-                    onChange={e => setForm({ ...form, category: e.target.value })}
-                  />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Provider Assignment *</label>
-                  <select
-                    className="form-input"
-                    value={form.providerId}
-                    onChange={e => setForm({ ...form, providerId: e.target.value })}
-                  >
-                    {providers.map(prov => (
-                      <option key={prov.id} value={prov.id}>
-                        {prov.name} {prov.isHouseBrand ? '(House Brand)' : ''}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 14 }}>
-                <div className="form-group">
-                  <label className="form-label">Price *</label>
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    className="form-input"
-                    required
-                    value={form.price}
-                    onChange={e => setForm({ ...form, price: Number(e.target.value) })}
-                  />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Currency</label>
-                  <select
-                    className="form-input"
-                    value={form.currency}
-                    onChange={e => setForm({ ...form, currency: e.target.value })}
-                  >
-                    <option value="USD">USD ($)</option>
-                    <option value="EGP">EGP</option>
-                    <option value="EUR">EUR (€)</option>
-                    <option value="GBP">GBP (£)</option>
-                  </select>
-                </div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-                <div className="form-group">
-                  <label className="form-label">Transaction Flow *</label>
-                  <select
-                    className="form-input"
-                    value={form.purchaseType}
-                    onChange={e => setForm({ ...form, purchaseType: e.target.value })}
-                  >
-                    <option value="NATIVE">Native Checkout (Geidea / Fawry)</option>
-                    <option value="REDIRECT">External Referral (Webhook Attribution)</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Engagement CTA *</label>
-                  <select
-                    className="form-input"
-                    value={form.engagementType}
-                    onChange={e => setForm({ ...form, engagementType: e.target.value })}
-                  >
-                    <option value="BUY_NOW">Instant Buy Now</option>
-                    <option value="REQUEST_QUOTE">Request a Quote (Lead Form)</option>
-                    <option value="BOOK_CALL">Book a Discovery Call</option>
-                  </select>
-                </div>
-              </div>
-
-              {form.purchaseType === 'REDIRECT' && (
-                <div className="form-group">
-                  <label className="form-label">Outbound Referral URL *</label>
-                  <input
-                    className="form-input"
-                    required={form.purchaseType === 'REDIRECT'}
-                    placeholder="https://partner-store.com/checkout?item=..."
-                    value={form.redirectUrl}
-                    onChange={e => setForm({ ...form, redirectUrl: e.target.value })}
-                  />
-                  <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                    A secure tracking `clickId` will be appended automatically upon redirection.
-                  </span>
-                </div>
-              )}
-
-              <div className="form-group">
-                <label className="form-label">Description</label>
-                <textarea
-                  className="form-input"
-                  rows={3}
-                  placeholder="Detail the deliverable, scope, and timeline..."
-                  value={form.description}
-                  onChange={e => setForm({ ...form, description: e.target.value })}
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Tags (comma-separated)</label>
-                <input
-                  className="form-input"
-                  placeholder="e.g. curriculum, full-stack, retainer, cert"
-                  value={form.tags}
-                  onChange={e => setForm({ ...form, tags: e.target.value })}
-                />
-              </div>
-
-              <div style={{ display: 'flex', gap: 24, marginTop: 4 }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
-                  <input
-                    type="checkbox"
-                    checked={form.isPublished}
-                    onChange={e => setForm({ ...form, isPublished: e.target.checked })}
-                    style={{ width: 16, height: 16 }}
-                  />
-                  Publish Immediately (Live on Storefront)
-                </label>
-                <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
-                  <input
-                    type="checkbox"
-                    checked={form.isFeatured}
-                    onChange={e => setForm({ ...form, isFeatured: e.target.checked })}
-                    style={{ width: 16, height: 16 }}
-                  />
-                  Highlight as Featured
-                </label>
-              </div>
-
-              <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
-                <button type="submit" className="btn btn-primary btn-lg" style={{ flex: 1 }}>
-                  {editingId ? 'Save Changes' : 'Create Product Offering'}
-                </button>
-                <button type="button" className="btn btn-secondary btn-lg" onClick={() => setIsModalOpen(false)}>
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
 
-// ─── TAB: Providers ───────────────────────────────────────────────────────────
-function ProvidersTab() {
-  const [providers, setProviders] = useState<any[]>([]);
-  const [meta, setMeta] = useState({ total: 0 });
-  const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState('');
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [rejectModal, setRejectModal] = useState<{ id: string; name: string } | null>(null);
-  const [rejectReason, setRejectReason] = useState('');
-
-  const fetch_ = async () => {
-    const token = await ensureAdminToken(); if (!token) return;
-    setLoading(true);
-    const qs = new URLSearchParams(statusFilter ? { status: statusFilter } : {});
-    const res = await fetch(`${API}/admin/providers?${qs}`, { headers: { Authorization: `Bearer ${token}` } });
-    const data = await res.json();
-    setProviders(data.data || []); setMeta(data.meta || { total: 0 }); setLoading(false);
-  };
-
-  useEffect(() => { fetch_(); }, [statusFilter]);
-
-  const action = async (id: string, endpoint: string, body?: object) => {
-    setActionLoading(id + endpoint);
-    const token = await ensureAdminToken();
-    await fetch(`${API}/admin/providers/${id}/${endpoint}`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: body ? JSON.stringify(body) : undefined });
-    setActionLoading(null); setRejectModal(null); setRejectReason(''); fetch_();
-  };
-
-  return (
-    <div>
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
-        <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{meta.total} registered</span>
-        {['', 'PENDING', 'APPROVED', 'REJECTED', 'SUSPENDED'].map(s => (
-          <button key={s} className={`btn btn-sm ${statusFilter === s ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setStatusFilter(s)}>
-            {s || 'All'} {s === 'PENDING' && <span className="badge badge-amber" style={{ marginLeft: 4, fontSize: 10 }}>!</span>}
-          </button>
-        ))}
-      </div>
-      <div className="table-wrap">
-        <table className="data-table">
-          <thead><tr><th>Provider</th><th>Activity / Bio</th><th>Status</th><th>Conversion Token</th><th>Created</th><th>Actions</th></tr></thead>
-          <tbody>
-            {loading ? <tr><td colSpan={6} style={{ textAlign: 'center', padding: 40, color: 'var(--text-muted)' }}>Loading…</td></tr>
-              : providers.length === 0 ? <tr><td colSpan={6}><div className="empty-state"><p>No providers found</p></div></td></tr>
-              : providers.map(p => (
-                <tr key={p.id}>
-                  <td>
-                    <div style={{ fontWeight: 600 }}>{p.name} {p.isHouseBrand && <span className="badge badge-blue" style={{ fontSize: 10 }}>House Brand</span>}</div>
-                    <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{p.slug}</div>
-                  </td>
-                  <td style={{ maxWidth: 260, fontSize: 13, color: 'var(--text-secondary)' }}>{p.bio || p.tagline || '—'}</td>
-                  <td><StatusBadge status={p.status} /></td>
-                  <td>
-                    {p.conversionToken ? <code style={{ fontSize: 11, background: 'var(--bg-elevated)', padding: '2px 6px', borderRadius: 4 }}>{p.conversionToken.slice(0, 16)}…</code> : <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>—</span>}
-                  </td>
-                  <td style={{ fontSize: 12, color: 'var(--text-muted)' }}>{new Date(p.createdAt).toLocaleDateString()}</td>
-                  <td>
-                    <div style={{ display: 'flex', gap: 6 }}>
-                      {p.status === 'PENDING' && (
-                        <>
-                          <button className="btn btn-sm btn-primary" style={{ background: 'var(--green)' }} disabled={actionLoading === p.id + 'approve'} onClick={() => action(p.id, 'approve')}>Approve</button>
-                          <button className="btn btn-sm btn-danger" onClick={() => setRejectModal({ id: p.id, name: p.name })}>Reject</button>
-                        </>
-                      )}
-                      {p.status === 'APPROVED' && !p.isHouseBrand && (
-                        <button className="btn btn-sm btn-secondary" style={{ color: 'var(--amber)' }} disabled={actionLoading === p.id + 'suspend'} onClick={() => action(p.id, 'suspend')}>Suspend</button>
-                      )}
-                      {p.status === 'SUSPENDED' && (
-                        <button className="btn btn-sm btn-primary" disabled={actionLoading === p.id + 'approve'} onClick={() => action(p.id, 'approve')}>Re-activate</button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-      </div>
-      {rejectModal && (
-        <div className="modal-overlay" onClick={() => setRejectModal(null)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-header"><h2 className="modal-title">Reject {rejectModal.name}</h2><button className="modal-close" onClick={() => setRejectModal(null)}>✕</button></div>
-            <div className="form-group" style={{ marginBottom: 20 }}><label className="form-label">Reason (optional)</label><textarea className="form-input" placeholder="Explain why…" value={rejectReason} onChange={e => setRejectReason(e.target.value)} /></div>
-            <div style={{ display: 'flex', gap: 10 }}>
-              <button className="btn btn-danger btn-lg" style={{ flex: 1 }} disabled={actionLoading === rejectModal.id + 'reject'} onClick={() => action(rejectModal.id, 'reject', { reason: rejectReason })}>Confirm Rejection</button>
-              <button className="btn btn-secondary btn-lg" onClick={() => setRejectModal(null)}>Cancel</button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── TAB: Orders ──────────────────────────────────────────────────────────────
 function OrdersTab() {
-  const [orders, setOrders] = useState<any[]>([]);
-  const [meta, setMeta] = useState({ total: 0 });
-  const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState('');
-  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
-  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
-
-  const fetch_ = async () => {
-    const token = await ensureAdminToken(); if (!token) return;
-    setLoading(true);
-    const qs = new URLSearchParams(statusFilter ? { status: statusFilter } : {});
-    try {
-      const res = await fetch(`${API}/orders?${qs}`, { headers: { Authorization: `Bearer ${token}` } });
-      const data = await res.json(); setOrders(data.data || []); setMeta(data.meta || { total: 0 });
-    } finally { setLoading(false); }
-  };
-
-  useEffect(() => { fetch_(); }, [statusFilter]);
-
-  const approveRedirect = async (orderId: string) => {
-    const token = await ensureAdminToken(); if (!token) return;
-    setActionLoadingId(orderId); setFeedback(null);
-    try {
-      const res = await fetch(`${API}/orders/${orderId}/approve-redirect`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` } });
-      if (!res.ok) { const err = await res.json(); throw new Error(err.message); }
-      setFeedback({ type: 'success', message: `Order #${orderId.slice(-8).toUpperCase()} approved & credited.` });
-      fetch_();
-    } catch (err: any) {
-      setFeedback({ type: 'error', message: err.message || 'Failed to approve' });
-    } finally { setActionLoadingId(null); }
-  };
-
   return (
-    <div>
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
-        <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{meta.total} total</span>
-        {[{ id: '', label: 'All' }, { id: 'PENDING_VERIFICATION', label: 'Pending Verification' }, { id: 'PAID', label: 'Paid' }, { id: 'PENDING', label: 'Pending' }, { id: 'FAILED', label: 'Failed' }].map(s => (
-          <button key={s.id} className={`btn btn-sm ${statusFilter === s.id ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setStatusFilter(s.id)}>{s.label}</button>
-        ))}
-      </div>
-      {feedback && (
-        <div style={{ padding: '12px 16px', borderRadius: 8, marginBottom: 16, fontSize: 14, fontWeight: 500, background: feedback.type === 'success' ? 'var(--success-bg)' : 'var(--danger-bg)', color: feedback.type === 'success' ? 'var(--success)' : 'var(--danger)', border: `1px solid ${feedback.type === 'success' ? '#C2E4D2' : '#F8CCC5'}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span>{feedback.message}</span>
-          <button onClick={() => setFeedback(null)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'inherit', fontWeight: 700 }}>✕</button>
-        </div>
-      )}
-      <div className="table-wrap">
-        <table className="data-table">
-          <thead><tr><th>Ref</th><th>Source</th><th>Provider</th><th>Customer</th><th>Gross</th><th>Commission</th><th>Net</th><th>Gateway</th><th>Status</th><th>Action</th></tr></thead>
-          <tbody>
-            {loading ? <tr><td colSpan={10} style={{ textAlign: 'center', padding: 40, color: 'var(--text-muted)' }}>Loading…</td></tr>
-              : orders.length === 0 ? <tr><td colSpan={10}><div className="empty-state"><p>No orders found</p></div></td></tr>
-              : orders.map(o => (
-                <tr key={o.id}>
-                  <td style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: 12 }}>#{o.id.slice(-8).toUpperCase()}</td>
-                  <td><span className={`badge ${o.source === 'NATIVE' ? 'badge-blue' : 'badge-accent'}`}>{o.source}</span></td>
-                  <td>{o.provider?.name || '—'}</td>
-                  <td style={{ fontSize: 12 }}>{o.customerEmail}</td>
-                  <td className="tabular-nums" style={{ fontWeight: 600 }}>{formatCurrency(o.amount, o.currency)}</td>
-                  <td className="tabular-nums" style={{ color: 'var(--amber)', fontWeight: 600 }}>{formatCurrency(o.commissionAmount || 0, o.currency)}</td>
-                  <td className="tabular-nums" style={{ color: 'var(--green)', fontWeight: 600 }}>{formatCurrency(o.netAmount || 0, o.currency)}</td>
-                  <td style={{ fontSize: 12 }}>{o.gatewayUsed}</td>
-                  <td><StatusBadge status={o.status} /></td>
-                  <td>
-                    {o.status === 'PENDING_VERIFICATION' && (
-                      <button className="btn btn-sm btn-primary" style={{ background: 'var(--green)' }} disabled={actionLoadingId === o.id} onClick={() => approveRedirect(o.id)}>
-                        {actionLoadingId === o.id ? 'Approving…' : 'Approve'}
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <ReadOnlyNavCard
+      title="Orders & Transaction Ledger"
+      icon="≡"
+      badgeText="Authoritative Storefront View"
+      owningSystem="Admin Portal → Orders Module"
+      targetUrl="/orders"
+      actionLabel="Open Orders & Transactions Studio"
+      description="Order settlement auditing, line-item reconciliation, and learner transaction history are governed by the dedicated Orders & Transactions module. To avoid dual-entry discrepancies, please manage and audit orders on the owning page."
+      features={[
+        'Full transaction audit trail with payment gateway references (Geidea, Fawry, Paymob)',
+        'Order status verification (PENDING, PAID, FAILED, REFUNDED)',
+        'Customer billing info and purchased course / cohort details',
+        'Direct links to payment sessions and transaction logs',
+      ]}
+    />
   );
 }
 
-// ─── TAB: Leads ───────────────────────────────────────────────────────────────
 function LeadsTab() {
-  const [leads, setLeads] = useState<any[]>([]);
-  const [meta, setMeta] = useState({ total: 0 });
-  const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState('');
-  const [updatingId, setUpdatingId] = useState<string | null>(null);
-
-  const fetch_ = async () => {
-    const token = await ensureAdminToken(); if (!token) return;
-    setLoading(true);
-    const qs = new URLSearchParams(statusFilter ? { status: statusFilter } : {});
-    const res = await fetch(`${API}/leads?${qs}`, { headers: { Authorization: `Bearer ${token}` } });
-    const data = await res.json(); setLeads(data.data || []); setMeta(data.meta || { total: 0 }); setLoading(false);
-  };
-
-  useEffect(() => { fetch_(); }, [statusFilter]);
-
-  const updateStatus = async (id: string, s: string) => {
-    setUpdatingId(id);
-    const token = await ensureAdminToken();
-    await fetch(`${API}/leads/${id}/status`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ status: s }) });
-    setUpdatingId(null); fetch_();
-  };
-
   return (
-    <div>
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16, alignItems: 'center' }}>
-        <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{meta.total} total</span>
-        {['', 'NEW', 'CONTACTED', 'CLOSED'].map(s => (
-          <button key={s} className={`btn btn-sm ${statusFilter === s ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setStatusFilter(s)}>{s || 'All'}</button>
-        ))}
-      </div>
-      <div className="table-wrap">
-        <table className="data-table">
-          <thead><tr><th>Lead</th><th>Provider</th><th>Service</th><th>Engagement</th><th>Status</th><th>Update</th></tr></thead>
-          <tbody>
-            {loading ? <tr><td colSpan={6} style={{ textAlign: 'center', padding: 40, color: 'var(--text-muted)' }}>Loading…</td></tr>
-              : leads.length === 0 ? <tr><td colSpan={6}><div className="empty-state"><p>No leads found</p></div></td></tr>
-              : leads.map(l => (
-                <tr key={l.id}>
-                  <td>
-                    <div style={{ fontWeight: 600 }}>{l.name}</div>
-                    <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{l.email} {l.phone && `· ${l.phone}`}</div>
-                    {l.message && <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2, maxWidth: 280, fontStyle: 'italic' }}>"{l.message}"</div>}
-                  </td>
-                  <td>{l.provider?.name || '—'}</td>
-                  <td style={{ fontSize: 13 }}>{l.listing?.title || '—'}</td>
-                  <td><span className="badge badge-muted">{l.engagementType}</span></td>
-                  <td><StatusBadge status={l.status} /></td>
-                  <td>
-                    <select className="form-input" style={{ padding: '4px 8px', fontSize: 12 }} value={l.status} disabled={updatingId === l.id} onChange={e => updateStatus(l.id, e.target.value)}>
-                      <option value="NEW">NEW</option>
-                      <option value="CONTACTED">CONTACTED</option>
-                      <option value="CLOSED">CLOSED</option>
-                    </select>
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <ReadOnlyNavCard
+      title="Leads & CRM Inquiries"
+      icon="◎"
+      badgeText="Authoritative CRM View"
+      owningSystem="Admin Portal → CRM & Leads"
+      targetUrl="/leads"
+      actionLabel="Open CRM & Leads Studio"
+      description="Inbound quote requests, corporate training inquiries, and tutor consultation leads are tracked and managed under the dedicated Leads CRM module."
+      features={[
+        'Inbound learner engagement inquiries and corporate quote requests',
+        'CRM lead pipeline management (NEW, CONTACTED, CLOSED)',
+        'Contact details, preferred cohort timing, and client messaging history',
+        'Status updating with direct follow-up email and phone links',
+      ]}
+    />
   );
 }
 
-// ─── TAB: Commissions ─────────────────────────────────────────────────────────
+function ProvidersTab() {
+  return (
+    <ReadOnlyNavCard
+      title="Venture & Brand Directory"
+      icon="▦"
+      badgeText="Authoritative Directory View"
+      owningSystem="Admin Portal → Providers Directory"
+      targetUrl="/providers"
+      actionLabel="Open Providers Directory"
+      description="Partner accounts, venture profiles, and brand verification statuses are managed directly in the dedicated Providers directory."
+      features={[
+        'Brand verification statuses (APPROVED, PENDING, SUSPENDED)',
+        'House-brand vs external partner division directory',
+        'Direct link to venture storefront profile and catalog offerings',
+      ]}
+    />
+  );
+}
+
 function CommissionsTab() {
-  const [globalRate, setGlobalRate] = useState<number | null>(null);
-  const [providers, setProviders] = useState<any[]>([]);
-  const [newGlobalRate, setNewGlobalRate] = useState('');
-  const [savingGlobal, setSavingGlobal] = useState(false);
-  const [editingProviderId, setEditingProviderId] = useState<string | null>(null);
-  const [providerRateInput, setProviderRateInput] = useState('');
-  const [savingProvider, setSavingProvider] = useState(false);
-  const [feedback, setFeedback] = useState<string | null>(null);
-
-  const fetch_ = async () => {
-    const token = await ensureAdminToken(); if (!token) return;
-    const res = await fetch(`${API}/admin/commission`, { headers: { Authorization: `Bearer ${token}` } });
-    const data = await res.json();
-    setGlobalRate(data.globalRule ? Number(data.globalRule.rate) : 0.1);
-    setNewGlobalRate(data.globalRule ? String(Number(data.globalRule.rate) * 100) : '10');
-    const pRes = await fetch(`${API}/admin/providers?limit=50`, { headers: { Authorization: `Bearer ${token}` } });
-    const pData = await pRes.json();
-    setProviders(pData.data || []);
-  };
-
-  useEffect(() => { fetch_(); }, []);
-
-  const saveGlobal = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const token = await ensureAdminToken(); if (!token) return;
-    setSavingGlobal(true);
-    const r = parseFloat(newGlobalRate) / 100;
-    await fetch(`${API}/admin/commission/global`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ rate: r }) });
-    setSavingGlobal(false); setFeedback('Global rate updated.'); setTimeout(() => setFeedback(null), 3000); fetch_();
-  };
-
-  const saveProviderRate = async (providerId: string) => {
-    const token = await ensureAdminToken(); if (!token) return;
-    setSavingProvider(true);
-    const r = parseFloat(providerRateInput) / 100;
-    await fetch(`${API}/admin/commission/provider/${providerId}`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ rate: r }) });
-    setSavingProvider(false); setEditingProviderId(null); setFeedback('Provider rate updated.'); setTimeout(() => setFeedback(null), 3000); fetch_();
-  };
-
-  const removeProviderRate = async (providerId: string) => {
-    const token = await ensureAdminToken(); if (!token) return;
-    await fetch(`${API}/admin/commission/provider/${providerId}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
-    setFeedback('Provider override removed.'); setTimeout(() => setFeedback(null), 3000); fetch_();
-  };
-
   return (
-    <div style={{ maxWidth: 800 }}>
-      {feedback && <div style={{ padding: '10px 16px', background: 'var(--success-bg)', color: 'var(--success)', borderRadius: 8, marginBottom: 16, fontSize: 14, fontWeight: 600 }}>{feedback}</div>}
-      <div className="card-panel" style={{ marginBottom: 24 }}>
-        <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 8 }}>Global Commission Rate</h3>
-        <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 16 }}>Applied to all sales unless a provider has a custom override.</p>
-        <form onSubmit={saveGlobal} style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          <div style={{ position: 'relative', width: 140 }}>
-            <input type="number" min="0" max="100" step="0.5" className="form-input" value={newGlobalRate} onChange={e => setNewGlobalRate(e.target.value)} required />
-            <span style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }}>%</span>
-          </div>
-          <button type="submit" className="btn btn-primary" disabled={savingGlobal}>{savingGlobal ? 'Saving…' : 'Update Global Rate'}</button>
-          {globalRate !== null && <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Current: <strong>{(globalRate * 100).toFixed(1)}%</strong></span>}
-        </form>
-      </div>
-      <div className="card-panel">
-        <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 8 }}>Provider-Specific Overrides</h3>
-        <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 16 }}>Set unique commission rates per provider.</p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-          {providers.map(p => {
-            const hasRule = p.commissionRules && p.commissionRules.length > 0;
-            const rate = hasRule ? Number(p.commissionRules[0].rate) : null;
-            const isEditing = editingProviderId === p.id;
-            return (
-              <div key={p.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid var(--border)' }}>
-                <div>
-                  <span style={{ fontWeight: 600, fontSize: 14 }}>{p.name}</span>
-                  {p.isHouseBrand && <span className="badge badge-blue" style={{ marginLeft: 8, fontSize: 10 }}>House Brand</span>}
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  {isEditing ? (
-                    <>
-                      <input type="number" min="0" max="100" step="0.5" className="form-input" style={{ width: 80, padding: '4px 8px' }} placeholder="%" value={providerRateInput} onChange={e => setProviderRateInput(e.target.value)} />
-                      <button className="btn btn-primary btn-sm" disabled={savingProvider} onClick={() => saveProviderRate(p.id)}>Save</button>
-                      <button className="btn btn-secondary btn-sm" onClick={() => setEditingProviderId(null)}>Cancel</button>
-                    </>
-                  ) : (
-                    <>
-                      <span style={{ fontSize: 13, color: hasRule ? 'var(--brand)' : 'var(--text-muted)', fontWeight: hasRule ? 700 : 400 }}>
-                        {hasRule ? `${(rate! * 100).toFixed(1)}% (Custom)` : `${globalRate ? (globalRate * 100).toFixed(1) : 10}% (Default)`}
-                      </span>
-                      <button className="btn btn-secondary btn-sm" onClick={() => { setEditingProviderId(p.id); setProviderRateInput(hasRule ? String(rate! * 100) : String(globalRate ? globalRate * 100 : 10)); }}>Edit</button>
-                      {hasRule && <button className="btn btn-danger btn-sm" onClick={() => removeProviderRate(p.id)}>Reset</button>}
-                    </>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </div>
+    <ReadOnlyNavCard
+      title="Commission Rules & Platform Fee Schedules"
+      icon="▲"
+      badgeText="Hub Financial Governance"
+      owningSystem="Central Payment Hub (Financial Controls)"
+      targetUrl="http://localhost:3002/settlements"
+      actionLabel="Open Central Payment Hub → Financial Controls"
+      description="Platform take rates, venture-specific fee overrides, and gateway cost allocations are strictly governed in the Central Payment Hub under dual-control authorization."
+      features={[
+        'Global and venture-specific platform fee schedules (Percentage, Flat, Combined)',
+        'Configurable VAT on fees (14%) per venture accountant sign-off',
+        'Automated fee deduction prior to net settlement balance calculation',
+      ]}
+    />
   );
 }
 
-// ─── TAB: Payouts ─────────────────────────────────────────────────────────────
 function PayoutsTab() {
-  const [payouts, setPayouts] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [markingId, setMarkingId] = useState<string | null>(null);
-  const [noteModal, setNoteModal] = useState<any | null>(null);
-  const [note, setNote] = useState('');
-
-  const fetch_ = async () => {
-    const token = await ensureAdminToken(); if (!token) return;
-    setLoading(true);
-    const res = await fetch(`${API}/payouts`, { headers: { Authorization: `Bearer ${token}` } });
-    const data = await res.json(); setPayouts(data.data || []); setLoading(false);
-  };
-
-  useEffect(() => { fetch_(); }, []);
-
-  const markPaid = async (id: string, n: string) => {
-    setMarkingId(id);
-    const token = await ensureAdminToken();
-    await fetch(`${API}/payouts/${id}/mark-paid`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ note: n }) });
-    setMarkingId(null); setNoteModal(null); setNote(''); fetch_();
-  };
-
-  const totalPending = payouts.filter(p => p.status === 'PENDING').reduce((acc, p) => acc + Number(p.netAmount), 0);
-
   return (
-    <div>
-      <div style={{ display: 'flex', gap: 16, marginBottom: 20, alignItems: 'center' }}>
-        <div className="stat-card" style={{ padding: '12px 20px', minWidth: 200 }}>
-          <div className="stat-card-label">Pending Payouts Total</div>
-          <div className="stat-card-value" style={{ fontSize: 22, color: 'var(--amber)' }}>{formatCurrency(totalPending, 'USD')}</div>
-        </div>
-      </div>
-      <div className="table-wrap">
-        <table className="data-table">
-          <thead><tr><th>Period</th><th>Provider</th><th>Gross Volume</th><th>Platform Fee</th><th>Net Disbursed</th><th>Status</th><th>Paid At</th><th>Action</th></tr></thead>
-          <tbody>
-            {loading ? <tr><td colSpan={8} style={{ textAlign: 'center', padding: 40, color: 'var(--text-muted)' }}>Loading…</td></tr>
-              : payouts.length === 0 ? <tr><td colSpan={8}><div className="empty-state"><p>No payout ledgers found</p></div></td></tr>
-              : payouts.map(p => (
-                <tr key={p.id}>
-                  <td style={{ fontSize: 12, color: 'var(--text-muted)' }}>{new Date(p.periodStart).toLocaleDateString()} – {new Date(p.periodEnd).toLocaleDateString()}</td>
-                  <td style={{ fontWeight: 600 }}>{p.provider?.name || '—'}</td>
-                  <td className="tabular-nums">{formatCurrency(p.grossAmount, 'USD')}</td>
-                  <td className="tabular-nums" style={{ color: 'var(--amber)' }}>{formatCurrency(p.commissionAmount, 'USD')}</td>
-                  <td className="tabular-nums" style={{ fontWeight: 700, color: 'var(--green)' }}>{formatCurrency(p.netAmount, 'USD')}</td>
-                  <td><StatusBadge status={p.status} /></td>
-                  <td style={{ fontSize: 12, color: 'var(--text-muted)' }}>{p.paidAt ? new Date(p.paidAt).toLocaleDateString() : '—'}</td>
-                  <td>
-                    {p.status === 'PENDING' && (
-                      <button className="btn btn-primary btn-sm" style={{ background: 'var(--green)' }} onClick={() => setNoteModal(p)}>Mark Paid</button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-      </div>
-      {noteModal && (
-        <div className="modal-overlay" onClick={() => setNoteModal(null)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-header"><h2 className="modal-title">Mark Payout as Settled</h2><button className="modal-close" onClick={() => setNoteModal(null)}>✕</button></div>
-            <p style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 16 }}>Disbursing net <strong>{formatCurrency(noteModal.netAmount, 'USD')}</strong> to <strong>{noteModal.provider?.name}</strong>.</p>
-            <div className="form-group" style={{ marginBottom: 20 }}><label className="form-label">Note (optional — e.g. bank ref)</label><input className="form-input" placeholder="Bank transfer ref #…" value={note} onChange={e => setNote(e.target.value)} /></div>
-            <div style={{ display: 'flex', gap: 10 }}>
-              <button className="btn btn-primary btn-lg" style={{ flex: 1, background: 'var(--green)' }} disabled={markingId === noteModal.id} onClick={() => markPaid(noteModal.id, note)}>
-                {markingId === noteModal.id ? 'Saving…' : 'Confirm Payment'}
-              </button>
-              <button className="btn btn-secondary btn-lg" onClick={() => setNoteModal(null)}>Cancel</button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+    <ReadOnlyNavCard
+      title="Settlements & Dual-Control Payouts"
+      icon="⊛"
+      badgeText="Hub Financial Governance"
+      owningSystem="Central Payment Hub (Settlements & Dual-Control)"
+      targetUrl="http://localhost:3002/settlements"
+      actionLabel="Open Central Payment Hub → Settlements & Dual-Control"
+      description="Settlement batches, reserve withholdings (5%), double-entry journal transfers, and two-person dual-control disbursements are exclusively processed in the Central Payment Hub."
+      features={[
+        'Enforced two-person dual control (creator cannot approve their own batch)',
+        'Double-entry internal journal posting (TR-INT) for verified accounting',
+        'Configurable 5% reserve hold-back with 14-day release horizon',
+        'Exportable brand-isolated settlement statements (STL-*)',
+      ]}
+    />
   );
 }
 
-// ─── TAB: Settings ────────────────────────────────────────────────────────────
 function SettingsTab() {
-  const [config, setConfig] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch(`${API}/config`).then(r => r.ok ? r.json() : null).then(d => { if (d) setConfig(d); setLoading(false); }).catch(() => setLoading(false));
-  }, []);
-
-  const rows = config ? [
-    { label: 'Payment Simulation Mode', value: config.paymentSimulationMode ? 'ENABLED — No real charges' : 'DISABLED — Live payments', highlight: config.paymentSimulationMode },
-    { label: 'Default Payment Gateway', value: config.defaultGateway || '—' },
-    { label: 'Default Commission Rate', value: config.defaultCommissionRate != null ? `${(config.defaultCommissionRate * 100).toFixed(1)}%` : '—' },
-    { label: 'API Base URL', value: config.apiBaseUrl || API },
-    { label: 'Storefront URL', value: config.storefrontUrl || 'http://localhost:3010' },
-    { label: 'Admin Portal URL', value: config.adminPortalUrl || 'http://localhost:3012' },
-    { label: 'Provider Portal URL', value: config.providerPortalUrl || 'http://localhost:3013' },
-    { label: 'Central Payment Hub URL', value: 'http://localhost:3011' },
-  ] : [];
-
   return (
-    <div style={{ maxWidth: 720 }}>
-      {loading ? <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>Loading config…</p> : (
-        <>
-          <div className="card-panel" style={{ marginBottom: 20 }}>
-            <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>Platform Configuration</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-              {rows.map(row => (
-                <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid var(--border)' }}>
-                  <span style={{ fontSize: 14, color: 'var(--text-secondary)', fontWeight: 500 }}>{row.label}</span>
-                  <span style={{ fontSize: 14, fontWeight: 600, color: row.highlight ? 'var(--green)' : 'var(--text-primary)', fontFamily: row.label.includes('URL') ? 'monospace' : 'inherit' }}>{row.value}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="card-panel">
-            <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 8 }}>Quick Access Links</h3>
-            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 16 }}>Direct platform portals</p>
-            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-              {[
-                { label: 'Storefront', href: 'http://localhost:3010' },
-                { label: 'Provider Portal', href: 'http://localhost:3013' },
-                { label: 'Central Hub', href: 'http://localhost:3011' },
-              ].map(l => (
-                <a key={l.href} href={l.href} target="_blank" rel="noopener noreferrer" className="btn btn-secondary">{l.label}</a>
-              ))}
-            </div>
-          </div>
-        </>
-      )}
-    </div>
+    <ReadOnlyNavCard
+      title="Platform & Gateway Configuration"
+      icon="⊙"
+      badgeText="Hub System Configuration"
+      owningSystem="Central Payment Hub (Venture Configuration)"
+      targetUrl="http://localhost:3002/ventures"
+      actionLabel="Open Central Payment Hub → Venture Configuration"
+      description="Card & wallet gateway routing (Geidea / Paymob), Fawry independent rails, outbound webhook secrets, and authorized redirect domains are configured in the Central Payment Hub."
+      features={[
+        'Per-venture PSP assignment: exactly one Card/Wallet gateway (Geidea vs Paymob)',
+        'Independent Fawry cash/kiosk rail gating toggle',
+        'Offline enrollment code activation gating toggle',
+        'Authorized redirect domains whitelist to protect against open redirects',
+      ]}
+    />
   );
 }
 
@@ -1596,7 +704,7 @@ function SettingsTab() {
 function SuperAdminCMSContent() {
   const searchParams = useSearchParams();
   const requestedTab = searchParams.get('tab') as Tab;
-  const [activeTab, setActiveTab] = useState<Tab>(requestedTab && TABS.some(t => t.id === requestedTab) ? requestedTab : 'products');
+  const [activeTab, setActiveTab] = useState<Tab>(requestedTab && TABS.some(t => t.id === requestedTab) ? requestedTab : 'content');
   const [isSim, setIsSim] = useState(true);
 
   useEffect(() => {
@@ -1662,10 +770,9 @@ function SuperAdminCMSContent() {
 
         <div className="page-content fade-up">
           {activeTab === 'content'     && <ContentTab />}
-          {activeTab === 'products'    && <ProductsTab />}
-          {activeTab === 'providers'   && <ProvidersTab />}
           {activeTab === 'orders'      && <OrdersTab />}
           {activeTab === 'leads'       && <LeadsTab />}
+          {activeTab === 'providers'   && <ProvidersTab />}
           {activeTab === 'commissions' && <CommissionsTab />}
           {activeTab === 'payouts'     && <PayoutsTab />}
           {activeTab === 'settings'    && <SettingsTab />}

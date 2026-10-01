@@ -3,7 +3,8 @@ import fs from 'fs';
 import path from 'path';
 
 // Path to shared CMS data file
-const CMS_FILE_PATH = path.resolve(process.cwd(), '../../packages/shared-types/src/cms-data.json');
+// process.cwd() in Next.js monorepo = monorepo root (NOT apps/admin-portal)
+const CMS_FILE_PATH = path.resolve(process.cwd(), 'packages/shared-types/src/cms-data.json');
 
 export async function GET() {
   try {

@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+npx ts-node --project tsconfig.seed.json scripts/list-routes.ts

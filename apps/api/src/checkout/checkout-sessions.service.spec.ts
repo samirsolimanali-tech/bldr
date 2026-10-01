@@ -44,6 +44,10 @@ describe('CheckoutSessionsService - Idempotency Security', () => {
           return session;
         },
       },
+      listing: {
+        findUnique: async () => null,
+        findFirst: async () => null,
+      },
     } as any;
 
     service = new CheckoutSessionsService(mockPrisma);
@@ -127,4 +131,24 @@ describe('CheckoutSessionsService - Idempotency Security', () => {
       },
     );
   });
+
+  test('price and catalog resolution strictly fails closed in production when product is missing', async () => {
+    const origNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'production';
+
+    try {
+      await assert.rejects(
+        async () => {
+          await service.resolveCheckoutProduct({ productId: 'unregistered-or-tampered-id' });
+        },
+        (err: any) => {
+          assert.match(err.message, /not found in authoritative database catalog\. Checkout refused\./i);
+          return true;
+        },
+      );
+    } finally {
+      process.env.NODE_ENV = origNodeEnv;
+    }
+  });
 });
+

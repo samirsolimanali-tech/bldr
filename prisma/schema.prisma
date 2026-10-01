@@ -189,6 +189,7 @@ model Provider {
   checkoutSessions   CheckoutSession[]
   settlementStatements SettlementStatement[]
   enrollmentCodes    EnrollmentCode[]
+  products           Product[]
 }
 
 /// @alias VentureUser — a bldr team member scoped to one specific brand.
@@ -335,7 +336,10 @@ model Lead {
 
 model Order {
   id                String      @id @default(cuid())
-  listingId         String
+  listingId         String?
+  productId         String?     // FK to authoritative Product
+  productTitle      String?     // Snapshot of product title at purchase time
+  productPriceMinor Int?        // Snapshot of price (in piasters) at purchase time
   providerId        String
   customerEmail     String
   customerName      String?
@@ -356,13 +360,57 @@ model Order {
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
 
-  listing       Listing        @relation(fields: [listingId], references: [id])
+  listing       Listing?       @relation(fields: [listingId], references: [id])
+  product       Product?       @relation(fields: [productId], references: [id])
   provider      Provider       @relation(fields: [providerId], references: [id])
   trackingEvent TrackingEvent? @relation(fields: [trackingEventId], references: [id])
   transactions  Transaction[]
   payout        Payout?        @relation(fields: [payoutId], references: [id])
   payoutId      String?
 }
+
+// ─── Authoritative Product Catalog (PostgreSQL Single Source of Truth) ──────
+model Product {
+  id          String   @id @default(cuid())
+  ventureId   String
+  slug        String   @unique
+  title_en    String
+  title_ar    String
+  description String?  @db.Text
+  priceMinor  Int      // integer minor units (piasters: e.g. 480000 = 4,800.00 EGP)
+  currency    String   @default("EGP")
+  saleMode    String   @default("DIRECT") // DIRECT | REDIRECT
+  redirectUrl String?
+  status      String   @default("ACTIVE") // ACTIVE | INACTIVE | DRAFT | ARCHIVED
+  coverImage  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  provider    Provider @relation(fields: [ventureId], references: [id], onDelete: Cascade)
+  orders      Order[]
+
+  @@index([ventureId])
+  @@index([status])
+}
+
+// ─── Forensic Audit Trail ──────────────────────────────────────────────────
+model AuditLog {
+  id        String   @id @default(cuid())
+  entity    String   // e.g. "PRODUCT", "SETTLEMENT", "VENTURE"
+  entityId  String
+  action    String   // e.g. "CREATE", "UPDATE_PRICE", "UPDATE_STATUS", "OVERRIDE"
+  actorId   String
+  actorRole String?
+  ventureId String?
+  diff      Json?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([entity, entityId])
+  @@index([ventureId])
+  @@index([createdAt])
+}
+
 
 model Transaction {
   id              String   @id @default(cuid())
