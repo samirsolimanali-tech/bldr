@@ -220,7 +220,7 @@ export default function PaymentMethodsPage() {
 
                     <td style={{ padding: '16px 18px' }}>
                       <div style={{ fontSize: 12, color: '#334155' }}>
-                        Cards (Visa/Mastercard) + Mobile Wallets (Vodafone, Orange, WE)
+                        Cards (Visa/Mastercard) + Mobile Wallets
                       </div>
                       <div style={{ fontSize: 11, color: '#64748B', marginTop: 2 }}>
                         Routed via {b.assignedGateway === 'GEIDEA' ? 'Geidea Payment Gateway' : 'Paymob Egypt'}

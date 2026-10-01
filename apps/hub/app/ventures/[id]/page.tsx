@@ -303,6 +303,15 @@ export default function VentureConfigPage() {
   const [fawryEnabled, setFawryEnabled] = useState(true);
   const [codeActivationEnabled, setCodeActivationEnabled] = useState(true);
 
+  const [internalLedgerCode, setInternalLedgerCode] = useState('2100-BLDR-HQ');
+  const [financeContactName, setFinanceContactName] = useState('Central Treasury Ops');
+  const [financeContactEmail, setFinanceContactEmail] = useState('finance@bldr.dev');
+  const [financeContactPhone, setFinanceContactPhone] = useState('+20 10 0000 0000');
+  const [taxRegNumber, setTaxRegNumber] = useState('');
+  const [commercialRegNumber, setCommercialRegNumber] = useState('');
+  const [withholdingTaxEnabled, setWithholdingTaxEnabled] = useState(false);
+  const [maxTransactionAmount, setMaxTransactionAmount] = useState('50000');
+
   // Activation Codes Management State
   const [ventureCodes, setVentureCodes] = useState<EnrollmentCode[]>([]);
   const [codeSearch, setCodeSearch] = useState('');
@@ -342,7 +351,7 @@ export default function VentureConfigPage() {
 
   const [methods, setMethods] = useState([
     { id: 'cards', label: 'Cards (Visa, Mastercard)', fg: '#2E6F5E', bg: '#E6EFEB', bd: '#A8D5C8', enabled: true },
-    { id: 'wallets', label: 'Mobile Wallets (Vodafone, Orange, WE)', fg: '#2E6F5E', bg: '#E6EFEB', bd: '#A8D5C8', enabled: true },
+    { id: 'wallets', label: 'Mobile Wallets', fg: '#2E6F5E', bg: '#E6EFEB', bd: '#A8D5C8', enabled: true },
     { id: 'fawry', label: 'Fawry Pay Kiosk', fg: '#2E6F5E', bg: '#E6EFEB', bd: '#A8D5C8', enabled: true },
   ]);
 
@@ -391,6 +400,14 @@ export default function VentureConfigPage() {
         setApiKeyTest(p.apiKeyTest || config.apiKeyTest);
         setWebhookSecret(p.webhookSecret || config.webhookSecret);
         setApiKeyLive(config.apiKeyLive);
+        setInternalLedgerCode(p.internalLedgerCode || `2100-${config.code.toUpperCase()}`);
+        setFinanceContactName(p.financeContactName || 'Central Treasury Ops');
+        setFinanceContactEmail(p.financeContactEmail || config.supportEmail || 'finance@bldr.dev');
+        setFinanceContactPhone(p.financeContactPhone || '+20 10 0000 0000');
+        setTaxRegNumber(p.taxRegNumber || '');
+        setCommercialRegNumber(p.commercialRegNumber || '');
+        setWithholdingTaxEnabled(p.withholdingTaxEnabled ?? false);
+        setMaxTransactionAmount(p.maxTransactionAmount || '50000');
         return;
       }
     } catch (e) {}
@@ -553,6 +570,14 @@ export default function VentureConfigPage() {
         domains,
         apiKeyTest,
         webhookSecret,
+        internalLedgerCode,
+        financeContactName,
+        financeContactEmail,
+        financeContactPhone,
+        taxRegNumber,
+        commercialRegNumber,
+        withholdingTaxEnabled,
+        maxTransactionAmount,
       };
       localStorage.setItem(`bldr_venture_config_${ventureCode}`, JSON.stringify(dataToSave));
       setSaveSuccess(true);
@@ -831,6 +856,138 @@ export default function VentureConfigPage() {
                       onChange={e => setDescription(e.target.value)}
                       style={{ border: '1px solid #E3E8EF', borderRadius: 7, background: '#fff', padding: '9px 11px', fontSize: '12.5px', fontWeight: 500, color: '#1B2A4A', outline: 'none', resize: 'vertical' }}
                     />
+                  </div>
+                </div>
+
+                {/* Accounting & Corporate Tax Governance Card */}
+                <div style={{ background: '#fff', border: '1px solid #E3E8EF', borderRadius: 10, padding: '17px 19px 19px', display: 'flex', flexDirection: 'column', gap: 15 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 13, fontWeight: 800, color: '#1B2A4A', letterSpacing: '-0.02em' }}>
+                        Accounting &amp; Corporate Compliance
+                      </span>
+                      <span style={{ fontSize: 9.5, fontWeight: 700, color: '#0369A1', background: '#E0F2FE', borderRadius: 4, padding: '2px 6px' }}>
+                        INTERNAL ARM&apos;S-LENGTH
+                      </span>
+                    </div>
+                    <span style={{ fontSize: 11, color: '#64748B' }}>
+                      bldr is sole Merchant of Record
+                    </span>
+                  </div>
+
+                  <p style={{ margin: 0, fontSize: 11.5, color: '#64748B', lineHeight: 1.5 }}>
+                    bldr is the sole legal entity and bank account holder. Inter-brand transfers are recorded in internal accounting ledgers. Formal tax &amp; commercial numbers are optional pending corporate accountant sign-off.
+                  </p>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 13 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#8A94A6' }}>
+                        Internal Ledger Code (Required)
+                      </span>
+                      <input
+                        type="text"
+                        value={internalLedgerCode}
+                        onChange={e => setInternalLedgerCode(e.target.value)}
+                        placeholder="e.g. 2100-SH-APEX"
+                        style={{ height: 36, border: '1px solid #E3E8EF', borderRadius: 7, background: '#fff', padding: '0 11px', fontSize: '12.5px', fontWeight: 600, color: '#1B2A4A', outline: 'none', fontFamily: 'IBM Plex Mono, monospace' }}
+                      />
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#8A94A6' }}>
+                        Max Transaction Cap (EGP)
+                      </span>
+                      <input
+                        type="number"
+                        value={maxTransactionAmount}
+                        onChange={e => setMaxTransactionAmount(e.target.value)}
+                        placeholder="50000"
+                        style={{ height: 36, border: '1px solid #E3E8EF', borderRadius: 7, background: '#fff', padding: '0 11px', fontSize: '12.5px', fontWeight: 600, color: '#1B2A4A', outline: 'none' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 13 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#8A94A6' }}>
+                        Finance Contact Name
+                      </span>
+                      <input
+                        type="text"
+                        value={financeContactName}
+                        onChange={e => setFinanceContactName(e.target.value)}
+                        style={{ height: 36, border: '1px solid #E3E8EF', borderRadius: 7, background: '#fff', padding: '0 11px', fontSize: '12px', fontWeight: 600, color: '#1B2A4A', outline: 'none' }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#8A94A6' }}>
+                        Finance Email
+                      </span>
+                      <input
+                        type="email"
+                        value={financeContactEmail}
+                        onChange={e => setFinanceContactEmail(e.target.value)}
+                        style={{ height: 36, border: '1px solid #E3E8EF', borderRadius: 7, background: '#fff', padding: '0 11px', fontSize: '12px', fontWeight: 600, color: '#1B2A4A', outline: 'none' }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#8A94A6' }}>
+                        Finance Phone
+                      </span>
+                      <input
+                        type="text"
+                        value={financeContactPhone}
+                        onChange={e => setFinanceContactPhone(e.target.value)}
+                        style={{ height: 36, border: '1px solid #E3E8EF', borderRadius: 7, background: '#fff', padding: '0 11px', fontSize: '12px', fontWeight: 600, color: '#1B2A4A', outline: 'none' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 13 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#8A94A6' }}>
+                          Tax Registration Number (الرقم الضريبي)
+                        </span>
+                        <span style={{ fontSize: 9.5, color: '#94A3B8', fontWeight: 600 }}>Optional</span>
+                      </div>
+                      <input
+                        type="text"
+                        value={taxRegNumber}
+                        onChange={e => setTaxRegNumber(e.target.value)}
+                        placeholder="Optional — e.g. 100-200-300"
+                        style={{ height: 36, border: '1px solid #E3E8EF', borderRadius: 7, background: '#F8FAFC', padding: '0 11px', fontSize: '12px', fontWeight: 500, color: '#1B2A4A', outline: 'none' }}
+                      />
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#8A94A6' }}>
+                          Commercial Registration (السجل التجاري)
+                        </span>
+                        <span style={{ fontSize: 9.5, color: '#94A3B8', fontWeight: 600 }}>Optional</span>
+                      </div>
+                      <input
+                        type="text"
+                        value={commercialRegNumber}
+                        onChange={e => setCommercialRegNumber(e.target.value)}
+                        placeholder="Optional — e.g. CR-98124"
+                        style={{ height: 36, border: '1px solid #E3E8EF', borderRadius: 7, background: '#F8FAFC', padding: '0 11px', fontSize: '12px', fontWeight: 500, color: '#1B2A4A', outline: 'none' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, paddingTop: 4 }}>
+                    <input
+                      type="checkbox"
+                      id="wht-toggle"
+                      checked={withholdingTaxEnabled}
+                      onChange={e => setWithholdingTaxEnabled(e.target.checked)}
+                      style={{ accentColor: '#2E6F5E', width: 16, height: 16 }}
+                    />
+                    <label htmlFor="wht-toggle" style={{ fontSize: 12, color: '#475569', cursor: 'pointer' }}>
+                      Apply Withholding Tax (WHT) deduction to brand settlement statement (Optional — default: Disabled)
+                    </label>
                   </div>
                 </div>
 
@@ -1526,7 +1683,7 @@ export default function VentureConfigPage() {
                   </span>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                     {[
-                      { id: 'geidea', label: 'Geidea Egypt', desc: 'Acquiring via Geidea Payment Gateway with 3D-Secure 2.0 and Vodafone/Orange/Etisalat wallets.' },
+                      { id: 'geidea', label: 'Geidea Egypt', desc: 'Acquiring via Geidea Payment Gateway with 3D-Secure 2.0 and Mobile Wallets.' },
                       { id: 'paymob', label: 'Paymob Egypt (Accept)', desc: 'Acquiring via Paymob gateway integration with direct mobile wallet carrier settlement.' },
                     ].map(g => (
                       <div

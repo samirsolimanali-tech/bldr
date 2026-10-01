@@ -912,11 +912,11 @@ function HostedPaymentContent() {
                       {isRtl ? 'محفظة إلكترونية' : 'Mobile Wallet'}
                     </span>
                   </div>
-                  <div>
-                    <VodafoneCashLogo height={18} />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, height: 20 }}>
+                    <span style={{ fontSize: 16 }}>📱</span>
                   </div>
                   <span style={{ fontSize: 10, color: '#5A6A80' }}>
-                    {isRtl ? 'فودافون كاش، أورنج، وي' : 'Vodafone, Orange, WE'}
+                    {isRtl ? 'المحافظ الإلكترونية المعتمدة' : 'Supported Mobile Wallets'}
                   </span>
                 </div>
 

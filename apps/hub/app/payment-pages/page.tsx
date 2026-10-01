@@ -458,7 +458,7 @@ export default function HubPaymentPages() {
                           )}
                           {brand.activeRails.wallet && (
                             <span style={{ fontSize: 10, background: 'rgba(239, 68, 68, 0.15)', color: '#F87171', padding: '2px 6px', borderRadius: 4, border: '1px solid rgba(239, 68, 68, 0.3)' }}>
-                              📱 Mobile Wallets (Vodafone/Orange/WE)
+                              📱 Mobile Wallets
                             </span>
                           )}
                           {brand.activeRails.card && (
@@ -655,7 +655,7 @@ export default function HubPaymentPages() {
                           )}
                           {bp.allowedPaymentRails.wallet && (
                             <span style={{ fontSize: 10.5, background: 'rgba(239, 68, 68, 0.12)', color: '#F87171', padding: '3px 7px', borderRadius: 5 }}>
-                              📱 Mobile Wallets (Vodafone/Orange/WE)
+                              📱 Mobile Wallets
                             </span>
                           )}
                           {bp.allowedPaymentRails.card && (
@@ -1231,7 +1231,7 @@ export default function HubPaymentPages() {
                         })}
                         style={{ accentColor: '#10B981', width: 16, height: 16 }}
                       />
-                      <span>📱 Mobile Wallets (Vodafone, Orange, WE)</span>
+                      <span>📱 Mobile Wallets</span>
                     </label>
 
                     <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5, color: '#CBD5E1', cursor: 'pointer' }}>

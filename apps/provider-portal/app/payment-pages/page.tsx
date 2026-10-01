@@ -969,7 +969,7 @@ export default function MasterCheckoutStudioPage() {
                         {
                           step: '3',
                           title: 'Student completes checkout via Egyptian rails',
-                          desc: 'Student picks Fawry Ref Code, Mobile Wallet (Vodafone Cash/Orange/WE), or Card in your branded environment.',
+                          desc: 'Student picks Fawry Ref Code, Mobile Wallet, or Card in your branded environment.',
                         },
                         {
                           step: '4',

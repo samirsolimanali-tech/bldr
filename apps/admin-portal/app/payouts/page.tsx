@@ -9,10 +9,6 @@ const getToken = () => localStorage.getItem('bldr_admin_token');
 export default function AdminPayoutsPage() {
   const [payouts, setPayouts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [markingId, setMarkingId] = useState<string | null>(null);
-  const [noteModal, setNoteModal] = useState<any | null>(null);
-  const [note, setNote] = useState('');
-
   const fetchPayouts = async () => {
     const token = getToken();
     if (!token) { window.location.href = '/login'; return; }
@@ -24,20 +20,6 @@ export default function AdminPayoutsPage() {
   };
 
   useEffect(() => { fetchPayouts(); }, []);
-
-  const markPaid = async (id: string, n: string) => {
-    setMarkingId(id);
-    const token = getToken();
-    await fetch(`${API}/payouts/${id}/mark-paid`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ note: n }),
-    });
-    setMarkingId(null);
-    setNoteModal(null);
-    setNote('');
-    fetchPayouts();
-  };
 
   const totalPending = payouts.filter(p => p.status === 'PENDING').reduce((s, p) => s + Number(p.netAmount), 0);
 
@@ -85,7 +67,7 @@ export default function AdminPayoutsPage() {
           <div className="table-wrap">
             <table className="data-table">
               <thead>
-                <tr><th>Brand</th><th>Period</th><th>Gross</th><th>Platform Fee</th><th>Net Settled</th><th>Status</th><th>Settled At</th><th>Transfer Ref</th><th></th></tr>
+                <tr><th>Brand</th><th>Period</th><th>Gross</th><th>Platform Fee</th><th>Net Settled</th><th>Status</th><th>Settled At</th><th>Transfer Ref</th></tr>
               </thead>
               <tbody>
                 {loading ? (
@@ -101,17 +83,7 @@ export default function AdminPayoutsPage() {
                     <td style={{ fontWeight: 700, color: 'var(--green)' }}>EGP {Number(p.netAmount).toFixed(2)}</td>
                     <td><span className={`badge ${p.status === 'PAID' ? 'badge-green' : 'badge-amber'}`}>{p.status === 'PAID' ? 'Settled' : 'Pending'}</span></td>
                     <td>{p.paidAt ? new Date(p.paidAt).toLocaleDateString() : '—'}</td>
-                    <td style={{ fontSize: '12px', color: 'var(--text-muted)', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.note || '—'}</td>
-                    <td>
-                      {p.status === 'PENDING' && (
-                        <button className="btn btn-sm"
-                          style={{ background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.3)', color: 'var(--green)', borderRadius: '6px' }}
-                          disabled={markingId === p.id}
-                          onClick={() => setNoteModal(p)}>
-                          {markingId === p.id ? '…' : 'Authorize'}
-                        </button>
-                      )}
-                    </td>
+                    <td style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{p.note || '—'}</td>
                   </tr>
                 ))}
               </tbody>
@@ -119,34 +91,6 @@ export default function AdminPayoutsPage() {
           </div>
         </div>
       </div>
-
-      {/* Authorize internal transfer modal */}
-      {noteModal && (
-        <div className="modal-overlay" onClick={() => setNoteModal(null)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2 className="modal-title">Authorize Internal Transfer</h2>
-              <button className="modal-close" onClick={() => setNoteModal(null)}>✕</button>
-            </div>
-            <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
-              Authorizing internal ledger credit to <strong>{noteModal.provider?.name}</strong> for net <strong>EGP {Number(noteModal.netAmount).toFixed(2)}</strong>.
-            </p>
-            <div className="form-group" style={{ marginBottom: '20px' }}>
-              <label className="form-label">Transfer Journal Ref (optional)</label>
-              <input className="form-input" placeholder="TR-INT-..."
-                value={note} onChange={e => setNote(e.target.value)} />
-            </div>
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button className="btn btn-primary btn-lg" style={{ flex: 1, background: 'var(--green)' }}
-                disabled={markingId === noteModal.id}
-                onClick={() => markPaid(noteModal.id, note)}>
-                {markingId === noteModal.id ? 'Saving…' : 'Confirm Authorization'}
-              </button>
-              <button className="btn btn-secondary btn-lg" onClick={() => setNoteModal(null)}>Cancel</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

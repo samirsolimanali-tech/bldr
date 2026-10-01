@@ -3,6 +3,7 @@ import {
   UnauthorizedException,
   NotFoundException,
   ConflictException,
+  BadRequestException,
   Logger,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
@@ -87,9 +88,19 @@ export class CheckoutSessionsService {
       where: { slug: resolvedVentureCode.toLowerCase() },
     });
 
-    const sessionId = `cs_${apiKey.startsWith('sk_live') ? 'live' : 'test'}_${randomBytes(8).toString('hex')}`;
-    const expiresAt = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
+    // Enforce per-brand max transaction amount
+    const maxAllowedPiasters = (venture as any)?.maxTransactionAmountPiasters || 5000000; // default 50,000 EGP in minor units
+    if (dto.amountPiasters > maxAllowedPiasters) {
+      throw new BadRequestException(
+        `Transaction amount (${dto.amountPiasters} piasters) exceeds maximum allowed limit for this brand (${maxAllowedPiasters} piasters).`,
+      );
+    }
 
+    // Validate redirect URLs against brand authorized domains (prevent open redirect vulnerabilities)
+    this.validateRedirectUrls(venture, dto.successUrl, dto.cancelUrl);
+
+    const sessionId = `cs_${apiKey.startsWith('sk_live') ? 'live' : 'test'}_${randomBytes(8).toString('hex')}`;
+    const expiresAt = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes expiry
     const session = await (this.prisma as any).checkoutSession.create({
       data: {
         id: sessionId,
@@ -334,7 +345,7 @@ export class CheckoutSessionsService {
       this.logger.warn(`[Checkout Completion] Order upsert notice: ${dbErr?.message || dbErr}`);
     }
 
-    // 3. Dispatch outbound webhook to the venture's LMS / Storefront
+    // 3. Dispatch outbound webhook to the venture's LMS / Storefront with retry
     const webhookPayload = {
       id: `evt_${Date.now()}_${randomBytes(4).toString('hex')}`,
       object: 'event',
@@ -356,28 +367,7 @@ export class CheckoutSessionsService {
       },
     };
 
-    const rawBody = JSON.stringify(webhookPayload);
-    const sigHeader = this.buildWebhookSignatureHeader(webhookSecret, rawBody);
-
-    try {
-      this.logger.log(`[Outbound Webhook] Dispatching ${webhookPayload.type} to ${webhookUrl}`);
-      const res = await fetch(webhookUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-BLDR-Signature': sigHeader,
-          'User-Agent': 'bldr-Payment-Hub/1.0',
-        },
-        body: rawBody,
-      });
-
-      const resBody = await res.json().catch(() => ({}));
-      this.logger.log(
-        `[Outbound Webhook Response] HTTP ${res.status}: ${JSON.stringify(resBody)}`,
-      );
-    } catch (err: any) {
-      this.logger.error(`[Outbound Webhook Error] Failed to post to ${webhookUrl}: ${err.message}`);
-    }
+    await this.dispatchWebhookWithRetry(webhookUrl, webhookPayload, webhookSecret);
 
     return {
       success: true,
@@ -386,6 +376,125 @@ export class CheckoutSessionsService {
       orderId,
       dispatchedTo: webhookUrl,
     };
+  }
+
+  // ─── Dispatch Webhook with Exponential Backoff ─────────────────────────────────
+  private async dispatchWebhookWithRetry(url: string, payload: any, secret: string, maxRetries = 3): Promise<boolean> {
+    const rawBody = JSON.stringify(payload);
+    const sigHeader = this.buildWebhookSignatureHeader(secret, rawBody);
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        this.logger.log(`[Outbound Webhook] Dispatching ${payload.type} (Attempt ${attempt}/${maxRetries}) to ${url}`);
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-BLDR-Signature': sigHeader,
+            'User-Agent': 'bldr-Payment-Hub/1.0',
+          },
+          body: rawBody,
+        });
+
+        if (res.ok) {
+          this.logger.log(`[Outbound Webhook] Successfully delivered ${payload.type} (HTTP ${res.status})`);
+          return true;
+        }
+        this.logger.warn(`[Outbound Webhook] Attempt ${attempt} failed with HTTP ${res.status}`);
+      } catch (err: any) {
+        this.logger.warn(`[Outbound Webhook] Attempt ${attempt} error: ${err.message}`);
+      }
+
+      if (attempt < maxRetries) {
+        const delayMs = attempt * 1000;
+        await new Promise(r => setTimeout(r, delayMs));
+      }
+    }
+    this.logger.error(`[Outbound Webhook] All ${maxRetries} delivery attempts failed for ${url}`);
+    return false;
+  }
+
+  // ─── Validate Redirect URLs Against Brand Whitelist ──────────────────────────
+  private validateRedirectUrls(venture: any, successUrl: string, cancelUrl: string) {
+    if (!successUrl || !cancelUrl) {
+      throw new BadRequestException('Both successUrl and cancelUrl are required.');
+    }
+
+    const allowedHosts = new Set<string>([
+      'localhost',
+      '127.0.0.1',
+      'bldr.store',
+      'studyhub.eg',
+      'app.studyhub.eg',
+      'apexclasses.eg',
+      'elhesa.eg',
+      'careerhub.eg',
+      ...(venture?.allowedOrigins || []),
+      ...(venture?.domains ? venture.domains.map((d: any) => typeof d === 'string' ? d : d.host) : []),
+    ]);
+
+    for (const urlStr of [successUrl, cancelUrl]) {
+      try {
+        const parsed = new URL(urlStr);
+        const host = parsed.hostname.toLowerCase();
+        const isAllowed = Array.from(allowedHosts).some(allowed => {
+          const a = allowed.toLowerCase().replace(/^https?:\/\//, '').split('/')[0].split(':')[0];
+          return host === a || host.endsWith(`.${a}`);
+        });
+
+        if (!isAllowed) {
+          throw new BadRequestException(
+            `Redirect domain "${parsed.hostname}" is not authorized for this brand. Register authorized domains in Hub Venture Configuration to prevent open redirect vulnerabilities.`,
+          );
+        }
+      } catch (err: any) {
+        if (err instanceof BadRequestException) throw err;
+        throw new BadRequestException(`Invalid redirect URL: "${urlStr}". Must be a valid absolute HTTP/HTTPS URL.`);
+      }
+    }
+  }
+
+  // ─── Refund & Dispute Webhook Notifications ─────────────────────────────────
+  async dispatchRefundWebhook(ventureId: string, orderId: string, refundAmountPiasters: number, reason: string) {
+    const venture = await this.prisma.provider.findFirst({ where: { slug: ventureId.toLowerCase() } });
+    if (!venture?.externalWebhookUrl) return false;
+
+    const payload = {
+      id: `evt_rf_${Date.now()}_${randomBytes(4).toString('hex')}`,
+      object: 'event',
+      type: 'refund.created',
+      event: 'refund.created',
+      created_at: new Date().toISOString(),
+      data: {
+        order_id: orderId,
+        refund_amount_piasters: refundAmountPiasters,
+        refund_amount_egp: refundAmountPiasters / 100,
+        currency: 'EGP',
+        reason,
+        status: 'refunded',
+      },
+    };
+    return this.dispatchWebhookWithRetry(venture.externalWebhookUrl, payload, venture.externalWebhookSecret || 'whsec_test_bldr_pilot_2026');
+  }
+
+  async dispatchDisputeWebhook(ventureId: string, orderId: string, disputeRef: string, reason: string) {
+    const venture = await this.prisma.provider.findFirst({ where: { slug: ventureId.toLowerCase() } });
+    if (!venture?.externalWebhookUrl) return false;
+
+    const payload = {
+      id: `evt_dsp_${Date.now()}_${randomBytes(4).toString('hex')}`,
+      object: 'event',
+      type: 'dispute.created',
+      event: 'dispute.created',
+      created_at: new Date().toISOString(),
+      data: {
+        order_id: orderId,
+        dispute_ref: disputeRef,
+        reason,
+        status: 'under_review',
+      },
+    };
+    return this.dispatchWebhookWithRetry(venture.externalWebhookUrl, payload, venture.externalWebhookSecret || 'whsec_test_bldr_pilot_2026');
   }
 
   // ─── Format ──────────────────────────────────────────────────────────────────

@@ -224,63 +224,65 @@ export default function HubLoginPage() {
           </p>
         </div>
 
-        {/* ─── Demo Profiles Quick-Fill Strip ─────────────────────── */}
-        <div style={{ marginBottom: 20 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Quick-Fill Verified Profiles:
-            </span>
-            <span style={{ fontSize: 10.5, color: '#64748B' }}>1-Click Switch</span>
-          </div>
+        {/* ─── Demo Profiles Quick-Fill Strip (Gated for Test Tools) ─────────────────────── */}
+        {process.env.NEXT_PUBLIC_ENABLE_TEST_TOOLS === 'true' && (
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Quick-Fill Verified Profiles:
+              </span>
+              <span style={{ fontSize: 10.5, color: '#64748B' }}>1-Click Switch</span>
+            </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
-            {DEMO_PROFILES.map((p) => {
-              const isSelected = activeProfile === p.label;
-              return (
-                <button
-                  key={p.label}
-                  type="button"
-                  onClick={() => handleProfileSelect(p)}
-                  style={{
-                    background: isSelected ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255, 255, 255, 0.04)',
-                    border: isSelected ? '1px solid #10B981' : '1px solid rgba(255, 255, 255, 0.08)',
-                    borderRadius: 8,
-                    padding: '7px 4px',
-                    textAlign: 'center',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease',
-                  }}
-                >
-                  <div
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
+              {DEMO_PROFILES.map((p) => {
+                const isSelected = activeProfile === p.label;
+                return (
+                  <button
+                    key={p.label}
+                    type="button"
+                    onClick={() => handleProfileSelect(p)}
                     style={{
-                      fontSize: 11,
-                      fontWeight: 800,
-                      color: isSelected ? '#34D399' : '#E2E8F0',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
+                      background: isSelected ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255, 255, 255, 0.04)',
+                      border: isSelected ? '1px solid #10B981' : '1px solid rgba(255, 255, 255, 0.08)',
+                      borderRadius: 8,
+                      padding: '7px 4px',
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
                     }}
                   >
-                    {p.label}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 9,
-                      color: isSelected ? '#A7F3D0' : '#64748B',
-                      marginTop: 2,
-                      fontWeight: 600,
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                    }}
-                  >
-                    {p.badge}
-                  </div>
-                </button>
-              );
-            })}
+                    <div
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 800,
+                        color: isSelected ? '#34D399' : '#E2E8F0',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
+                    >
+                      {p.label}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 9,
+                        color: isSelected ? '#A7F3D0' : '#64748B',
+                        marginTop: 2,
+                        fontWeight: 600,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
+                    >
+                      {p.badge}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Error message alert */}
         {errorMessage && (
