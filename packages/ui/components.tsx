@@ -591,16 +591,28 @@ export function BldrFooter({ lang = 'EN' }: { lang?: 'EN' | 'AR' } = {}) {
                 : 'A venture studio & payments infrastructure in Cairo & Giza. Specialist units, one single accountability line.'}
             </p>
             <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
-              {['LinkedIn', 'Instagram', 'X'].map((net) => (
-                <span key={net} style={{
-                  padding: '4px 10px',
-                  borderRadius: 999,
-                  border: '1px solid rgba(255, 255, 255, 0.16)',
-                  fontSize: 11,
-                  color: 'rgba(255, 255, 255, 0.75)',
-                }}>
-                  {net}
-                </span>
+              {[
+                { label: 'Instagram', href: 'https://www.instagram.com/bldr.management' },
+                { label: 'Facebook',  href: 'https://www.facebook.com/share/14uAjf399GL/' },
+                { label: 'LinkedIn',  href: 'https://www.linkedin.com/company/bldrmanagement/' },
+              ].map(({ label, href }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    padding: '4px 10px',
+                    borderRadius: 999,
+                    border: '1px solid rgba(255, 255, 255, 0.16)',
+                    fontSize: 11,
+                    fontWeight: 500,
+                    color: 'rgba(255, 255, 255, 0.75)',
+                    textDecoration: 'none',
+                  }}
+                >
+                  {label}
+                </a>
               ))}
             </div>
           </div>
@@ -611,18 +623,18 @@ export function BldrFooter({ lang = 'EN' }: { lang?: 'EN' | 'AR' } = {}) {
               {isRtl ? 'تواصل معنا' : 'Contact Us'}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13.5, fontWeight: 300, color: 'rgba(255,255,255,0.85)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ color: tokens.colors.gradientEnd }}>📍</span>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                <span style={{ color: tokens.colors.gradientEnd, fontSize: 11, marginTop: 2 }}>LOC</span>
                 <span>{isRtl ? 'الجيزة، جمهورية مصر العربية' : 'Giza, Egypt'}</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ color: tokens.colors.gradientEnd }}>📞</span>
+                <span style={{ color: tokens.colors.gradientEnd, fontSize: 11 }}>TEL</span>
                 <a href="tel:+201030165000" style={{ color: '#FFFFFF', textDecoration: 'none', fontWeight: 500, direction: 'ltr', unicodeBidi: 'embed' }}>
                   +20 10 30165000
                 </a>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ color: tokens.colors.gradientEnd }}>✉️</span>
+                <span style={{ color: tokens.colors.gradientEnd, fontSize: 11 }}>EMAIL</span>
                 <a href="mailto:bldr.management@gmail.com" style={{ color: '#FFFFFF', textDecoration: 'none', fontWeight: 400 }}>
                   bldr.management@gmail.com
                 </a>

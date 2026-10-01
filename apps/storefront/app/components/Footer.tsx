@@ -16,6 +16,31 @@ export default function Footer() {
             <p style={{ margin: 0, fontSize: 13.5, color: 'rgba(255, 255, 255, 0.65)', lineHeight: 1.68, maxWidth: 280 }}>
               We build world-class digital platforms and payment infrastructure. From strategy to execution — we're your full-stack growth partner.
             </p>
+            <div style={{ display: 'flex', gap: 8, marginTop: 2 }}>
+              {[
+                { label: 'Instagram', href: 'https://www.instagram.com/bldr.management' },
+                { label: 'Facebook',  href: 'https://www.facebook.com/share/14uAjf399GL/' },
+                { label: 'LinkedIn',  href: 'https://www.linkedin.com/company/bldrmanagement/' },
+              ].map(({ label, href }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    padding: '4px 10px',
+                    borderRadius: 999,
+                    border: '1px solid rgba(255,255,255,0.16)',
+                    fontSize: 11,
+                    fontWeight: 500,
+                    color: 'rgba(255,255,255,0.75)',
+                    textDecoration: 'none',
+                  }}
+                >
+                  {label}
+                </a>
+              ))}
+            </div>
           </div>
 
           {/* Contact Us Info */}
@@ -23,17 +48,17 @@ export default function Footer() {
             <h4 style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#FD9426', margin: 0 }}>Contact Us</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13.5, color: 'rgba(255,255,255,0.85)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span>📍</span>
+                <span style={{ fontSize: 10, fontWeight: 600, color: '#FD9426' }}>LOC</span>
                 <span>Giza, Egypt</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span>📞</span>
+                <span style={{ fontSize: 10, fontWeight: 600, color: '#FD9426' }}>TEL</span>
                 <a href="tel:+201030165000" style={{ color: '#FFFFFF', textDecoration: 'none', fontWeight: 500 }}>
                   +20 10 30165000
                 </a>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span>✉️</span>
+                <span style={{ fontSize: 10, fontWeight: 600, color: '#FD9426' }}>EMAIL</span>
                 <a href="mailto:bldr.management@gmail.com" style={{ color: '#FFFFFF', textDecoration: 'none' }}>
                   bldr.management@gmail.com
                 </a>
