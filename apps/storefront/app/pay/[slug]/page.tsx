@@ -415,61 +415,35 @@ function HostedPaymentContent() {
               <span>{isRtl ? 'English' : 'العربية'}</span>
             </button>
           </div>
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                <span
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 800,
-                    letterSpacing: '0.04em',
-                    padding: '3px 8px',
-                    borderRadius: 5,
-                    background: payment.chipBg,
-                    color: payment.chipFg,
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  {payment.ventureName}
-                </span>
-                <span style={{ fontSize: 11, color: '#94A3B8', fontFamily: tokens.fonts.mono }}>
-                  #{payment.orderNumber}
-                </span>
-              </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 20, flexWrap: 'wrap' }}>
+            <div style={{ flex: 1, minWidth: 240 }}>
               <h1
                 style={{
-                  fontSize: 19,
+                  fontSize: 'clamp(18px, 2.4vw, 22px)',
                   fontWeight: 800,
                   color: '#0F172A',
-                  margin: '0 0 6px',
+                  margin: 0,
                   letterSpacing: '-0.02em',
-                  lineHeight: 1.3,
+                  lineHeight: 1.35,
                 }}
               >
                 {isRtl ? payment.descriptionAr || payment.description : payment.description}
               </h1>
-              <div style={{ fontSize: 12, color: '#64748B', display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-                <span>
-                  {isRtl ? 'دعم القبول:' : 'Admissions:'}{' '}
-                  <strong style={{ color: '#0F172A' }}>{payment.supportPhone}</strong>
-                </span>
-                <span>•</span>
-                <span>{payment.supportEmail}</span>
-              </div>
             </div>
 
             {/* Price Badge */}
             <div style={{ textAlign: isRtl ? 'left' : 'right', flexShrink: 0 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', marginBottom: 2 }}>
                 {isRtl ? 'إجمالي الرسوم' : 'Total Amount'}
               </div>
               <div
                 style={{
-                  fontSize: 24,
+                  fontSize: 'clamp(22px, 2.8vw, 26px)',
                   fontWeight: 900,
                   color: '#0F172A',
                   fontFamily: tokens.fonts.mono,
                   letterSpacing: '-0.02em',
+                  lineHeight: 1.2,
                 }}
               >
                 {isRtl
