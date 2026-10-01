@@ -229,7 +229,16 @@ export function BldrNav({ lang = 'EN', onLanguageChange, onStartProject }: BldrN
         <a
           href="/"
           style={{
-                 {/* Navigation: Clean focused Courses & Programs link (services/projects/contact hidden from nav per requirement) */}
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            textDecoration: 'none',
+          }}
+        >
+          <span style={{ fontSize: 22, fontWeight: 800, letterSpacing: -0.5, color: '#14141A' }}>bldr</span>
+        </a>
+
+        {/* Navigation: Clean focused Courses & Programs link */}
         <nav style={{ display: 'flex', alignItems: 'center', gap: 24, position: 'relative' }}>
           <a
             href="/products"
