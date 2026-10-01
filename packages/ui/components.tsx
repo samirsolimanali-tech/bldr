@@ -748,7 +748,42 @@ export function BldrFooter({ lang = 'EN' }: { lang?: 'EN' | 'AR' } = {}) {
             </div>
           </div>
 
-          {/* Contact Us Info */}
+          {/* Company — left column */}
+          <div style={{ flex: '0 1 180px', minWidth: 150, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)' }}>
+              {isRtl ? 'الشركة' : 'Company'}
+            </div>
+            <a href="/" style={{ fontSize: 13.5, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>
+              {isRtl ? 'الرئيسية' : 'Home'}
+            </a>
+            <a href="/products" style={{ fontSize: 13.5, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>
+              {isRtl ? 'المنتجات والدورات' : 'Courses & Programs'}
+            </a>
+            <a href="/apply-provider" style={{ fontSize: 13.5, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>
+              {isRtl ? 'كن شريكاً معنا' : 'Partner with bldr'}
+            </a>
+          </div>
+
+          {/* Legal & Policies — middle column */}
+          <div style={{ flex: '0 1 180px', minWidth: 160, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)' }}>
+              {isRtl ? 'السياسات والشروط' : 'Legal & Policies'}
+            </div>
+            <a href="/privacy-policy" style={{ fontSize: 13.5, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>
+              {isRtl ? 'سياسة الخصوصية' : 'Privacy Policy'}
+            </a>
+            <a href="/terms" style={{ fontSize: 13.5, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>
+              {isRtl ? 'شروط الخدمة' : 'Terms of Service'}
+            </a>
+            <a href="/refund-policy" style={{ fontSize: 13.5, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>
+              {isRtl ? 'سياسة الاسترجاع والإلغاء' : 'Refund Policy'}
+            </a>
+            <a href="/contact" style={{ fontSize: 13.5, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>
+              {isRtl ? 'تواصل معنا' : 'Contact Us'}
+            </a>
+          </div>
+
+          {/* Contact Us — right column */}
           <div style={{ flex: '1 1 240px', minWidth: 220, display: 'flex', flexDirection: 'column', gap: 12 }}>
             <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: tokens.colors.gradientEnd }}>
               {isRtl ? 'تواصل معنا' : 'Contact Us'}
@@ -776,44 +811,6 @@ export function BldrFooter({ lang = 'EN' }: { lang?: 'EN' | 'AR' } = {}) {
                 </a>
               </div>
             </div>
-          </div>
-
-          {/* Legal & Policies */}
-          <div style={{ flex: '0 1 180px', minWidth: 160, display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)' }}>
-              {isRtl ? 'السياسات والشروط' : 'Legal & Policies'}
-            </div>
-            <a href="/privacy-policy" style={{ fontSize: 13.5, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>
-              {isRtl ? 'سياسة الخصوصية' : 'Privacy Policy'}
-            </a>
-            <a href="/terms" style={{ fontSize: 13.5, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>
-              {isRtl ? 'شروط الخدمة' : 'Terms of Service'}
-            </a>
-            <a href="/refund-policy" style={{ fontSize: 13.5, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>
-              {isRtl ? 'سياسة الاسترجاع والإلغاء' : 'Refund Policy'}
-            </a>
-            <a href="/contact" style={{ fontSize: 13.5, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>
-              {isRtl ? 'تواصل معنا' : 'Contact Us'}
-            </a>
-          </div>
-
-          {/* Company & Portals */}
-          <div style={{ flex: '0 1 180px', minWidth: 150, display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)' }}>
-              {isRtl ? 'الشركة والمنصات' : 'Company & Portals'}
-            </div>
-            <a href="/" style={{ fontSize: 13.5, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>
-              {isRtl ? 'الرئيسية' : 'Home'}
-            </a>
-            <a href="/products" style={{ fontSize: 13.5, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>
-              {isRtl ? 'المنتجات والدورات' : 'Courses & Programs'}
-            </a>
-            <a href="/apply-provider" style={{ fontSize: 13.5, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>
-              {isRtl ? 'كن شريكاً معنا' : 'Partner with bldr'}
-            </a>
-            <a href="http://localhost:3011" target="_blank" rel="noreferrer" style={{ fontSize: 13.5, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>
-              Payment Hub ↗
-            </a>
           </div>
         </div>
 

@@ -43,7 +43,28 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Contact Us Info */}
+          {/* Company — left */}
+          <div className="bldr-footer-col" style={{ flex: '0 1 180px', minWidth: 150, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <h4 style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)', margin: 0 }}>Company</h4>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <li><Link href="/" style={{ color: 'rgba(255,255,255,0.82)', fontSize: 13.5, textDecoration: 'none' }}>Home</Link></li>
+              <li><Link href="/products" style={{ color: 'rgba(255,255,255,0.82)', fontSize: 13.5, textDecoration: 'none' }}>Courses &amp; Programs</Link></li>
+              <li><Link href="/apply-provider" style={{ color: 'rgba(255,255,255,0.82)', fontSize: 13.5, textDecoration: 'none' }}>Partner with bldr</Link></li>
+            </ul>
+          </div>
+
+          {/* Legal & Policies — middle */}
+          <div className="bldr-footer-col" style={{ flex: '0 1 180px', minWidth: 160, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <h4 style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)', margin: 0 }}>Legal &amp; Policies</h4>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <li><Link href="/privacy-policy" style={{ color: 'rgba(255,255,255,0.82)', fontSize: 13.5, textDecoration: 'none' }}>Privacy Policy</Link></li>
+              <li><Link href="/terms" style={{ color: 'rgba(255,255,255,0.82)', fontSize: 13.5, textDecoration: 'none' }}>Terms of Service</Link></li>
+              <li><Link href="/refund-policy" style={{ color: 'rgba(255,255,255,0.82)', fontSize: 13.5, textDecoration: 'none' }}>Refund Policy</Link></li>
+              <li><Link href="/contact" style={{ color: 'rgba(255,255,255,0.82)', fontSize: 13.5, textDecoration: 'none' }}>Contact Us</Link></li>
+            </ul>
+          </div>
+
+          {/* Contact Us — right */}
           <div className="bldr-footer-col" style={{ flex: '1 1 240px', minWidth: 220, display: 'flex', flexDirection: 'column', gap: 12 }}>
             <h4 style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#FD9426', margin: 0 }}>Contact Us</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13.5, color: 'rgba(255,255,255,0.85)' }}>
@@ -65,33 +86,12 @@ export default function Footer() {
               </div>
               <div style={{ marginTop: 4 }}>
                 <Link href="/contact" style={{ fontSize: 12.5, fontWeight: 600, color: '#FD9426', textDecoration: 'none' }}>
-                  Contact Page & Inquiry Form →
+                  Contact Page &amp; Inquiry Form &rarr;
                 </Link>
               </div>
             </div>
           </div>
 
-          {/* Legal & Policies */}
-          <div className="bldr-footer-col" style={{ flex: '0 1 180px', minWidth: 160, display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <h4 style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)', margin: 0 }}>Legal & Policies</h4>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <li><Link href="/privacy-policy" style={{ color: 'rgba(255,255,255,0.82)', fontSize: 13.5, textDecoration: 'none' }}>Privacy Policy</Link></li>
-              <li><Link href="/terms" style={{ color: 'rgba(255,255,255,0.82)', fontSize: 13.5, textDecoration: 'none' }}>Terms of Service</Link></li>
-              <li><Link href="/refund-policy" style={{ color: 'rgba(255,255,255,0.82)', fontSize: 13.5, textDecoration: 'none' }}>Refund Policy</Link></li>
-              <li><Link href="/contact" style={{ color: 'rgba(255,255,255,0.82)', fontSize: 13.5, textDecoration: 'none' }}>Contact Us</Link></li>
-            </ul>
-          </div>
-
-          {/* Company */}
-          <div className="bldr-footer-col" style={{ flex: '0 1 180px', minWidth: 150, display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <h4 style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)', margin: 0 }}>Company</h4>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <li><Link href="/" style={{ color: 'rgba(255,255,255,0.82)', fontSize: 13.5, textDecoration: 'none' }}>Home</Link></li>
-              <li><Link href="/products" style={{ color: 'rgba(255,255,255,0.82)', fontSize: 13.5, textDecoration: 'none' }}>Courses & Programs</Link></li>
-              <li><Link href="/apply-provider" style={{ color: 'rgba(255,255,255,0.82)', fontSize: 13.5, textDecoration: 'none' }}>Partner with bldr</Link></li>
-              <li><a href="http://localhost:3011" target="_blank" rel="noreferrer" style={{ color: 'rgba(255,255,255,0.82)', fontSize: 13.5, textDecoration: 'none' }}>Payment Hub ↗</a></li>
-            </ul>
-          </div>
         </div>
 
         {/* Divider */}
