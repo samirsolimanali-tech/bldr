@@ -665,7 +665,7 @@ function HostedPaymentContent() {
                         <path d="M13 11v2"/>
                       </svg>
                       <strong style={{ fontSize: 15, color: '#0F172A' }}>
-                        {isRtl ? 'تفعيل كود مسبق الدفع' : 'Activate a Code'}
+                        {isRtl ? 'تفعيل كود أو قسيمة اشتراك' : 'Redeem Access Code'}
                       </strong>
                     </div>
                     <span
@@ -680,12 +680,12 @@ function HostedPaymentContent() {
                   </div>
                   <p style={{ fontSize: 12, color: '#64748B', margin: 0, lineHeight: 1.5 }}>
                     {isRtl
-                      ? 'لطلبة السنتر أو حاملي كروت التفعيل المطبوعة. تسجيل وقيد فوري بدون أي رسوم دفع إلكتروني.'
-                      : 'For center students with prepaid scratch cards. Zero fee, single-use instant enrollment.'}
+                      ? 'لحاملي أكواد الاشتراك المسبقة أو القسائم المعتمدة. التحاق فوري دون أي رسوم إضافية.'
+                      : 'For students with prepaid access codes or authorized vouchers. Instant enrollment with no extra processing fees.'}
                   </p>
                   <div style={{ marginTop: 'auto', paddingTop: 6 }}>
                     <span style={{ fontSize: 11, fontWeight: 700, color: '#059669', background: '#DCFCE7', padding: '2px 8px', borderRadius: 4 }}>
-                      {isRtl ? 'رسوم الدفع: 0 ج.م' : '0 EGP Gateway Fees'}
+                      {isRtl ? 'بدون رسوم إضافية (0 ج.م)' : 'No Processing Fees (0 EGP)'}
                     </span>
                   </div>
                 </div>
@@ -744,25 +744,25 @@ function HostedPaymentContent() {
                 <span>{isRtl ? 'العودة للاختيار' : 'Back to Options'}</span>
               </button>
               <span style={{ fontSize: 11, fontWeight: 700, color: '#059669', background: '#ECFDF5', padding: '3px 8px', borderRadius: 4 }}>
-                {isRtl ? 'تفعيل مباشر بدون رسوم' : 'Direct Zero-Fee Activation'}
+                {isRtl ? 'تفعيل فوري دون رسوم إضافية' : 'Instant Zero-Fee Activation'}
               </span>
             </div>
 
             <div>
               <h2 style={{ fontSize: 17, fontWeight: 800, color: '#0F172A', margin: '0 0 4px' }}>
-                {isRtl ? 'إدخال كود التفعيل وبيانات الطالب' : 'Enter Activation Code & Student Details'}
+                {isRtl ? 'إدخال كود التفعيل وبيانات الطالب' : 'Enter Access Code & Student Details'}
               </h2>
               <p style={{ fontSize: 12, color: '#64748B', margin: 0 }}>
                 {isRtl
-                  ? 'أدخل كود الكارت المطبوع وسجل بيانات الطالب لإتمام القيد الفوري.'
-                  : 'Enter the voucher serial code and student information to activate course access.'}
+                  ? 'أدخل كود الاشتراك وبيانات الطالب لإتمام التسجيل وتفعيل الوصول للمحتوى فوراً.'
+                  : 'Enter your access code and student information to activate course access immediately.'}
               </p>
             </div>
 
             {/* Code Input */}
             <div>
               <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#334155', marginBottom: 6 }}>
-                {isRtl ? 'كود التفعيل (سريال الكارت):' : 'Prepaid Activation Serial / Code:'} *
+                {isRtl ? 'كود التفعيل (رمز القسيمة):' : 'Access / Voucher Code:'} *
               </label>
               <input
                 type="text"
