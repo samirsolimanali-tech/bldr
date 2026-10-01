@@ -66,7 +66,16 @@ function ContentTab() {
   const [saveMsg, setSaveMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/api/cms').then(r => r.json()).then(r => { if (r.success && r.data) setData(r.data); });
+    fetch('/api/cms')
+      .then(r => r.json())
+      .then(r => {
+        if (r && r.data) {
+          setData(r.data);
+        }
+      })
+      .catch((err) => {
+        console.warn('Failed to fetch CMS data:', err);
+      });
   }, []);
 
   const save = async () => {
@@ -100,7 +109,20 @@ function ContentTab() {
     { id: 'brand', label: 'Brand & Contact' },
   ];
 
-  if (!data) return <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>Loading CMS data…</div>;
+  if (!data) return (
+    <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>
+      <div style={{ marginBottom: 12 }}>Loading CMS data…</div>
+      <button
+        onClick={() => {
+          fetch('/api/cms').then(r => r.json()).then(r => { if (r?.data) setData(r.data); });
+        }}
+        className="btn btn-sm btn-secondary"
+        style={{ fontSize: 12, padding: '5px 14px' }}
+      >
+        Retry
+      </button>
+    </div>
+  );
 
   const carouselItems: any[] = Array.isArray(data.carousel)
     ? data.carousel

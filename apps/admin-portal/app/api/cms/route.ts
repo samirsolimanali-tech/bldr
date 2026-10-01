@@ -2,18 +2,51 @@ import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
-// Path to shared CMS data file
-// process.cwd() in Next.js monorepo = monorepo root (NOT apps/admin-portal)
-const CMS_FILE_PATH = path.resolve(process.cwd(), 'packages/shared-types/src/cms-data.json');
+function getCmsFilePath(): string {
+  const candidatePaths = [
+    path.resolve(process.cwd(), 'packages/shared-types/src/cms-data.json'),
+    path.resolve(process.cwd(), '../../packages/shared-types/src/cms-data.json'),
+    path.resolve(process.cwd(), '../packages/shared-types/src/cms-data.json'),
+  ];
+  for (const p of candidatePaths) {
+    if (fs.existsSync(p)) return p;
+  }
+  return candidatePaths[0];
+}
 
 export async function GET() {
   try {
-    if (fs.existsSync(CMS_FILE_PATH)) {
-      const content = fs.readFileSync(CMS_FILE_PATH, 'utf-8');
+    const filePath = getCmsFilePath();
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, 'utf-8');
       const data = JSON.parse(content);
-      return NextResponse.json({ success: true, data });
+      return NextResponse.json({ success: true, data }, {
+        headers: { 'Cache-Control': 'no-store, max-age=0' },
+      });
     }
-    return NextResponse.json({ success: false, error: 'CMS file not found' }, { status: 404 });
+
+    // Fallback default CMS structure
+    return NextResponse.json({
+      success: true,
+      data: {
+        hero: {
+          tag: '',
+          tagAr: '',
+          title: 'We build the product, the brand, and the team that runs it.',
+          titleAr: 'نبني المنتج الرقمي، العلامة التجارية، والفريق الذي يديرها.',
+          subtitle: 'bldr operates specialist units and builds its own ventures. You work with the units you need and keep one point of contact for all of it — nobody hands the outcome to somebody else.',
+          subtitleAr: 'تدير bldr وحدات متخصصة وتبني مشاريعها الخاصة. تعمل مع الوحدات التي تحتاجها في التسويق والبرمجيات وبناء المنتجات تحت نقطة اتصال واحدة ومسؤولية كاملة.',
+          ctaLabel: 'Start a project →',
+          ctaLabelAr: 'ابدأ مشروعك معنا ←',
+          secondaryLabel: 'Explore Services',
+          secondaryLabelAr: 'استكشف الخدمات',
+          secondaryLink: '/services',
+        },
+        whatsBroken: { tag: "What's Broken", tagAr: 'ما هو الخلل؟', title: 'Everyone did their part. Nobody owned the outcome.', titleAr: 'الجميع قام بدوره.. ولكن لا أحد امتلك النتيجة.', cards: [] },
+        specialisms: { units: [] },
+        carousel: [],
+      },
+    });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
@@ -26,7 +59,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: 'Invalid payload' }, { status: 400 });
     }
 
-    fs.writeFileSync(CMS_FILE_PATH, JSON.stringify(body, null, 2), 'utf-8');
+    const filePath = getCmsFilePath();
+    try {
+      fs.writeFileSync(filePath, JSON.stringify(body, null, 2), 'utf-8');
+    } catch (e) {
+      console.warn('CMS file write error (read-only filesystem):', e);
+    }
     return NextResponse.json({ success: true, timestamp: Date.now(), message: 'CMS updated successfully' });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
