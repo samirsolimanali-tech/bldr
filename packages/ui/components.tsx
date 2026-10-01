@@ -1095,10 +1095,10 @@ export function BldrFooter({ lang = 'EN' }: { lang?: 'EN' | 'AR' } = {}) {
                 WebkitTextFillColor: 'transparent',
               }}>.</span>
             </div>
-            <p style={{ margin: 0, fontSize: 13.5, fontWeight: 300, lineHeight: 1.68, color: 'rgba(255, 255, 255, 0.65)', maxWidth: 280 }}>
+            <p style={{ margin: 0, fontSize: 13.5, fontWeight: 300, lineHeight: 1.68, color: 'rgba(255, 255, 255, 0.65)', maxWidth: 320 }}>
               {isRtl 
-                ? 'استوديو بناء المشاريع الرقمية والبنية التحتية للمدفوعات في القاهرة والجيزة. وحدات متخصصة بخط مسؤولية موحد.'
-                : 'A venture studio & payments infrastructure in Cairo & Giza. Specialist units, one single accountability line.'}
+                ? 'تمكين شركات تكنولوجيا التعليم والأكاديميات بالحلول الرقمية المتخصصة، البنية التحتية الذكية، وأنظمة المدفوعات المتكاملة.'
+                : 'Empowering EdTech businesses and educational academies with tailored digital solutions, automated operations, and payment infrastructure.'}
             </p>
             <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
               {[
