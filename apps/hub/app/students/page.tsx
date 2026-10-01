@@ -7,14 +7,14 @@ import HubTopBar from '../../components/HubTopBar';
 const STUDENTS = [
   { id: 'stu-001', name: 'أحمد حسن (Ahmed Hassan)', email: 'ahmed.hassan@gmail.com', venture: 'StudyHub Egypt', product: 'Full-Stack Engineering Bootcamp', amount: 4800, method: 'Fawry Ref Code', gateway: 'Fawry Pay', date: '2026-09-26', refund: 'None' },
   { id: 'stu-002', name: 'سارة محمود (Sara Mahmoud)', email: 'sara.mahmoud@gmail.com', venture: 'TechBridge Cairo', product: 'React & Next.js Workshop', amount: 1850, method: 'Vodafone Cash', gateway: 'Paymob', date: '2026-09-26', refund: 'None' },
-  { id: 'stu-003', name: 'عمر فاروق (Omar Farouk)', email: 'omar.farouk@yahoo.com', venture: 'EL HESA Academy', product: 'Executive MBA Registration', amount: 8500, method: 'Meeza Card', gateway: 'Geidea', date: '2026-09-25', refund: 'None' },
-  { id: 'stu-004', name: 'فاطمة السيد (Fatima El-Sayed)', email: 'fatima.elsayed@gmail.com', venture: 'Apex Alexandria', product: 'UI/UX Design Masterclass', amount: 2200, method: 'InstaPay', gateway: 'Paymob', date: '2026-09-25', refund: 'None' },
+  { id: 'stu-003', name: 'عمر فاروق (Omar Farouk)', email: 'omar.farouk@yahoo.com', venture: 'EL HESA Academy', product: 'Executive MBA Registration', amount: 8500, method: 'Visa Card', gateway: 'Geidea', date: '2026-09-25', refund: 'None' },
+  { id: 'stu-004', name: 'فاطمة السيد (Fatima El-Sayed)', email: 'fatima.elsayed@gmail.com', venture: 'Apex Alexandria', product: 'UI/UX Design Masterclass', amount: 2200, method: 'Vodafone Cash', gateway: 'Paymob', date: '2026-09-25', refund: 'None' },
   { id: 'stu-005', name: 'خالد إبراهيم (Khaled Ibrahim)', email: 'khaled.ibrahim@outlook.com', venture: 'StudyHub Egypt', product: 'Full-Stack Engineering Bootcamp', amount: 4800, method: 'Fawry Ref Code', gateway: 'Fawry Pay', date: '2026-09-24', refund: 'Full Refund' },
   { id: 'stu-006', name: 'نورا الشاذلي (Nora El-Shazly)', email: 'nora.shazly@gmail.com', venture: 'Sidekick Studio Egypt', product: 'Brand Design Playbook', amount: 450, method: 'Orange Money', gateway: 'Paymob', date: '2026-09-24', refund: 'None' },
   { id: 'stu-007', name: 'ماجد عبد الرحمن (Majed Abdelrahman)', email: 'majed.abdel@gmail.com', venture: 'TechBridge Cairo', product: 'Advanced Node.js & Docker', amount: 1650, method: 'Etisalat Cash', gateway: 'Fawry Pay', date: '2026-09-23', refund: 'None' },
   { id: 'stu-008', name: 'مريم خليل (Mariam Khalil)', email: 'mariam.khalil@gmail.com', venture: 'EL HESA Academy', product: 'Executive MBA Registration', amount: 8500, method: 'Bank Transfer (CIB)', gateway: 'Geidea', date: '2026-09-22', refund: 'Partial Refund' },
   { id: 'stu-009', name: 'يوسف الأمين (Youssef El-Amin)', email: 'youssef.amin@gmail.com', venture: 'StudyHub Egypt', product: 'Python & Data Science Diploma', amount: 3500, method: 'WE Pay', gateway: 'Paymob', date: '2026-09-22', refund: 'None' },
-  { id: 'stu-010', name: 'منى السيد (Mona El-Sayed)', email: 'mona.sayed@gmail.com', venture: 'EL HESA Academy', product: 'Digital Marketing & Growth', amount: 2800, method: 'Meeza Card', gateway: 'Geidea', date: '2026-09-21', refund: 'None' },
+  { id: 'stu-010', name: 'منى السيد (Mona El-Sayed)', email: 'mona.sayed@gmail.com', venture: 'EL HESA Academy', product: 'Digital Marketing & Growth', amount: 2800, method: 'Mastercard', gateway: 'Geidea', date: '2026-09-21', refund: 'None' },
 ];
 
 function RefundBadge({ r }: { r: string }) {

@@ -341,10 +341,9 @@ export default function VentureConfigPage() {
   ]);
 
   const [methods, setMethods] = useState([
-    { id: 'cards', label: 'Cards (Visa, MC, Meeza)', fg: '#2E6F5E', bg: '#E6EFEB', bd: '#A8D5C8', enabled: true },
-    { id: 'wallets', label: 'Mobile Wallets', fg: '#2E6F5E', bg: '#E6EFEB', bd: '#A8D5C8', enabled: true },
-    { id: 'fawry', label: 'Fawry Pay', fg: '#2E6F5E', bg: '#E6EFEB', bd: '#A8D5C8', enabled: true },
-    { id: 'installments', label: 'ValU / Installments', fg: '#5A6A80', bg: '#F5F7FA', bd: '#E3E8EF', enabled: false },
+    { id: 'cards', label: 'Cards (Visa, Mastercard)', fg: '#2E6F5E', bg: '#E6EFEB', bd: '#A8D5C8', enabled: true },
+    { id: 'wallets', label: 'Mobile Wallets (Vodafone, Orange, WE)', fg: '#2E6F5E', bg: '#E6EFEB', bd: '#A8D5C8', enabled: true },
+    { id: 'fawry', label: 'Fawry Pay Kiosk', fg: '#2E6F5E', bg: '#E6EFEB', bd: '#A8D5C8', enabled: true },
   ]);
 
   // Load active venture configuration whenever rawId changes
@@ -2101,17 +2100,29 @@ export default function VentureConfigPage() {
 
                   <div>
                     <label style={{ display: 'block', fontSize: 10.5, fontWeight: 700, textTransform: 'uppercase', color: '#8A94A6', marginBottom: 4 }}>
-                      Payout Cadence
+                      Settlement Cycle
                     </label>
                     <select
                       value={payoutCadence}
                       onChange={e => setPayoutCadence(e.target.value as any)}
                       style={{ height: 36, width: '100%', border: '1px solid #E3E8EF', borderRadius: 7, padding: '0 8px', fontSize: 12, fontWeight: 600 }}
                     >
-                      <option value="weekly">Weekly (Tuesdays)</option>
-                      <option value="daily">Daily Batch</option>
-                      <option value="manual">Manual On-Demand</option>
+                      <option value="weekly">Weekly Batch (Fridays)</option>
+                      <option value="biweekly">Bi-weekly Batch</option>
+                      <option value="monthly">Monthly Batch</option>
                     </select>
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: 10.5, fontWeight: 700, textTransform: 'uppercase', color: '#8A94A6', marginBottom: 4 }}>
+                      Rolling Reserve (%)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.5"
+                      defaultValue={5.0}
+                      style={{ height: 36, width: '100%', boxSizing: 'border-box', border: '1px solid #E3E8EF', borderRadius: 7, padding: '0 8px', fontSize: 13, fontWeight: 700 }}
+                    />
                   </div>
                 </div>
 

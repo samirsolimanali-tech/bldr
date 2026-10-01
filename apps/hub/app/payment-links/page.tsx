@@ -807,7 +807,7 @@ export default function PaymentLinksPage() {
                   https://pay.bldr.dev/{formVenture.toLowerCase().slice(0, 4)}/{formDesc ? formDesc.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 16) : 'checkout-pass'}
                 </div>
                 <div style={{ fontSize: 11, color: '#5B6169', marginTop: 4 }}>
-                  Includes Card (Visa/Mastercard/Meeza), Mobile Wallets & Fawry Pay
+                  Includes Card (Visa/Mastercard), Mobile Wallets & Fawry Pay
                 </div>
               </div>
 

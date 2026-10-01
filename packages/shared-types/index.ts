@@ -33,6 +33,7 @@ export enum OrderSource {
 
 export enum GatewayType {
   GEIDEA = 'GEIDEA',
+  PAYMOB = 'PAYMOB',
   FAWRY = 'FAWRY',
   EXTERNAL = 'EXTERNAL',
 }
@@ -295,7 +296,7 @@ export interface TransactionDetailDTO {
   vatAmount: number;
   refundableBalance: number;
   status: 'PAID' | 'FAILED' | 'PENDING' | 'REFUNDED' | 'EXPIRED';
-  paymentMethod: 'CARD' | 'WALLET' | 'FAWRY_CASH' | 'MEEZA';
+  paymentMethod: 'CARD' | 'WALLET' | 'FAWRY_CASH' | 'ACTIVATION_CODE';
   gatewayUsed: GatewayType;
   gatewayRef?: string;
   paidAt?: string;

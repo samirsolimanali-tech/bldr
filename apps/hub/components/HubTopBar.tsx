@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { logoutHubUser } from '../lib/auth';
 
 export interface HubTopBarProps {
-  title: string;
+  title?: string;
   crumb?: string;
   activeVenture?: string;
   selectedVenture?: string;
@@ -52,7 +52,7 @@ export function matchVenture(recordVentureName: string, selectedVentureIdOrName?
 }
 
 export default function HubTopBar({
-  title,
+  title = 'Central Payment Hub',
   crumb,
   activeVenture,
   selectedVenture: propSelectedVenture,

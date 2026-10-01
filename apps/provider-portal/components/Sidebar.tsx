@@ -25,19 +25,27 @@ interface NavItem {
   group: string;
 }
 
-const NAV: NavItem[] = [
-  { href: '/dashboard',        Icon: DashboardIcon,    label: 'Overview',          group: 'Main' },
-  { href: '/transactions',     Icon: TransactionsIcon, label: 'Transactions',      group: 'Financials' },
-  { href: '/students',         Icon: UsersIcon,        label: 'Paid Users',        group: 'Financials' },
-  { href: '/payouts',          Icon: PayoutIcon,       label: 'Payouts',           group: 'Financials' },
-  { href: '/payment-links',    Icon: LinkIcon,         label: 'Payment Links',     group: 'Tools' },
-  { href: '/payment-pages',    Icon: CheckoutIcon,     label: 'Master Checkout',   group: 'Tools' },
-  { href: '/activation-codes', Icon: TicketIcon,       label: 'Activation Codes',  group: 'Tools' },
-  { href: '/apis',             Icon: ApiIcon,          label: 'Bldr APIs',         group: 'Tools' },
-  { href: '/options',          Icon: SettingsIcon,     label: 'Bldr Options',      group: 'Settings' },
+const FINANCE_NAV: NavItem[] = [
+  { href: '/dashboard',        Icon: DashboardIcon,    label: 'Dashboard',             group: 'Main' },
+  { href: '/payouts',          Icon: PayoutIcon,       label: 'Settlement Statements', group: 'Financials' },
+  { href: '/transactions',     Icon: TransactionsIcon, label: 'Transactions',          group: 'Financials' },
+  { href: '/orders',           Icon: LinkIcon,         label: 'Orders (Read-only)',    group: 'Financials' },
+  { href: '/refund-requests',  Icon: SettingsIcon,     label: 'Refund Requests',       group: 'Financials' },
+  { href: '/activation-codes', Icon: TicketIcon,       label: 'Activation Codes',      group: 'Operations' },
+  { href: '/payment-pages',    Icon: CheckoutIcon,     label: 'Checkout Branding',     group: 'Operations' },
+  { href: '/payment-links',    Icon: LinkIcon,         label: 'Payment Links',         group: 'Operations' },
+  { href: '/team',             Icon: UsersIcon,        label: 'Team & Roles',          group: 'Configuration' },
+  { href: '/integrations',     Icon: ApiIcon,          label: 'Integrations & Keys',   group: 'Configuration' },
+  { href: '/settings',         Icon: SettingsIcon,     label: 'Brand Settings',        group: 'Configuration' },
 ];
 
-const GROUPS = ['Main', 'Financials', 'Tools', 'Settings'];
+const OPTIONAL_CATALOG_NAV: NavItem[] = [
+  { href: '/listings',         Icon: LinkIcon,         label: 'Catalog & Courses',     group: 'LMS Incubation' },
+  { href: '/students',         Icon: UsersIcon,        label: 'Student Directory',     group: 'LMS Incubation' },
+  { href: '/leads',            Icon: UsersIcon,        label: 'Inbound Leads',         group: 'LMS Incubation' },
+];
+
+const GROUPS = ['Main', 'Financials', 'Operations', 'Configuration', 'LMS Incubation'];
 
 export default function ProviderSidebar() {
   const path = usePathname();
@@ -67,6 +75,20 @@ export default function ProviderSidebar() {
   const handleSignOut = () => {
     logoutProvider();
   };
+
+  const [showCatalog, setShowCatalog] = React.useState(false);
+
+  React.useEffect(() => {
+    try {
+      const feat = localStorage.getItem('bldr_brand_features');
+      if (feat) {
+        const parsed = JSON.parse(feat);
+        if (parsed.catalog || parsed.students) setShowCatalog(true);
+      }
+    } catch (e) {}
+  }, []);
+
+  const navItems = showCatalog ? [...FINANCE_NAV, ...OPTIONAL_CATALOG_NAV] : FINANCE_NAV;
 
   return (
     <aside style={{
@@ -111,7 +133,8 @@ export default function ProviderSidebar() {
       {/* Navigation */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4, marginTop: 8 }}>
         {GROUPS.map((group) => {
-          const items = NAV.filter(n => n.group === group);
+          const items = navItems.filter(n => n.group === group);
+          if (items.length === 0) return null;
           return (
             <div key={group} style={{ marginTop: group === 'Main' ? 0 : 12 }}>
               {group !== 'Main' && (

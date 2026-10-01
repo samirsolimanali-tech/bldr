@@ -5,9 +5,9 @@ import HubSidebar from '../../components/HubSidebar';
 import HubTopBar from '../../components/HubTopBar';
 
 const GATEWAYS = [
-  { id: 'gw-fawry', name: 'Fawry Pay', region: 'Egypt (Fawry Ref Code / Wallets / Meeza)', logo: 'FP', connected: true, ventures: 5, lastSync: '1 min ago', keyPreview: 'fawry_sec_****9920', webhook: 'https://hub.bldr.io/webhooks/fawry-ipn', color: '#F59E0B' },
-  { id: 'gw-paymob', name: 'Paymob (Accept)', region: 'Egypt & MENA (Cards / Wallets / ValU)', logo: 'PM', connected: true, ventures: 4, lastSync: '3 min ago', keyPreview: 'paymob_live_****7821', webhook: 'https://hub.bldr.io/webhooks/paymob-callback', color: '#2563EB' },
-  { id: 'gw-geidea', name: 'Geidea Payment Gateway', region: 'Egypt & KSA (Meeza / Cards / POS)', logo: 'GD', connected: true, ventures: 3, lastSync: '8 min ago', keyPreview: 'geidea_pub_****3310', webhook: 'https://hub.bldr.io/webhooks/geidea', color: '#DC2626' },
+  { id: 'gw-fawry', name: 'Fawry Pay', region: 'Egypt (Fawry Ref Code / Kiosk Payments)', logo: 'FP', connected: true, ventures: 5, lastSync: '1 min ago', keyPreview: 'fawry_sec_****9920', webhook: 'https://hub.bldr.io/webhooks/fawry-ipn', color: '#F59E0B' },
+  { id: 'gw-paymob', name: 'Paymob (Accept)', region: 'Egypt (Cards / Mobile Wallets)', logo: 'PM', connected: true, ventures: 4, lastSync: '3 min ago', keyPreview: 'paymob_live_****7821', webhook: 'https://hub.bldr.io/webhooks/paymob-callback', color: '#2563EB' },
+  { id: 'gw-geidea', name: 'Geidea Payment Gateway', region: 'Egypt (Cards / Mobile Wallets)', logo: 'GD', connected: true, ventures: 3, lastSync: '8 min ago', keyPreview: 'geidea_pub_****3310', webhook: 'https://hub.bldr.io/webhooks/geidea', color: '#DC2626' },
   { id: 'gw-tap', name: 'Tap Payments', region: 'MENA', logo: 'TAP', connected: true, ventures: 2, lastSync: '15 min ago', keyPreview: 'sk_live_****3f2a', webhook: 'https://hub.bldr.io/webhooks/tap', color: '#0EA5E9' },
   { id: 'gw-stripe', name: 'Stripe', region: 'Global', logo: 'STR', connected: true, ventures: 2, lastSync: '20 min ago', keyPreview: 'sk_live_****8c1b', webhook: 'https://hub.bldr.io/webhooks/stripe', color: '#6366F1' },
   { id: 'gw-paypal', name: 'PayPal', region: 'Global', logo: 'PP', connected: false, ventures: 0, lastSync: 'Never', keyPreview: null, webhook: null, color: '#3B82F6' },

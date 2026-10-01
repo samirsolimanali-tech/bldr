@@ -63,10 +63,9 @@ const VENTURE_BASELINES: VentureBaseline[] = [
     unmatched: 22500,
     pendingPayouts: 85000,
     rails: [
-      { name: 'Cards (Visa / MC)', code: 'cards', share: 0.62, feeRate: 0.026, sr: 96.4 },
-      { name: 'Mobile Wallets', code: 'wallets', share: 0.22, feeRate: 0.020, sr: 93.8 },
-      { name: 'Kiosk / Fawry Pay', code: 'kiosk', share: 0.11, feeRate: 0.025, sr: 91.2 },
-      { name: 'InstaPay Direct', code: 'instapay', share: 0.05, feeRate: 0.010, sr: 98.6 },
+      { name: 'Cards (Visa / MC)', code: 'cards', share: 0.65, feeRate: 0.026, sr: 96.4 },
+      { name: 'Mobile Wallets', code: 'wallets', share: 0.23, feeRate: 0.020, sr: 93.8 },
+      { name: 'Kiosk / Fawry Pay', code: 'kiosk', share: 0.12, feeRate: 0.025, sr: 91.2 },
     ],
   },
   {
@@ -83,10 +82,9 @@ const VENTURE_BASELINES: VentureBaseline[] = [
     unmatched: 11250,
     pendingPayouts: 38000,
     rails: [
-      { name: 'Cards (Visa / MC)', code: 'cards', share: 0.70, feeRate: 0.026, sr: 95.0 },
-      { name: 'Mobile Wallets', code: 'wallets', share: 0.18, feeRate: 0.020, sr: 92.1 },
+      { name: 'Cards (Visa / MC)', code: 'cards', share: 0.72, feeRate: 0.026, sr: 95.0 },
+      { name: 'Mobile Wallets', code: 'wallets', share: 0.20, feeRate: 0.020, sr: 92.1 },
       { name: 'Kiosk / Fawry Pay', code: 'kiosk', share: 0.08, feeRate: 0.025, sr: 89.5 },
-      { name: 'InstaPay Direct', code: 'instapay', share: 0.04, feeRate: 0.010, sr: 97.9 },
     ],
   },
   {
@@ -103,10 +101,9 @@ const VENTURE_BASELINES: VentureBaseline[] = [
     unmatched: 5500,
     pendingPayouts: 19000,
     rails: [
-      { name: 'Mobile Wallets', code: 'wallets', share: 0.45, feeRate: 0.020, sr: 93.2 },
-      { name: 'Kiosk / Fawry Pay', code: 'kiosk', share: 0.35, feeRate: 0.025, sr: 90.6 },
+      { name: 'Mobile Wallets', code: 'wallets', share: 0.46, feeRate: 0.020, sr: 93.2 },
+      { name: 'Kiosk / Fawry Pay', code: 'kiosk', share: 0.36, feeRate: 0.025, sr: 90.6 },
       { name: 'Cards (Visa / MC)', code: 'cards', share: 0.18, feeRate: 0.026, sr: 94.8 },
-      { name: 'InstaPay Direct', code: 'instapay', share: 0.02, feeRate: 0.010, sr: 97.5 },
     ],
   },
   {
@@ -123,9 +120,8 @@ const VENTURE_BASELINES: VentureBaseline[] = [
     unmatched: 2000,
     pendingPayouts: 6000,
     rails: [
-      { name: 'Cards (Visa / MC)', code: 'cards', share: 0.82, feeRate: 0.026, sr: 97.5 },
-      { name: 'InstaPay Direct', code: 'instapay', share: 0.12, feeRate: 0.010, sr: 99.0 },
-      { name: 'Mobile Wallets', code: 'wallets', share: 0.06, feeRate: 0.020, sr: 94.0 },
+      { name: 'Cards (Visa / MC)', code: 'cards', share: 0.88, feeRate: 0.026, sr: 97.5 },
+      { name: 'Mobile Wallets', code: 'wallets', share: 0.12, feeRate: 0.020, sr: 94.0 },
     ],
   },
 ];
@@ -232,10 +228,9 @@ export default function HubExecutiveOverview() {
   // Method Factor & SR adjustments
   const methodFactors: Record<string, { share: number; srDelta: number; label: string }> = {
     all: { share: 1.0, srDelta: 0, label: 'All Methods' },
-    cards: { share: 0.65, srDelta: 1.8, label: 'Cards (Visa & MC)' },
+    cards: { share: 0.68, srDelta: 1.8, label: 'Cards (Visa & MC)' },
     wallets: { share: 0.22, srDelta: -1.2, label: 'Mobile Wallets' },
-    kiosk: { share: 0.09, srDelta: -3.5, label: 'Kiosk / Fawry Pay' },
-    instapay: { share: 0.04, srDelta: 3.2, label: 'InstaPay Direct' },
+    kiosk: { share: 0.10, srDelta: -3.5, label: 'Kiosk / Fawry Pay' },
   };
 
   // Gateway Factor

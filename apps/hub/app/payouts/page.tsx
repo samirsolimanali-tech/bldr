@@ -4,40 +4,176 @@ import React, { useState, useEffect, useMemo } from 'react';
 import HubSidebar from '../../components/HubSidebar';
 import HubTopBar, { resolveVentureObj, matchVenture, VENTURES } from '../../components/HubTopBar';
 
-interface PayoutRecord {
+interface SettlementRecord {
   id: string;
+  batchId: string;
   venture: string;
-  amount: number;
-  status: 'Settled' | 'Pending';
-  method: string;
-  date: string;
-  ref: string;
-  bankName: string;
-  iban: string;
+  ventureCode: string;
+  period: string;
   grossAmount: number;
+  gatewayFee: number;
   platformFee: number;
+  vatAmount: number;
+  reserveAmount: number;
+  netSettlement: number;
+  status: 'Settled' | 'Pending Settlement';
+  transferRef: string;
+  debitAccount: string;
+  creditAccount: string;
+  settledAt?: string;
+  createdAt: string;
 }
 
-const INITIAL_PAYOUTS: PayoutRecord[] = [
-  // bldr (Storefront Pilot)
-  { id: 'PAY-EG-0442', venture: 'bldr (Storefront Pilot)', amount: 145000, status: 'Settled', method: 'Bank Transfer (CIB)', date: '2026-09-18', ref: 'CIB-ACH-44220', bankName: 'Commercial International Bank (CIB)', iban: 'EG38 0010 0023 4455 6677 8899 99', grossAmount: 161111, platformFee: 16111 },
-  { id: 'PAY-EG-0437', venture: 'bldr (Storefront Pilot)', amount: 52000, status: 'Pending', method: 'Bank Transfer (CIB)', date: '2026-09-30', ref: 'Awaiting Initiation', bankName: 'Commercial International Bank (CIB)', iban: 'EG38 0010 0023 4455 6677 8899 99', grossAmount: 57777, platformFee: 5777 },
-
-  // StudyHub
-  { id: 'PAY-EG-0441', venture: 'StudyHub', amount: 93600, status: 'Settled', method: 'Bank Transfer (CIB)', date: '2026-09-15', ref: 'CIB-ACH-44219', bankName: 'Commercial International Bank (CIB)', iban: 'EG38 0010 0023 4455 6677 8899 01', grossAmount: 104000, platformFee: 10400 },
-  { id: 'PAY-EG-0436', venture: 'StudyHub', amount: 48000, status: 'Pending', method: 'Bank Transfer (CIB)', date: '2026-09-30', ref: 'Awaiting Initiation', bankName: 'Commercial International Bank (CIB)', iban: 'EG38 0010 0023 4455 6677 8899 01', grossAmount: 53333, platformFee: 5333 },
-
-  // Apex Classes
-  { id: 'PAY-EG-0440', venture: 'Apex Classes', amount: 133500, status: 'Settled', method: 'Bank Transfer (QNB)', date: '2026-09-15', ref: 'QNB-EG-44218', bankName: 'QNB Alahli Egypt', iban: 'EG12 0037 0019 8877 6655 4433 22', grossAmount: 148333, platformFee: 14833 },
-  { id: 'PAY-EG-0435', venture: 'Apex Classes', amount: 28000, status: 'Pending', method: 'Bank Transfer (CIB)', date: '2026-09-30', ref: 'Awaiting Initiation', bankName: 'Commercial International Bank (CIB)', iban: 'EG38 0010 0099 1122 3344 5566 77', grossAmount: 31111, platformFee: 3111 },
-
-  // EL HESA
-  { id: 'PAY-EG-0439', venture: 'EL HESA', amount: 60900, status: 'Settled', method: 'Bank Transfer (Banque Misr)', date: '2026-09-01', ref: 'BMR-ACH-43991', bankName: 'Banque Misr', iban: 'EG55 0002 0011 2233 4455 6677 88', grossAmount: 67666, platformFee: 6766 },
-  { id: 'PAY-EG-0434', venture: 'EL HESA', amount: 14000, status: 'Pending', method: 'Bank Transfer (Banque Misr)', date: '2026-09-30', ref: 'Awaiting Initiation', bankName: 'Banque Misr', iban: 'EG55 0002 0011 2233 4455 6677 88', grossAmount: 15555, platformFee: 1555 },
-
-  // Career Hub
-  { id: 'PAY-EG-0438', venture: 'Career Hub', amount: 59550, status: 'Settled', method: 'InstaPay Corporate', date: '2026-09-01', ref: 'IP-CORP-43990', bankName: 'National Bank of Egypt (NBE)', iban: 'EG09 0001 0044 5566 7788 9900 11', grossAmount: 66166, platformFee: 6616 },
-  { id: 'PAY-EG-0433', venture: 'Career Hub', amount: 18500, status: 'Pending', method: 'InstaPay Corporate', date: '2026-09-30', ref: 'Awaiting Initiation', bankName: 'National Bank of Egypt (NBE)', iban: 'EG09 0001 0044 5566 7788 9900 11', grossAmount: 20555, platformFee: 2055 },
+const INITIAL_SETTLEMENTS: SettlementRecord[] = [
+  {
+    id: 'STL-EG-0442',
+    batchId: 'BATCH-2026-W37',
+    venture: 'bldr (Storefront Pilot)',
+    ventureCode: 'BLDR',
+    period: '2026-09-08 to 2026-09-14',
+    grossAmount: 161111,
+    gatewayFee: 4028,
+    platformFee: 8055,
+    vatAmount: 1128,
+    reserveAmount: 8055,
+    netSettlement: 139845,
+    status: 'Settled',
+    transferRef: 'TR-INT-44220',
+    debitAccount: 'BLDR Merchant Holding Pool (Acquiring)',
+    creditAccount: 'BLDR Incubator Treasury (Operating)',
+    settledAt: '2026-09-18',
+    createdAt: '2026-09-15',
+  },
+  {
+    id: 'STL-EG-0437',
+    batchId: 'BATCH-2026-W39',
+    venture: 'bldr (Storefront Pilot)',
+    ventureCode: 'BLDR',
+    period: '2026-09-22 to 2026-09-28',
+    grossAmount: 57777,
+    gatewayFee: 1444,
+    platformFee: 2889,
+    vatAmount: 404,
+    reserveAmount: 2889,
+    netSettlement: 50151,
+    status: 'Pending Settlement',
+    transferRef: 'TR-PEND-43701',
+    debitAccount: 'BLDR Merchant Holding Pool (Acquiring)',
+    creditAccount: 'BLDR Incubator Treasury (Operating)',
+    createdAt: '2026-09-29',
+  },
+  {
+    id: 'STL-EG-0441',
+    batchId: 'BATCH-2026-W37',
+    venture: 'StudyHub',
+    ventureCode: 'SH',
+    period: '2026-09-08 to 2026-09-14',
+    grossAmount: 104000,
+    gatewayFee: 2600,
+    platformFee: 5200,
+    vatAmount: 728,
+    reserveAmount: 5200,
+    netSettlement: 90272,
+    status: 'Settled',
+    transferRef: 'TR-INT-44219',
+    debitAccount: 'BLDR Merchant Holding Pool (Acquiring)',
+    creditAccount: 'StudyHub Brand Ledger (Internal)',
+    settledAt: '2026-09-15',
+    createdAt: '2026-09-15',
+  },
+  {
+    id: 'STL-EG-0436',
+    batchId: 'BATCH-2026-W39',
+    venture: 'StudyHub',
+    ventureCode: 'SH',
+    period: '2026-09-22 to 2026-09-28',
+    grossAmount: 53333,
+    gatewayFee: 1333,
+    platformFee: 2667,
+    vatAmount: 373,
+    reserveAmount: 2667,
+    netSettlement: 46293,
+    status: 'Pending Settlement',
+    transferRef: 'TR-PEND-43601',
+    debitAccount: 'BLDR Merchant Holding Pool (Acquiring)',
+    creditAccount: 'StudyHub Brand Ledger (Internal)',
+    createdAt: '2026-09-29',
+  },
+  {
+    id: 'STL-EG-0440',
+    batchId: 'BATCH-2026-W37',
+    venture: 'Apex Classes',
+    ventureCode: 'AC',
+    period: '2026-09-08 to 2026-09-14',
+    grossAmount: 148333,
+    gatewayFee: 3708,
+    platformFee: 7417,
+    vatAmount: 1038,
+    reserveAmount: 7417,
+    netSettlement: 128753,
+    status: 'Settled',
+    transferRef: 'TR-INT-44218',
+    debitAccount: 'BLDR Merchant Holding Pool (Acquiring)',
+    creditAccount: 'Apex Classes Brand Ledger (Internal)',
+    settledAt: '2026-09-15',
+    createdAt: '2026-09-15',
+  },
+  {
+    id: 'STL-EG-0435',
+    batchId: 'BATCH-2026-W39',
+    venture: 'Apex Classes',
+    ventureCode: 'AC',
+    period: '2026-09-22 to 2026-09-28',
+    grossAmount: 31111,
+    gatewayFee: 778,
+    platformFee: 1556,
+    vatAmount: 218,
+    reserveAmount: 1556,
+    netSettlement: 27003,
+    status: 'Pending Settlement',
+    transferRef: 'TR-PEND-43501',
+    debitAccount: 'BLDR Merchant Holding Pool (Acquiring)',
+    creditAccount: 'Apex Classes Brand Ledger (Internal)',
+    createdAt: '2026-09-29',
+  },
+  {
+    id: 'STL-EG-0439',
+    batchId: 'BATCH-2026-W35',
+    venture: 'EL HESA',
+    ventureCode: 'EH',
+    period: '2026-08-25 to 2026-08-31',
+    grossAmount: 67666,
+    gatewayFee: 1692,
+    platformFee: 3383,
+    vatAmount: 474,
+    reserveAmount: 3383,
+    netSettlement: 58734,
+    status: 'Settled',
+    transferRef: 'TR-INT-43991',
+    debitAccount: 'BLDR Merchant Holding Pool (Acquiring)',
+    creditAccount: 'EL HESA Brand Ledger (Internal)',
+    settledAt: '2026-09-01',
+    createdAt: '2026-09-01',
+  },
+  {
+    id: 'STL-EG-0438',
+    batchId: 'BATCH-2026-W35',
+    venture: 'Career Hub',
+    ventureCode: 'CH',
+    period: '2026-08-25 to 2026-08-31',
+    grossAmount: 66166,
+    gatewayFee: 1654,
+    platformFee: 3308,
+    vatAmount: 463,
+    reserveAmount: 3308,
+    netSettlement: 57433,
+    status: 'Settled',
+    transferRef: 'TR-INT-43990',
+    debitAccount: 'BLDR Merchant Holding Pool (Acquiring)',
+    creditAccount: 'Career Hub Brand Ledger (Internal)',
+    settledAt: '2026-09-01',
+    createdAt: '2026-09-01',
+  },
 ];
 
 const BASE_MONTHLY = [
@@ -49,495 +185,566 @@ const BASE_MONTHLY = [
   { month: 'Sep', settled: 492550, pending: 160500 },
 ];
 
-const PROVIDER_BANKS: Record<string, { bank: string; iban: string; pendingBalance: number }> = {
-  'bldr (Storefront Pilot)': { bank: 'Commercial International Bank (CIB)', iban: 'EG38 0010 0023 4455 6677 8899 99', pendingBalance: 52000 },
-  'StudyHub': { bank: 'Commercial International Bank (CIB)', iban: 'EG38 0010 0023 4455 6677 8899 01', pendingBalance: 48000 },
-  'Apex Classes': { bank: 'Commercial International Bank (CIB)', iban: 'EG38 0010 0099 1122 3344 5566 77', pendingBalance: 28000 },
-  'EL HESA': { bank: 'Banque Misr', iban: 'EG55 0002 0011 2233 4455 6677 88', pendingBalance: 14000 },
-  'Career Hub': { bank: 'National Bank of Egypt (NBE)', iban: 'EG09 0001 0044 5566 7788 9900 11', pendingBalance: 18500 },
-};
-
 function StatusBadge({ s }: { s: string }) {
-  return <span className={`hub-badge ${s === 'Settled' ? 'success' : 'warning'}`}>{s}</span>;
+  return (
+    <span
+      style={{
+        padding: '3px 8px',
+        borderRadius: 4,
+        fontSize: 11,
+        fontWeight: 600,
+        background: s === 'Settled' ? '#DCFCE7' : '#FEF3C7',
+        color: s === 'Settled' ? '#166534' : '#92400E',
+      }}
+    >
+      {s}
+    </span>
+  );
 }
 
-export default function PayoutsPage() {
-  const [payouts, setPayouts] = useState<PayoutRecord[]>(INITIAL_PAYOUTS);
+export default function SettlementsPage() {
+  const [settlements, setSettlements] = useState<SettlementRecord[]>(INITIAL_SETTLEMENTS);
   const [filter, setFilter] = useState('All');
   const [activeVenture, setActiveVenture] = useState<string>('all');
-  
+
   // Modal States
   const [showInitiateModal, setShowInitiateModal] = useState(false);
-  const [receiptPayout, setReceiptPayout] = useState<PayoutRecord | null>(null);
+  const [selectedStatement, setSelectedStatement] = useState<SettlementRecord | null>(null);
   const [successToast, setSuccessToast] = useState('');
 
-  // Form State for Initiating Payout
+  // Form State for Initiating Settlement Batch
   const [modalVenture, setModalVenture] = useState('bldr (Storefront Pilot)');
-  const [payoutAmount, setPayoutAmount] = useState('52000');
-  const [payoutMethod, setPayoutMethod] = useState('Egyptian Bank Transfer (ACH / CIB)');
-  const [transferNotes, setTransferNotes] = useState('September 2026 Student Cohort Net Settlement');
+  const [settlementAmount, setSettlementAmount] = useState('50151');
+  const [transferNotes, setTransferNotes] = useState('Weekly inter-brand transfer authorization per ledger rules');
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Sync with localStorage & cross-component changes
   useEffect(() => {
     try {
       const stored = localStorage.getItem('bldr_active_venture');
       if (stored) setActiveVenture(stored);
-    } catch (e) {}
+    } catch {}
 
-    const handleVentureChanged = (e: any) => {
-      if (e?.detail) setActiveVenture(e.detail);
+    const handleStorage = () => {
+      try {
+        const stored = localStorage.getItem('bldr_active_venture');
+        if (stored) setActiveVenture(stored);
+      } catch {}
     };
-    window.addEventListener('bldr:venture-changed', handleVentureChanged);
-    return () => window.removeEventListener('bldr:venture-changed', handleVentureChanged);
+
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
   }, []);
 
-  const handleVentureChange = (v: string) => {
-    setActiveVenture(v);
-    try {
-      localStorage.setItem('bldr_active_venture', v);
-      window.dispatchEvent(new CustomEvent('bldr:venture-changed', { detail: v }));
-    } catch (e) {}
-  };
+  const filteredSettlements = useMemo(() => {
+    return settlements.filter((s) => {
+      const matchStatus =
+        filter === 'All'
+          ? true
+          : filter === 'Settled'
+          ? s.status === 'Settled'
+          : s.status === 'Pending Settlement';
 
-  const handleOpenInitiateModal = (initialV?: string) => {
-    let target = initialV;
-    if (!target) {
-      const resolved = resolveVentureObj(activeVenture);
-      target = resolved.slug === 'all' ? 'bldr (Storefront Pilot)' : resolved.name;
-    }
-    const cleanVenture = Object.keys(PROVIDER_BANKS).find(k => matchVenture(k, target)) || 'bldr (Storefront Pilot)';
-    setModalVenture(cleanVenture);
-    setPayoutAmount((PROVIDER_BANKS[cleanVenture]?.pendingBalance || 25000).toString());
-    setShowInitiateModal(true);
-  };
+      const matchV = matchVenture(s.venture, activeVenture);
+      return matchStatus && matchV;
+    });
+  }, [settlements, filter, activeVenture]);
 
-  const handleModalVentureChange = (v: string) => {
-    setModalVenture(v);
-    const balance = PROVIDER_BANKS[v]?.pendingBalance || 25000;
-    setPayoutAmount(balance.toString());
-  };
+  const activeVentureObj = resolveVentureObj(activeVenture);
 
-  const handlePayNowRow = (p: PayoutRecord) => {
-    setModalVenture(p.venture);
-    setPayoutAmount(p.amount.toString());
-    setShowInitiateModal(true);
-  };
+  const totalSettled = filteredSettlements
+    .filter((s) => s.status === 'Settled')
+    .reduce((sum, s) => sum + s.netSettlement, 0);
 
-  // Filter payouts by active venture & status
-  const venturePayouts = useMemo(() => {
-    return payouts.filter(p => matchVenture(p.venture, activeVenture));
-  }, [payouts, activeVenture]);
+  const totalPending = filteredSettlements
+    .filter((s) => s.status === 'Pending Settlement')
+    .reduce((sum, s) => sum + s.netSettlement, 0);
 
-  const filtered = useMemo(() => {
-    return venturePayouts.filter(p => filter === 'All' || p.status === filter);
-  }, [venturePayouts, filter]);
-
-  const totalSettled = useMemo(() => {
-    return venturePayouts.filter(p => p.status === 'Settled').reduce((s, p) => s + p.amount, 0);
-  }, [venturePayouts]);
-
-  const totalPending = useMemo(() => {
-    return venturePayouts.filter(p => p.status === 'Pending').reduce((s, p) => s + p.amount, 0);
-  }, [venturePayouts]);
-
-  // Scaled monthly trends for selected brand
-  const monthlyData = useMemo(() => {
-    const isAll = !activeVenture || activeVenture === 'all' || activeVenture === 'All' || activeVenture === 'All ventures';
-    if (isAll) return BASE_MONTHLY;
-    const baseTotal = 492550 + 160500;
-    const currentTotal = totalSettled + totalPending;
-    const ratio = Math.max(0.12, Math.min(1.0, currentTotal / (baseTotal || 1)));
-    return BASE_MONTHLY.map(m => ({
-      month: m.month,
-      settled: Math.round(m.settled * ratio),
-      pending: Math.round(m.pending * ratio),
-    }));
-  }, [activeVenture, totalSettled, totalPending]);
-
-  const maxMonthlyVal = useMemo(() => {
-    return Math.max(...monthlyData.map(d => d.settled + d.pending), 1000);
-  }, [monthlyData]);
-
-  const handleExecutePayout = (e: React.FormEvent) => {
+  const handleInitiateSettlement = (e: React.FormEvent) => {
     e.preventDefault();
     setIsProcessing(true);
 
     setTimeout(() => {
-      const amountNum = parseFloat(payoutAmount) || 0;
-      const gross = Math.round(amountNum / 0.9);
-      const fee = gross - amountNum;
-      const bankInfo = PROVIDER_BANKS[modalVenture] || { bank: 'Commercial International Bank (CIB)', iban: 'EG38 0010 ...' };
-      const newRef = `ACH-EG-${Math.floor(100000 + Math.random() * 900000)}`;
+      const newRef = `TR-INT-${Math.floor(10000 + Math.random() * 90000)}`;
+      const newBatch = `BATCH-2026-W${Math.floor(39 + Math.random() * 5)}`;
+      const amt = parseFloat(settlementAmount) || 0;
 
-      const newRecord: PayoutRecord = {
-        id: `PAY-EG-04${Math.floor(45 + payouts.length)}`,
+      const newRecord: SettlementRecord = {
+        id: `STL-EG-0${Math.floor(450 + Math.random() * 100)}`,
+        batchId: newBatch,
         venture: modalVenture,
-        amount: amountNum,
+        ventureCode: modalVenture.includes('Apex') ? 'AC' : modalVenture.includes('Study') ? 'SH' : 'BLDR',
+        period: '2026-09-22 to 2026-09-28',
+        grossAmount: Math.round(amt * 1.15),
+        gatewayFee: Math.round(amt * 0.025),
+        platformFee: Math.round(amt * 0.05),
+        vatAmount: Math.round(amt * 0.007),
+        reserveAmount: Math.round(amt * 0.05),
+        netSettlement: amt,
         status: 'Settled',
-        method: payoutMethod,
-        date: new Date().toISOString().split('T')[0],
-        ref: newRef,
-        bankName: bankInfo.bank,
-        iban: bankInfo.iban,
-        grossAmount: gross,
-        platformFee: fee,
+        transferRef: newRef,
+        debitAccount: 'BLDR Merchant Holding Pool (Acquiring)',
+        creditAccount: `${modalVenture} Brand Ledger (Internal)`,
+        settledAt: new Date().toISOString().split('T')[0],
+        createdAt: new Date().toISOString().split('T')[0],
       };
 
-      // Update existing pending record if matching, otherwise prepend
-      const existingPendingIdx = payouts.findIndex(p => p.venture === modalVenture && p.status === 'Pending');
-      if (existingPendingIdx !== -1) {
-        const copy = [...payouts];
-        copy[existingPendingIdx] = newRecord;
-        setPayouts(copy);
-      } else {
-        setPayouts([newRecord, ...payouts]);
-      }
-
+      setSettlements((prev) => [newRecord, ...prev]);
       setIsProcessing(false);
       setShowInitiateModal(false);
-      setSuccessToast(`✓ Disbursed EGP ${amountNum.toLocaleString()} to ${modalVenture} successfully via ${newRef}`);
+      setSelectedStatement(newRecord);
+      setSuccessToast(`Internal settlement transfer ${newRef} authorized and posted to brand ledger.`);
       setTimeout(() => setSuccessToast(''), 4500);
     }, 900);
   };
 
-  const activeVentureObj = resolveVentureObj(activeVenture);
-
   return (
-    <div style={{ display: 'flex', width: '100vw', height: '100vh', background: '#F5F7FA', overflow: 'hidden' }}>
-      <HubSidebar active="Payouts" />
-      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', height: '100vh', overflowY: 'auto' }}>
-        <HubTopBar
-          title="Payout Settlements"
-          crumb="Finance / Payouts"
-          activeVenture={activeVenture}
-          onVentureChange={handleVentureChange}
-          onSelectVenture={handleVentureChange}
-        />
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#F8FAFC' }}>
+      <HubSidebar />
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <HubTopBar />
 
-        <div style={{ padding: '16px 24px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-              <span style={{ fontSize: 16, fontWeight: 800, color: '#12203C' }}>Provider Payout Settlements</span>
-              <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 999, background: '#FEF3C7', color: '#92400E' }}>
-                Egypt Operations (EGP)
-              </span>
-              {activeVentureObj.slug !== 'all' && (
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#EFF6FF', border: '1px solid #BFDBFE', padding: '3px 8px', borderRadius: 6, fontSize: 11.5, color: '#1E40AF', fontWeight: 600 }}>
-                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: activeVentureObj.bg }} />
-                  <span>Brand: <strong>{activeVentureObj.name}</strong></span>
-                  <button
-                    onClick={() => handleVentureChange('all')}
-                    style={{ background: 'none', border: 'none', color: '#3B82F6', cursor: 'pointer', fontWeight: 800, padding: '0 2px', fontSize: 12 }}
-                    title="Clear filter & show all brands"
-                  >
-                    ✕
-                  </button>
-                </div>
-              )}
+        <div style={{ padding: '28px 32px' }}>
+          {/* Header */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
+            <div>
+              <h1 style={{ fontSize: 22, fontWeight: 700, color: '#0F172A', margin: 0 }}>
+                Brand Settlements
+              </h1>
+              <p style={{ fontSize: 13, color: '#64748B', marginTop: 4 }}>
+                Internal settlement statements and inter-entity journal transfer records for bldr-owned brands.
+                {activeVenture !== 'all' && (
+                  <span style={{ fontWeight: 600, color: '#0EA5E9', marginLeft: 6 }}>
+                    • Scoped to: {activeVentureObj.label}
+                  </span>
+                )}
+              </p>
             </div>
-            <span style={{ fontSize: 12, color: '#8A94A6' }}>
-              Automated reconciliation of student tuition collections, fee retention, and net bank disbursements
-            </span>
+
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                onClick={() => setShowInitiateModal(true)}
+                style={{
+                  background: '#0F172A',
+                  color: '#FFF',
+                  border: 'none',
+                  borderRadius: 6,
+                  padding: '9px 16px',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                + Authorize Settlement Batch
+              </button>
+            </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            {successToast && (
-              <span style={{ fontSize: 12, fontWeight: 700, color: '#059669', background: '#ECFDF5', padding: '6px 12px', borderRadius: 8, border: '1px solid #A7F3D0' }}>
-                {successToast}
-              </span>
-            )}
-            <button
-              onClick={() => handleOpenInitiateModal()}
+          {/* Success Toast */}
+          {successToast && (
+            <div
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                fontWeight: 700,
-                padding: '8px 16px',
-                fontSize: 12.5,
-                background: '#2E6F5E',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 7,
-                cursor: 'pointer',
+                background: '#DCFCE7',
+                border: '1px solid #86EFAC',
+                color: '#166534',
+                padding: '12px 16px',
+                borderRadius: 6,
+                fontSize: 13,
+                fontWeight: 500,
+                marginBottom: 20,
               }}
             >
-              <span>+ Initiate Payout</span>
-            </button>
-          </div>
-        </div>
-
-        <div className="hub-content" style={{ padding: '16px 24px 24px' }}>
-          {/* KPIs */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
-            {[
-              {
-                label: 'Total Settled to Providers',
-                val: `EGP ${(totalSettled / 1000).toFixed(0)}K`,
-                cls: 'success',
-                sub: activeVentureObj.slug !== 'all' ? `Transferred for ${activeVentureObj.name}` : 'Transferred to Egyptian bank accounts',
-              },
-              {
-                label: 'Pending Disbursement',
-                val: `EGP ${(totalPending / 1000).toFixed(0)}K`,
-                cls: 'warning',
-                sub: 'Available for immediate payout',
-              },
-              {
-                label: 'Settlement Runs',
-                val: venturePayouts.length,
-                sub: `Total batch transactions ${activeVentureObj.slug !== 'all' ? `(${activeVentureObj.code})` : ''}`,
-              },
-              {
-                label: 'Avg Payout Volume',
-                val: `EGP ${venturePayouts.length > 0 ? Math.round((totalSettled + totalPending) / venturePayouts.length / 1000) : 0}K`,
-                sub: 'Per provider batch settlement',
-              },
-            ].map(k => (
-              <div key={k.label} className="hub-kpi">
-                <div className="hub-kpi-value">{k.val}</div>
-                <div className="hub-kpi-label">{k.label}</div>
-                {k.sub && <div style={{ fontSize: 11, color: 'var(--hub-text-3)', marginTop: 4 }}>{k.sub}</div>}
-              </div>
-            ))}
-          </div>
-
-          {/* Stacked Bar Chart */}
-          <div className="hub-card" style={{ marginBottom: 20 }}>
-            <div className="hub-card-header">
-              <span className="hub-card-title">
-                Monthly Payout Trends in Egypt {activeVentureObj.slug !== 'all' ? `(${activeVentureObj.name})` : '(Settled vs Pending EGP)'}
-              </span>
-              <div style={{ display: 'flex', gap: 16 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <div style={{ width: 10, height: 10, borderRadius: 2, background: 'var(--hub-accent)' }} />
-                  <span style={{ fontSize: 11, color: 'var(--hub-text-3)' }}>Settled to Bank (EGP)</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <div style={{ width: 10, height: 10, borderRadius: 2, background: '#F59E0B' }} />
-                  <span style={{ fontSize: 11, color: 'var(--hub-text-3)' }}>Pending Clearing (EGP)</span>
-                </div>
-              </div>
+              ✓ {successToast}
             </div>
-            <div style={{ padding: 20 }}>
-              <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, height: 150 }}>
-                {monthlyData.map(d => (
-                  <div key={d.month} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, height: '100%', justifyContent: 'flex-end' }}>
-                    <div style={{ fontSize: 10, color: 'var(--hub-text-3)', fontWeight: 600 }}>
-                      EGP {((d.settled + d.pending) / 1000).toFixed(0)}K
-                    </div>
-                    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', borderRadius: '4px 4px 0 0', overflow: 'hidden' }}>
-                      <div style={{ width: '100%', height: `${(d.pending / maxMonthlyVal) * 120}px`, background: '#F59E0B', minHeight: 4 }} />
-                      <div style={{ width: '100%', height: `${(d.settled / maxMonthlyVal) * 120}px`, background: 'var(--hub-accent)', minHeight: 8 }} />
-                    </div>
-                    <div style={{ fontSize: 11, color: 'var(--hub-text-3)' }}>{d.month}</div>
-                  </div>
+          )}
+
+          {/* Metrics Overview */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 28 }}>
+            <div style={{ background: '#FFF', border: '1px solid #E2E8F0', borderRadius: 8, padding: '18px 20px' }}>
+              <div style={{ fontSize: 12, color: '#64748B', fontWeight: 600 }}>TOTAL NET SETTLED</div>
+              <div style={{ fontSize: 22, fontWeight: 700, color: '#0F172A', marginTop: 6 }}>
+                EGP {totalSettled.toLocaleString()}
+              </div>
+              <div style={{ fontSize: 11, color: '#10B981', marginTop: 4 }}>Completed inter-brand ledger transfers</div>
+            </div>
+
+            <div style={{ background: '#FFF', border: '1px solid #E2E8F0', borderRadius: 8, padding: '18px 20px' }}>
+              <div style={{ fontSize: 12, color: '#64748B', fontWeight: 600 }}>PENDING SETTLEMENT</div>
+              <div style={{ fontSize: 22, fontWeight: 700, color: '#D97706', marginTop: 6 }}>
+                EGP {totalPending.toLocaleString()}
+              </div>
+              <div style={{ fontSize: 11, color: '#64748B', marginTop: 4 }}>Awaiting weekly batch sign-off</div>
+            </div>
+
+            <div style={{ background: '#FFF', border: '1px solid #E2E8F0', borderRadius: 8, padding: '18px 20px' }}>
+              <div style={{ fontSize: 12, color: '#64748B', fontWeight: 600 }}>SETTLEMENT CADENCE</div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: '#0F172A', marginTop: 6 }}>
+                Weekly Batch (Fridays)
+              </div>
+              <div style={{ fontSize: 11, color: '#64748B', marginTop: 4 }}>Automatic roll-up from transaction ledger</div>
+            </div>
+
+            <div style={{ background: '#FFF', border: '1px solid #E2E8F0', borderRadius: 8, padding: '18px 20px' }}>
+              <div style={{ fontSize: 12, color: '#64748B', fontWeight: 600 }}>ROLLING RESERVE (5%)</div>
+              <div style={{ fontSize: 22, fontWeight: 700, color: '#6366F1', marginTop: 6 }}>
+                EGP {(totalSettled * 0.05).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+              </div>
+              <div style={{ fontSize: 11, color: '#64748B', marginTop: 4 }}>Internal chargeback & refund buffer</div>
+            </div>
+          </div>
+
+          {/* Table Container */}
+          <div style={{ background: '#FFF', border: '1px solid #E2E8F0', borderRadius: 8, overflow: 'hidden' }}>
+            {/* Filter Bar */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '16px 20px',
+                borderBottom: '1px solid #E2E8F0',
+              }}
+            >
+              <div style={{ display: 'flex', gap: 8 }}>
+                {['All', 'Settled', 'Pending Settlement'].map((f) => (
+                  <button
+                    key={f}
+                    onClick={() => setFilter(f)}
+                    style={{
+                      background: filter === f ? '#0F172A' : '#F1F5F9',
+                      color: filter === f ? '#FFF' : '#475569',
+                      border: 'none',
+                      borderRadius: 4,
+                      padding: '6px 12px',
+                      fontSize: 12,
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {f}
+                  </button>
                 ))}
               </div>
+
+              <div style={{ fontSize: 12, color: '#64748B' }}>
+                Showing <strong>{filteredSettlements.length}</strong> settlement records
+              </div>
             </div>
-          </div>
 
-          {/* Filters & Table */}
-          <div className="hub-filters" style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
-            {['All', 'Settled', 'Pending'].map(s => (
-              <button key={s} onClick={() => setFilter(s)} className={`hub-btn ${filter === s ? 'hub-btn-primary' : 'hub-btn-secondary'} hub-btn-sm`}>
-                {s}
-              </button>
-            ))}
-            <span style={{ fontSize: 13, color: 'var(--hub-text-3)', marginLeft: 'auto' }}>
-              {filtered.length} payout record{filtered.length !== 1 ? 's' : ''}
-              {activeVentureObj.slug !== 'all' ? ` for ${activeVentureObj.name}` : ''}
-            </span>
-          </div>
-
-          {/* Payout Records Table */}
-          <div className="hub-card">
-            <div className="hub-table-wrap">
-              <table className="hub-table">
-                <thead>
-                  <tr>
-                    {['Payout ID', 'Provider / Academy', 'Net Disbursed', 'Settlement Rail', 'Status', 'Date', 'Bank Reference', 'Action'].map(h => (
-                      <th key={h}>{h}</th>
-                    ))}
+            {/* Table */}
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: 13 }}>
+              <thead>
+                <tr style={{ background: '#F8FAFC', borderBottom: '1px solid #E2E8F0', color: '#64748B', fontSize: 11, textTransform: 'uppercase' }}>
+                  <th style={{ padding: '12px 16px' }}>Statement ID / Batch</th>
+                  <th style={{ padding: '12px 16px' }}>Brand</th>
+                  <th style={{ padding: '12px 16px' }}>Period</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'right' }}>Gross Volume</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'right' }}>Fees & Reserve</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'right' }}>Net Settled</th>
+                  <th style={{ padding: '12px 16px' }}>Internal Transfer Ref</th>
+                  <th style={{ padding: '12px 16px' }}>Status</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'center' }}>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredSettlements.map((s) => (
+                  <tr key={s.id} style={{ borderBottom: '1px solid #F1F5F9' }}>
+                    <td style={{ padding: '14px 16px' }}>
+                      <div style={{ fontWeight: 600, color: '#0F172A' }}>{s.id}</div>
+                      <div style={{ fontSize: 11, color: '#64748B', fontFamily: 'monospace' }}>{s.batchId}</div>
+                    </td>
+                    <td style={{ padding: '14px 16px' }}>
+                      <span style={{ fontWeight: 600, color: '#0F172A' }}>{s.venture}</span>
+                    </td>
+                    <td style={{ padding: '14px 16px', color: '#475569', fontSize: 12 }}>{s.period}</td>
+                    <td style={{ padding: '14px 16px', textAlign: 'right', fontWeight: 600, color: '#0F172A' }}>
+                      EGP {s.grossAmount.toLocaleString()}
+                    </td>
+                    <td style={{ padding: '14px 16px', textAlign: 'right', color: '#EF4444', fontSize: 12 }}>
+                      -EGP {(s.gatewayFee + s.platformFee + s.vatAmount + s.reserveAmount).toLocaleString()}
+                    </td>
+                    <td style={{ padding: '14px 16px', textAlign: 'right', fontWeight: 700, color: '#16A34A' }}>
+                      EGP {s.netSettlement.toLocaleString()}
+                    </td>
+                    <td style={{ padding: '14px 16px' }}>
+                      <span style={{ fontFamily: 'monospace', fontSize: 11, background: '#F1F5F9', padding: '2px 6px', borderRadius: 4 }}>
+                        {s.transferRef}
+                      </span>
+                    </td>
+                    <td style={{ padding: '14px 16px' }}>
+                      <StatusBadge s={s.status} />
+                    </td>
+                    <td style={{ padding: '14px 16px', textAlign: 'center' }}>
+                      <button
+                        onClick={() => setSelectedStatement(s)}
+                        style={{
+                          background: '#F1F5F9',
+                          border: '1px solid #E2E8F0',
+                          borderRadius: 4,
+                          padding: '5px 10px',
+                          fontSize: 12,
+                          color: '#0F172A',
+                          cursor: 'pointer',
+                          fontWeight: 500,
+                        }}
+                      >
+                        View Statement
+                      </button>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {filtered.length === 0 ? (
-                    <tr>
-                      <td colSpan={8} style={{ textAlign: 'center', padding: '36px 16px', color: '#64748B' }}>
-                        No {filter !== 'All' ? filter.toLowerCase() : ''} payout records found for {activeVentureObj.name}.
-                      </td>
-                    </tr>
-                  ) : (
-                    filtered.map(p => (
-                      <tr key={p.id}>
-                        <td style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--hub-text-3)', fontWeight: 700 }}>{p.id}</td>
-                        <td style={{ fontWeight: 600, color: 'var(--hub-text)' }}>
-                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                            <span style={{ width: 8, height: 8, borderRadius: '50%', background: resolveVentureObj(p.venture).bg }} />
-                            {p.venture}
-                          </span>
-                        </td>
-                        <td style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: p.status === 'Settled' ? '#059669' : '#D97706' }}>
-                          EGP {p.amount.toLocaleString()}
-                        </td>
-                        <td><span className="hub-badge neutral">{p.method}</span></td>
-                        <td><StatusBadge s={p.status} /></td>
-                        <td style={{ fontSize: 12, color: 'var(--hub-text-3)' }}>{p.date}</td>
-                        <td style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--hub-text-2)' }}>{p.ref}</td>
-                        <td>
-                          {p.status === 'Pending' && (
-                            <button
-                              onClick={() => handlePayNowRow(p)}
-                              className="hub-btn hub-btn-primary hub-btn-sm"
-                              style={{ fontSize: 11, fontWeight: 700 }}
-                            >
-                              Pay Now →
-                            </button>
-                          )}
-                          {p.status === 'Settled' && (
-                            <button
-                              onClick={() => setReceiptPayout(p)}
-                              className="hub-btn hub-btn-secondary hub-btn-sm"
-                              style={{ fontSize: 11, fontWeight: 600 }}
-                            >
-                              Receipt
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
 
-      {/* ─── MODAL 1: INITIATE PAYOUT MODAL ─── */}
-      {showInitiateModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <div style={{ background: 'white', borderRadius: 16, padding: '28px 32px', maxWidth: 540, width: '100%', boxShadow: '0 25px 60px rgba(0,0,0,0.25)' }}>
+      {/* View Statement Modal */}
+      {selectedStatement && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(15, 23, 42, 0.6)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+          }}
+        >
+          <div
+            style={{
+              background: '#FFF',
+              borderRadius: 8,
+              width: 540,
+              padding: 28,
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+            }}
+          >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
               <div>
-                <h2 style={{ fontSize: 18, fontWeight: 800, margin: '0 0 4px', color: '#0F172A' }}>
-                  Initiate Provider Payout Settlement
+                <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0, color: '#0F172A' }}>
+                  Brand Settlement Statement
                 </h2>
-                <span style={{ fontSize: 12, color: '#64748B' }}>
-                  Disburse net student tuition earnings directly to the provider's verified Egyptian bank account
-                </span>
+                <div style={{ fontSize: 12, color: '#64748B', marginTop: 2 }}>
+                  Ref: {selectedStatement.id} • Batch: {selectedStatement.batchId}
+                </div>
               </div>
-              <button onClick={() => setShowInitiateModal(false)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#64748B' }}>✕</button>
+              <button
+                onClick={() => setSelectedStatement(null)}
+                style={{ background: 'transparent', border: 'none', fontSize: 20, cursor: 'pointer', color: '#94A3B8' }}
+              >
+                ✕
+              </button>
             </div>
 
-            <form onSubmit={handleExecutePayout} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {/* Provider Selection */}
-              <div>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#334155', marginBottom: 6 }}>
-                  Select Provider / Academy:
+            <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 6, padding: 16, marginBottom: 20 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                <span style={{ fontSize: 12, color: '#64748B' }}>Brand</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: '#0F172A' }}>{selectedStatement.venture}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                <span style={{ fontSize: 12, color: '#64748B' }}>Statement Period</span>
+                <span style={{ fontSize: 12, color: '#0F172A' }}>{selectedStatement.period}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: 12, color: '#64748B' }}>Transfer Status</span>
+                <StatusBadge s={selectedStatement.status} />
+              </div>
+            </div>
+
+            {/* Financial Breakdown */}
+            <div style={{ borderTop: '1px solid #E2E8F0', paddingTop: 14, marginBottom: 20, fontSize: 13 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                <span style={{ color: '#475569' }}>Gross Collections</span>
+                <span style={{ fontWeight: 600 }}>EGP {selectedStatement.grossAmount.toLocaleString()}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, color: '#DC2626' }}>
+                <span>Gateway Processing Fee</span>
+                <span>-EGP {selectedStatement.gatewayFee.toLocaleString()}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, color: '#DC2626' }}>
+                <span>bldr Platform Fee</span>
+                <span>-EGP {selectedStatement.platformFee.toLocaleString()}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, color: '#DC2626' }}>
+                <span>VAT on Platform Fee</span>
+                <span>-EGP {selectedStatement.vatAmount.toLocaleString()}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12, color: '#475569' }}>
+                <span>Rolling Reserve (5% Hold)</span>
+                <span>-EGP {selectedStatement.reserveAmount.toLocaleString()}</span>
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  paddingTop: 12,
+                  borderTop: '2px solid #0F172A',
+                  fontSize: 15,
+                  fontWeight: 700,
+                  color: '#16A34A',
+                }}
+              >
+                <span>Net Brand Ledger Transfer</span>
+                <span>EGP {selectedStatement.netSettlement.toLocaleString()}</span>
+              </div>
+            </div>
+
+            {/* Ledger Routing */}
+            <div style={{ background: '#F1F5F9', borderRadius: 6, padding: 12, marginBottom: 24, fontSize: 11 }}>
+              <div style={{ fontWeight: 600, color: '#475569', marginBottom: 4 }}>LEDGER JOURNAL ENTRY</div>
+              <div style={{ color: '#64748B' }}>Debit: {selectedStatement.debitAccount}</div>
+              <div style={{ color: '#64748B' }}>Credit: {selectedStatement.creditAccount}</div>
+              <div style={{ color: '#64748B', marginTop: 4 }}>Internal Ref: {selectedStatement.transferRef}</div>
+            </div>
+
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setSelectedStatement(null)}
+                style={{
+                  background: '#F1F5F9',
+                  border: 'none',
+                  borderRadius: 6,
+                  padding: '9px 16px',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  color: '#475569',
+                }}
+              >
+                Close
+              </button>
+              <button
+                onClick={() => {
+                  alert('Statement exported as PDF.');
+                }}
+                style={{
+                  background: '#0F172A',
+                  border: 'none',
+                  borderRadius: 6,
+                  padding: '9px 16px',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  color: '#FFF',
+                }}
+              >
+                Download Statement PDF
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Authorize Settlement Batch Modal */}
+      {showInitiateModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(15, 23, 42, 0.6)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+          }}
+        >
+          <div
+            style={{
+              background: '#FFF',
+              borderRadius: 8,
+              width: 500,
+              padding: 28,
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0, color: '#0F172A' }}>
+                Authorize Internal Settlement
+              </h2>
+              <button
+                onClick={() => setShowInitiateModal(false)}
+                style={{ background: 'transparent', border: 'none', fontSize: 20, cursor: 'pointer', color: '#94A3B8' }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleInitiateSettlement}>
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#475569', marginBottom: 6 }}>
+                  Brand (Venture)
                 </label>
                 <select
                   value={modalVenture}
-                  onChange={e => handleModalVentureChange(e.target.value)}
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #CBD5E1', fontSize: 13, fontWeight: 600 }}
+                  onChange={(e) => setModalVenture(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    borderRadius: 6,
+                    border: '1px solid #CBD5E1',
+                    fontSize: 13,
+                  }}
                 >
-                  {Object.keys(PROVIDER_BANKS).map(v => (
-                    <option key={v} value={v}>
-                      {v} (Pending Available: EGP {PROVIDER_BANKS[v].pendingBalance.toLocaleString()})
-                    </option>
-                  ))}
+                  <option>bldr (Storefront Pilot)</option>
+                  <option>StudyHub</option>
+                  <option>Apex Classes</option>
+                  <option>EL HESA</option>
+                  <option>Career Hub</option>
                 </select>
               </div>
 
-              {/* Provider Bank & IBAN Preview */}
-              <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 10, padding: '12px 14px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <span style={{ fontSize: 11, color: '#64748B' }}>Beneficiary Bank:</span>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>
-                    {PROVIDER_BANKS[modalVenture]?.bank}
-                  </span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: 11, color: '#64748B' }}>Egyptian IBAN:</span>
-                  <span style={{ fontSize: 11.5, fontFamily: 'monospace', fontWeight: 600, color: '#2563EB' }}>
-                    {PROVIDER_BANKS[modalVenture]?.iban}
-                  </span>
-                </div>
-              </div>
-
-              {/* Amount Breakdown */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 12 }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#334155', marginBottom: 6 }}>
-                    Net Payout Amount (EGP):
-                  </label>
-                  <input
-                    type="number"
-                    value={payoutAmount}
-                    onChange={e => setPayoutAmount(e.target.value)}
-                    required
-                    style={{ width: '100%', boxSizing: 'border-box', padding: '10px 12px', borderRadius: 8, border: '2px solid #2563EB', fontSize: 16, fontWeight: 800, color: '#0F172A' }}
-                  />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#334155', marginBottom: 6 }}>
-                    Settlement Rail:
-                  </label>
-                  <select
-                    value={payoutMethod}
-                    onChange={e => setPayoutMethod(e.target.value)}
-                    style={{ width: '100%', padding: '10px 8px', borderRadius: 8, border: '1px solid #CBD5E1', fontSize: 12, fontWeight: 600 }}
-                  >
-                    <option>Egyptian Bank Transfer (ACH / CIB)</option>
-                    <option>InstaPay Corporate Direct</option>
-                    <option>QNB Alahli Settlement</option>
-                    <option>Banque Misr Swift / ACH</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Financial Calculation Box */}
-              <div style={{ background: '#ECFDF5', border: '1px solid #A7F3D0', borderRadius: 10, padding: '12px 16px', fontSize: 12 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <span style={{ color: '#065F46' }}>Gross Student Tuition Collections:</span>
-                  <span style={{ fontWeight: 700, color: '#065F46' }}>
-                    EGP {Math.round((parseFloat(payoutAmount) || 0) / 0.9).toLocaleString()}
-                  </span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <span style={{ color: '#DC2626' }}>Bldr Platform Fee (10%):</span>
-                  <span style={{ fontWeight: 700, color: '#DC2626' }}>
-                    - EGP {Math.round(((parseFloat(payoutAmount) || 0) / 0.9) * 0.1).toLocaleString()}
-                  </span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed #A7F3D0', paddingTop: 6 }}>
-                  <strong style={{ color: '#065F46', fontSize: 13 }}>Final Net Transfer to Provider:</strong>
-                  <strong style={{ color: '#059669', fontSize: 15 }}>
-                    EGP {(parseFloat(payoutAmount) || 0).toLocaleString()}
-                  </strong>
-                </div>
-              </div>
-
-              {/* Transfer Reference Note */}
-              <div>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#334155', marginBottom: 4 }}>
-                  Bank Reference & Audit Description:
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#475569', marginBottom: 6 }}>
+                  Net Transfer Amount (EGP)
                 </label>
                 <input
-                  type="text"
-                  value={transferNotes}
-                  onChange={e => setTransferNotes(e.target.value)}
-                  style={{ width: '100%', boxSizing: 'border-box', padding: '8px 12px', borderRadius: 8, border: '1px solid #CBD5E1', fontSize: 12 }}
+                  type="number"
+                  value={settlementAmount}
+                  onChange={(e) => setSettlementAmount(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    borderRadius: 6,
+                    border: '1px solid #CBD5E1',
+                    fontSize: 13,
+                  }}
+                  required
                 />
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 8 }}>
+              <div style={{ marginBottom: 20 }}>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#475569', marginBottom: 6 }}>
+                  Transfer Journal Notes
+                </label>
+                <textarea
+                  value={transferNotes}
+                  onChange={(e) => setTransferNotes(e.target.value)}
+                  rows={2}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    borderRadius: 6,
+                    border: '1px solid #CBD5E1',
+                    fontSize: 13,
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
                 <button
                   type="button"
                   onClick={() => setShowInitiateModal(false)}
-                  style={{ padding: '9px 18px', borderRadius: 8, border: '1px solid #CBD5E1', background: 'white', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}
+                  style={{
+                    background: '#F1F5F9',
+                    border: 'none',
+                    borderRadius: 6,
+                    padding: '9px 16px',
+                    fontSize: 13,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    color: '#475569',
+                  }}
                 >
                   Cancel
                 </button>
@@ -545,91 +752,20 @@ export default function PayoutsPage() {
                   type="submit"
                   disabled={isProcessing}
                   style={{
-                    padding: '9px 20px',
-                    borderRadius: 8,
+                    background: '#0F172A',
                     border: 'none',
-                    background: '#059669',
-                    color: 'white',
-                    fontWeight: 800,
+                    borderRadius: 6,
+                    padding: '9px 16px',
                     fontSize: 13,
+                    fontWeight: 600,
                     cursor: 'pointer',
-                    boxShadow: '0 2px 8px rgba(5,150,105,0.3)',
+                    color: '#FFF',
                   }}
                 >
-                  {isProcessing ? 'Processing Bank ACH...' : `Confirm & Disburse EGP ${(parseFloat(payoutAmount) || 0).toLocaleString()} →`}
+                  {isProcessing ? 'Posting Transfer...' : 'Authorize & Post Transfer'}
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
-
-      {/* ─── MODAL 2: OFFICIAL DISBURSEMENT RECEIPT MODAL ─── */}
-      {receiptPayout && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <div style={{ background: 'white', borderRadius: 16, padding: '32px', maxWidth: 520, width: '100%', boxShadow: '0 25px 60px rgba(0,0,0,0.25)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{ width: 32, height: 32, borderRadius: 8, background: '#059669', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900 }}>
-                  ✓
-                </div>
-                <div>
-                  <h3 style={{ fontSize: 17, fontWeight: 800, margin: 0, color: '#0F172A' }}>Official Settlement Receipt</h3>
-                  <span style={{ fontSize: 11, color: '#64748B', fontFamily: 'monospace' }}>{receiptPayout.id}</span>
-                </div>
-              </div>
-              <button onClick={() => setReceiptPayout(null)} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer' }}>✕</button>
-            </div>
-
-            <div style={{ borderTop: '1px solid #E2E8F0', paddingTop: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: 12, color: '#64748B' }}>Beneficiary Provider</span>
-                <span style={{ fontSize: 13, fontWeight: 700 }}>{receiptPayout.venture}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: 12, color: '#64748B' }}>Receiving Bank</span>
-                <span style={{ fontSize: 13, fontWeight: 600 }}>{receiptPayout.bankName}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: 12, color: '#64748B' }}>Provider IBAN</span>
-                <span style={{ fontSize: 12, fontFamily: 'monospace' }}>{receiptPayout.iban}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: 12, color: '#64748B' }}>Gross Student Tuition Volume</span>
-                <span style={{ fontSize: 13 }}>EGP {receiptPayout.grossAmount.toLocaleString()}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: 12, color: '#64748B' }}>Bldr Platform Fee Retained (10%)</span>
-                <span style={{ fontSize: 13, color: '#DC2626' }}>- EGP {receiptPayout.platformFee.toLocaleString()}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed #CBD5E1', paddingTop: 10 }}>
-                <span style={{ fontSize: 13, fontWeight: 800, color: '#0F172A' }}>Net Amount Settled</span>
-                <span style={{ fontSize: 17, fontWeight: 900, color: '#059669' }}>EGP {receiptPayout.amount.toLocaleString()}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: 12, color: '#64748B' }}>ACH / Central Bank Clearance Ref</span>
-                <span style={{ fontSize: 12, fontFamily: 'monospace', fontWeight: 700, color: '#2563EB' }}>{receiptPayout.ref}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: 12, color: '#64748B' }}>Disbursement Date</span>
-                <span style={{ fontSize: 12 }}>{receiptPayout.date}</span>
-              </div>
-            </div>
-
-            <div style={{ marginTop: 24, display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-              <button
-                onClick={() => alert(`Receipt PDF for ${receiptPayout.id} printed.`)}
-                style={{ padding: '8px 16px', borderRadius: 8, border: '1px solid #CBD5E1', background: 'white', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}
-              >
-                Print PDF
-              </button>
-              <button
-                onClick={() => setReceiptPayout(null)}
-                style={{ padding: '8px 16px', borderRadius: 8, border: 'none', background: 'var(--brand)', color: 'white', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}
-              >
-                Done
-              </button>
-            </div>
           </div>
         </div>
       )}

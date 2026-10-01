@@ -376,11 +376,11 @@ export default function CentralPaymentPage() {
             bldr Central Financial Gateway
           </span>
           <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 4, background: '#DCFCE7', color: '#15803D', border: '1px solid #86EFAC' }}>
-            ● TLS 1.3 256-Bit Active
+            ● 256-Bit SSL Encrypted
           </span>
         </div>
         <span style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>
-          {isRtl ? 'معالجة مدفوعات معتمدة PCI-DSS عبر Geidea / Paymob / Fawry' : 'PCI-DSS Compliant Payment Processing via Geidea / Paymob / Fawry'}
+          {isRtl ? 'المدفوعات تُعالج بواسطة Geidea / Paymob / Fawry، معتمدة بمعايير PCI-DSS' : 'Payments processed by Geidea / Paymob / Fawry, PCI-DSS certified'}
         </span>
       </div>
 

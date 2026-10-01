@@ -496,7 +496,7 @@ export default function VenturesPage() {
                   <div style={{ background: '#ECFDF5', border: '1px solid #A7F3D0', borderRadius: 10, padding: '12px 14px', fontSize: 12 }}>
                     <div style={{ fontWeight: 700, color: '#065F46', marginBottom: 4 }}>Default Settlement Policy:</div>
                     <div style={{ color: '#047857' }}>
-                      Weekly bank ACH disbursement to the brand's verified Egyptian IBAN after deducting the {form.feePct}% platform fee.
+                      Weekly internal ledger settlement credited to the brand's operating balance after deducting the {form.feePct}% platform fee and 5% rolling reserve.
                     </div>
                   </div>
                 </div>

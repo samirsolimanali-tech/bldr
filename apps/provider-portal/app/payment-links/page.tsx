@@ -222,7 +222,7 @@ export default function ProviderPaymentLinksPage() {
               <div>
                 <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6 }}>Active Payment Methods</label>
                 <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0 }}>
-                  Automatically accepts Fawry Reference Code, Mobile Wallets, and Meeza/Cards via Bldr Egypt.
+                  Automatically accepts Fawry Reference Code, Mobile Wallets, and Cards via bldr Egypt.
                 </p>
               </div>
               <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>

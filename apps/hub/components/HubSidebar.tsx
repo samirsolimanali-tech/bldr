@@ -50,7 +50,7 @@ const NAV_ITEMS: NavItemDef[] = [
     d: 'M13 8a5 5 0 10-4.6 5M13 8V4.4M13 8H9.4',
   },
   {
-    label: 'Payouts',
+    label: 'Brand Settlements',
     href: '/payouts',
     d: 'M2.5 4.5h11v7h-11zM6 7.5a2 2 0 104 0 2 2 0 00-4 0z',
   },

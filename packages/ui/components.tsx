@@ -629,7 +629,7 @@ export function BldrNav({ lang = 'EN', onLanguageChange, onStartProject }: BldrN
               whiteSpace: 'nowrap',
             }}
           >
-            {isRtl ? 'انضم كمزود خدمة' : 'Apply as Provider'}
+            {isRtl ? 'كن شريكاً معنا' : 'Partner with bldr'}
           </a>
 
           <button
@@ -971,7 +971,7 @@ export function BldrFooter({ lang = 'EN' }: { lang?: 'EN' | 'AR' } = {}) {
         {/* Payment and Compliance Badges */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
-            {['VISA', 'Mastercard', 'Meeza', 'Fawry', 'Geidea'].map((badge) => (
+            {['VISA', 'Mastercard', 'Mobile Wallets', 'Fawry', 'Geidea'].map((badge) => (
               <span key={badge} style={{
                 height: 26,
                 padding: '0 10px',

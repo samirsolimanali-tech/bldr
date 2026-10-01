@@ -7,16 +7,14 @@ import React from 'react';
  * Designed according to official brand guidelines:
  * - Fawry (Yellow/Blue bird & wordmark)
  * - Vodafone Cash (Red circular brandmark)
- * - InstaPay Egypt (Official CBE IPN deep purple with neon green dot)
  * - Orange Money (Vibrant orange brandmark)
  * - Etisalat Cash / e& money (Official e& / Etisalat mark)
  * - WE Pay (Telecom Egypt royal purple)
- * - Meeza (Official Egyptian national card scheme)
  * - Visa (Official blue & gold)
  * - Mastercard (Official interlocking circles)
  * - Geidea (Official coral/red acquiring gateway)
  * - Paymob (Official PSP brandmark)
- * - PCI-DSS Level 1 & Central Bank of Egypt Trust Badges
+ * - PCI-DSS Level 1 Trust Badges
  */
 
 /* ─── 1. FAWRY LOGO ─── */
@@ -122,44 +120,6 @@ export function VodafoneCashLogo({ height = 24, className = '' }: { height?: num
   );
 }
 
-/* ─── 3. INSTAPAY EGYPT LOGO ─── */
-export function InstaPayLogo({ height = 24, className = '' }: { height?: number; className?: string }) {
-  return (
-    <div
-      className={className}
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 5,
-        background: '#3C1053',
-        borderRadius: 6,
-        padding: '2px 8px 2px 6px',
-        boxShadow: '0 1px 3px rgba(60, 16, 83, 0.25)',
-        height: height,
-        boxSizing: 'border-box',
-      }}
-      title="InstaPay Egypt (شبكة المدفوعات اللحظية إنستاباي)"
-    >
-      <svg width={height - 8} height={height - 8} viewBox="0 0 24 24" fill="none">
-        <circle cx="6" cy="6" r="3.5" fill="#00D284" />
-        <path d="M6 11V20M12 4V20M18 8V20" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-        <circle cx="18" cy="4" r="2" fill="#E83E8C" />
-      </svg>
-      <span
-        style={{
-          fontFamily: "system-ui, -apple-system, sans-serif",
-          fontSize: 11,
-          fontWeight: 800,
-          color: '#FFFFFF',
-          letterSpacing: '-0.2px',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        Insta<span style={{ color: '#00D284' }}>Pay</span>
-      </span>
-    </div>
-  );
-}
 
 /* ─── 4. ORANGE MONEY / ORANGE CASH LOGO ─── */
 export function OrangeCashLogo({ height = 24, className = '' }: { height?: number; className?: string }) {
@@ -303,55 +263,6 @@ export function WePayLogo({ height = 24, className = '' }: { height?: number; cl
   );
 }
 
-/* ─── 7. MEEZA LOGO (كروت ميزة المصرية) ─── */
-export function MeezaLogo({ height = 24, className = '' }: { height?: number; className?: string }) {
-  const width = Math.round(height * 2.2);
-  return (
-    <div
-      className={className}
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        background: '#0B1B3D',
-        borderRadius: 6,
-        padding: '2px 7px',
-        boxShadow: '0 1px 3px rgba(11, 27, 61, 0.25)',
-        height: height,
-        boxSizing: 'border-box',
-      }}
-      title="Meeza National Egyptian Payment Scheme (ميزة)"
-    >
-      <svg width={width} height={height - 6} viewBox="0 0 68 22" fill="none">
-        <path
-          d="M4 14C12 5 22 7 26 12C20 10 12 11 8 16C6 16 5 15 4 14Z"
-          fill="#00B050"
-        />
-        <text
-          x="26"
-          y="15"
-          fill="#FFFFFF"
-          fontFamily="system-ui, -apple-system, sans-serif"
-          fontWeight="900"
-          fontSize="12.5"
-          letterSpacing="-0.3px"
-        >
-          meeza
-        </text>
-        <text
-          x="66"
-          y="14"
-          fill="#00B050"
-          fontFamily="'Cairo', Tahoma, sans-serif"
-          fontWeight="800"
-          fontSize="9"
-          textAnchor="end"
-        >
-          ميزة
-        </text>
-      </svg>
-    </div>
-  );
-}
 
 /* ─── 8. VISA LOGO ─── */
 export function VisaLogo({ height = 24, className = '' }: { height?: number; className?: string }) {

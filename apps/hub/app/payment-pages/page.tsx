@@ -1231,7 +1231,7 @@ export default function HubPaymentPages() {
                         })}
                         style={{ accentColor: '#10B981', width: 16, height: 16 }}
                       />
-                      <span>📱 Mobile Wallets &amp; InstaPay</span>
+                      <span>📱 Mobile Wallets (Vodafone, Orange, WE)</span>
                     </label>
 
                     <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5, color: '#CBD5E1', cursor: 'pointer' }}>

@@ -210,7 +210,7 @@ export default function HubLoginPage() {
                 boxShadow: '0 0 8px #10B981',
               }}
             />
-            <span>TLS 1.3 Active</span>
+            <span>256-Bit SSL Encrypted</span>
           </div>
         </div>
 
@@ -220,7 +220,7 @@ export default function HubLoginPage() {
             Administrative Operations Login
           </h1>
           <p style={{ fontSize: 12.5, color: '#94A3B8', margin: 0, lineHeight: 1.5 }}>
-            Authenticate with verified platform keys to manage multi-gateway routing (Geidea, Paymob, Fawry), provider settlements, and brand payouts.
+            Authenticate with verified platform keys to manage multi-gateway routing (Geidea, Paymob, Fawry), internal brand settlements, and ledger transfers.
           </p>
         </div>
 

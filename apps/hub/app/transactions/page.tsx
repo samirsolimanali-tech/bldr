@@ -27,7 +27,7 @@ const TRANSACTIONS: TransactionItem[] = [
   { id: 'txn_01J8EX1TD5', venture: 'StudyHub', student: 'Sarah Mansour', email: 'sarah.m@gmail.com', product: 'Physics Bundle — Term 1', amount: 900, method: 'Mobile Wallet (Vodafone)', gateway: 'PSP-A (Hosted)', status: 'Pending', date: '2026-09-12 23:58', ref: 'SH-COURSE-4402' },
   { id: 'txn_01J8F4KP9X', venture: 'Apex Classes', student: 'Khaled Omar', email: 'khaled.omar@gmail.com', product: 'CFA Level 1 FastTrack', amount: 6500, method: 'Card (Mastercard •••• 1182)', gateway: 'PSP-A (Hosted)', status: 'Completed', date: '2026-09-14 11:20', ref: 'AC-CFA-8812' },
   { id: 'txn_01J8E09A1B', venture: 'EL HESA', student: 'Nader Tarek', email: 'nader@elhesa.eg', product: 'Arabic Masterclass', amount: 450, method: 'Fawry Pay', gateway: 'PSP-B', status: 'Completed', date: '2026-09-11 16:05', ref: 'EH-ARAB-0091' },
-  { id: 'txn_01J8D58M7Q', venture: 'Career Hub', student: 'Laila Mostafa', email: 'laila.m@yahoo.com', product: 'Executive Resume Review', amount: 1200, method: 'Meeza Card •••• 8821', gateway: 'PSP-A (Hosted)', status: 'Completed', date: '2026-09-10 09:44', ref: 'CH-RESUME-1049' },
+  { id: 'txn_01J8D58M7Q', venture: 'Career Hub', student: 'Laila Mostafa', email: 'laila.m@yahoo.com', product: 'Executive Resume Review', amount: 1200, method: 'Card (Visa •••• 8821)', gateway: 'Paymob', status: 'Completed', date: '2026-09-10 09:44', ref: 'CH-RESUME-1049' },
 ];
 
 function StatusBadge({ s }: { s: string }) {
@@ -67,7 +67,7 @@ export default function TransactionsPage() {
     return () => window.removeEventListener('bldr:venture-changed', handleVentureChanged);
   }, []);
 
-  const methods = ['All', 'Card', 'Mobile Wallet', 'Fawry Pay', 'Meeza', 'Activation Code'];
+  const methods = ['All', 'Card', 'Mobile Wallet', 'Fawry Pay', 'Activation Code'];
 
   const filtered = txnList.filter(t => {
     const ms = search === '' || t.student.toLowerCase().includes(search.toLowerCase()) || t.id.toLowerCase().includes(search.toLowerCase()) || t.venture.toLowerCase().includes(search.toLowerCase()) || t.ref.toLowerCase().includes(search.toLowerCase()) || (t.codeRedeemed && t.codeRedeemed.toLowerCase().includes(search.toLowerCase()));

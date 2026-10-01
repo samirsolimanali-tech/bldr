@@ -207,7 +207,7 @@ export default function MasterCheckoutStudioPage() {
   const [studentName, setStudentName] = useState('أحمد كمال (Ahmed Kamal)');
   const [studentPhone, setStudentPhone] = useState('01023456789');
   const [studentEmail, setStudentEmail] = useState('ahmed.kamal@gmail.com');
-  const [walletProvider, setWalletProvider] = useState<'Vodafone Cash' | 'InstaPay' | 'Orange Money' | 'Etisalat Cash' | 'WE Pay'>('Vodafone Cash');
+  const [walletProvider, setWalletProvider] = useState<'Vodafone Cash' | 'Orange Money' | 'Etisalat Cash' | 'WE Pay'>('Vodafone Cash');
   const [walletNumber, setWalletNumber] = useState('01023456789');
   const [fawryRefCode, setFawryRefCode] = useState('788-4421-9980');
   const [checkoutStep, setCheckoutStep] = useState<'SELECT' | 'REDIRECT' | 'CONFIRMED'>('SELECT');
@@ -969,7 +969,7 @@ export default function MasterCheckoutStudioPage() {
                         {
                           step: '3',
                           title: 'Student completes checkout via Egyptian rails',
-                          desc: 'Student picks Fawry Ref Code, Mobile Wallet (Vodafone Cash/InstaPay), or Meeza Card in your branded environment.',
+                          desc: 'Student picks Fawry Ref Code, Mobile Wallet (Vodafone Cash/Orange/WE), or Card in your branded environment.',
                         },
                         {
                           step: '4',

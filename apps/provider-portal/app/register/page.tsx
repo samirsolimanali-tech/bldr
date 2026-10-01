@@ -2,434 +2,215 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { tokens } from '@bldr/ui';
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-
-export default function RegisterPage() {
+export default function RegisterLeadCapturePage() {
   const [form, setForm] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    orgName: '',
-    orgSlug: '',
-    tagline: '',
+    contactName: '',
+    workEmail: '',
+    brandName: '',
     website: '',
+    category: 'EdTech / Digital Academy',
+    annualProjectedVolume: 'EGP 1M - 5M',
+    notes: '',
   });
-  const [state, setState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [error, setError] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const autoSlug = (name: string) =>
-    name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-
-  const handleOrgName = (val: string) => {
-    setForm((f) => ({ ...f, orgName: val, orgSlug: autoSlug(val) }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setState('loading');
-    setError('');
+    setLoading(true);
 
-    try {
-      const res = await fetch(`${API}/auth/provider/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.message || 'Registration failed');
-      }
-
-      const { accessToken } = await res.json();
-      localStorage.setItem('bldr_token', accessToken);
-      setState('success');
-      setTimeout(() => {
-        window.location.href = '/dashboard';
-      }, 800);
-    } catch (err: any) {
-      setState('error');
-      setError(err.message || 'Failed to create provider account');
-    }
+    setTimeout(() => {
+      setLoading(false);
+      setSubmitted(true);
+      // Store lead locally for Hub /leads integration
+      try {
+        const existing = JSON.parse(localStorage.getItem('bldr_brand_inquiries') || '[]');
+        existing.push({
+          id: `LEAD-${Date.now()}`,
+          ...form,
+          submittedAt: new Date().toISOString(),
+          status: 'NEW',
+        });
+        localStorage.setItem('bldr_brand_inquiries', JSON.stringify(existing));
+      } catch {}
+    }, 600);
   };
 
   return (
     <div
       style={{
         minHeight: '100vh',
-        width: '100%',
+        background: '#F8FAFC',
         display: 'flex',
-        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '40px 16px',
-        background: 'radial-gradient(ellipse at 50% 10%, #1A2942 0%, #12203C 50%, #0A1222 100%)',
-        fontFamily: tokens.fonts.ui,
-        color: '#12203C',
-        position: 'relative',
-        overflow: 'hidden',
+        padding: '32px 16px',
+        fontFamily: 'system-ui, -apple-system, sans-serif',
       }}
     >
-      {/* Decorative ambient gradient glows */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '-15%',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: '700px',
-          height: '400px',
-          background: 'radial-gradient(ellipse, rgba(46, 111, 94, 0.22) 0%, rgba(209, 7, 33, 0.08) 50%, transparent 75%)',
-          filter: 'blur(70px)',
-          pointerEvents: 'none',
-        }}
-      />
-
-      {/* Main Registration Card */}
       <div
         style={{
           width: '100%',
-          maxWidth: '520px',
+          maxWidth: 520,
           background: '#FFFFFF',
-          borderRadius: '16px',
-          boxShadow: '0 24px 60px -12px rgba(10, 18, 34, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.1)',
-          position: 'relative',
-          zIndex: 10,
-          overflow: 'hidden',
+          borderRadius: 12,
+          border: '1px solid #E2E8F0',
+          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.05)',
+          padding: '32px 36px',
         }}
       >
-        {/* Top Brand Accent Line */}
-        <div
-          style={{
-            height: '4px',
-            width: '100%',
-            background: `linear-gradient(90deg, ${tokens.colors.gradientStart}, ${tokens.colors.gradientEnd})`,
-          }}
-        />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
+          <div
+            style={{
+              width: 32,
+              height: 32,
+              background: '#0F172A',
+              borderRadius: 8,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: 800,
+              fontSize: 14,
+            }}
+          >
+            b/
+          </div>
+          <span style={{ fontSize: 16, fontWeight: 700, color: '#0F172A' }}>bldr Management</span>
+        </div>
 
-        <div style={{ padding: '36px 32px 32px' }}>
-          {/* Header */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginBottom: '28px' }}>
+        {submitted ? (
+          <div>
             <div
               style={{
-                fontFamily: tokens.fonts.display,
-                fontSize: '28px',
-                fontWeight: 700,
-                color: '#12203C',
-                letterSpacing: '-0.04em',
-                lineHeight: 1,
-                display: 'flex',
-                alignItems: 'baseline',
-                marginBottom: '10px',
+                background: '#DCFCE7',
+                border: '1px solid #86EFAC',
+                borderRadius: 8,
+                padding: '20px',
+                textAlign: 'center',
+                marginBottom: 20,
               }}
             >
-              bldr
-              <span
+              <div style={{ fontSize: 24, marginBottom: 8 }}>✓</div>
+              <h2 style={{ fontSize: 16, fontWeight: 700, color: '#166534', margin: '0 0 6px' }}>
+                Partnership Inquiry Received
+              </h2>
+              <p style={{ fontSize: 13, color: '#15803D', margin: 0, lineHeight: 1.5 }}>
+                Brand onboarding is admin-governed. Our venture management team will review your details and contact you within 24 hours.
+              </p>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <Link
+                href="/login"
                 style={{
-                  background: `linear-gradient(90deg, ${tokens.colors.gradientStart}, ${tokens.colors.gradientEnd})`,
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: '#0EA5E9',
+                  textDecoration: 'none',
                 }}
               >
-                .
-              </span>
+                Already have provisioned brand credentials? Sign in &rarr;
+              </Link>
             </div>
-
-            <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '4px 10px',
-                borderRadius: '20px',
-                background: 'rgba(44, 95, 158, 0.1)',
-                border: '1px solid rgba(44, 95, 158, 0.25)',
-                fontSize: '11px',
-                fontWeight: 700,
-                letterSpacing: '0.06em',
-                textTransform: 'uppercase',
-                color: '#2C5F9E',
-                marginBottom: '14px',
-              }}
-            >
-              <span
-                style={{
-                  width: '6px',
-                  height: '6px',
-                  borderRadius: '50%',
-                  background: '#2C5F9E',
-                  boxShadow: '0 0 6px #2C5F9E',
-                }}
-              />
-              Provider Hub
-            </div>
-
-            <h1
-              style={{
-                margin: 0,
-                fontSize: '20px',
-                fontWeight: 800,
-                color: '#12203C',
-                letterSpacing: '-0.02em',
-              }}
-            >
-              Apply as a Provider
-            </h1>
-            <p
-              style={{
-                margin: '6px 0 0',
-                fontSize: '13px',
-                color: '#5A6A80',
-                lineHeight: 1.45,
-              }}
-            >
-              Join the ecosystem to offer your services, courses & workshops.
-            </p>
           </div>
+        ) : (
+          <div>
+            <h1 style={{ fontSize: 20, fontWeight: 700, color: '#0F172A', margin: '0 0 6px' }}>
+              Brand Partnership &amp; Incubation
+            </h1>
+            <p style={{ fontSize: 13, color: '#64748B', margin: '0 0 20px', lineHeight: 1.5 }}>
+              Brand onboarding is admin-only. bldr acts as the sole merchant of record for all portfolio ventures. Submit an inquiry below or sign in if already provisioned.
+            </p>
 
-          {state === 'success' ? (
-            <div style={{ textAlign: 'center', padding: '30px 20px' }}>
-              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '12px' }}>
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#16A34A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                  <polyline points="22 4 12 14.01 9 11.01" />
-                </svg>
-              </div>
-              <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#12203C', margin: '0 0 8px' }}>Account Created!</h2>
-              <p style={{ color: '#5A6A80', fontSize: '14px' }}>Redirecting to your provider dashboard...</p>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#1B2A4A', marginBottom: '5px' }}>
-                    First Name
-                  </label>
-                  <input
-                    required
-                    placeholder="Alex"
-                    value={form.firstName}
-                    onChange={(e) => setForm((f) => ({ ...f, firstName: e.target.value }))}
-                    style={{
-                      width: '100%',
-                      height: '40px',
-                      padding: '0 12px',
-                      borderRadius: '8px',
-                      border: '1px solid #D3DAE4',
-                      background: '#FAFBFD',
-                      fontSize: '13px',
-                      boxSizing: 'border-box',
-                    }}
-                  />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#1B2A4A', marginBottom: '5px' }}>
-                    Last Name
-                  </label>
-                  <input
-                    required
-                    placeholder="Rivera"
-                    value={form.lastName}
-                    onChange={(e) => setForm((f) => ({ ...f, lastName: e.target.value }))}
-                    style={{
-                      width: '100%',
-                      height: '40px',
-                      padding: '0 12px',
-                      borderRadius: '8px',
-                      border: '1px solid #D3DAE4',
-                      background: '#FAFBFD',
-                      fontSize: '13px',
-                      boxSizing: 'border-box',
-                    }}
-                  />
-                </div>
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#475569', marginBottom: 5 }}>
+                  Contact Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={form.contactName}
+                  onChange={(e) => setForm({ ...form, contactName: e.target.value })}
+                  placeholder="e.g. Karim Mansour"
+                  style={{ width: '100%', padding: '9px 12px', borderRadius: 6, border: '1px solid #CBD5E1', fontSize: 13 }}
+                />
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#1B2A4A', marginBottom: '5px' }}>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#475569', marginBottom: 5 }}>
                   Work Email
                 </label>
                 <input
                   type="email"
                   required
-                  placeholder="you@company.com"
-                  value={form.email}
-                  onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                  style={{
-                    width: '100%',
-                    height: '40px',
-                    padding: '0 12px',
-                    borderRadius: '8px',
-                    border: '1px solid #D3DAE4',
-                    background: '#FAFBFD',
-                    fontSize: '13px',
-                    boxSizing: 'border-box',
-                  }}
+                  value={form.workEmail}
+                  onChange={(e) => setForm({ ...form, workEmail: e.target.value })}
+                  placeholder="name@company.com"
+                  style={{ width: '100%', padding: '9px 12px', borderRadius: 6, border: '1px solid #CBD5E1', fontSize: 13 }}
                 />
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#1B2A4A', marginBottom: '5px' }}>
-                  Password (min 8 characters)
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#475569', marginBottom: 5 }}>
+                  Brand / Academy Name
                 </label>
                 <input
-                  type="password"
+                  type="text"
                   required
-                  minLength={8}
-                  placeholder="••••••••••••"
-                  value={form.password}
-                  onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-                  style={{
-                    width: '100%',
-                    height: '40px',
-                    padding: '0 12px',
-                    borderRadius: '8px',
-                    border: '1px solid #D3DAE4',
-                    background: '#FAFBFD',
-                    fontSize: '13px',
-                    boxSizing: 'border-box',
-                  }}
-                />
-              </div>
-
-              <div style={{ height: '1px', background: '#E3E8EF', margin: '4px 0' }} />
-
-              <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#1B2A4A', marginBottom: '5px' }}>
-                  Organisation / Brand Name
-                </label>
-                <input
-                  required
-                  placeholder="Apex Tutoring Academy"
-                  value={form.orgName}
-                  onChange={(e) => handleOrgName(e.target.value)}
-                  style={{
-                    width: '100%',
-                    height: '40px',
-                    padding: '0 12px',
-                    borderRadius: '8px',
-                    border: '1px solid #D3DAE4',
-                    background: '#FAFBFD',
-                    fontSize: '13px',
-                    boxSizing: 'border-box',
-                  }}
+                  value={form.brandName}
+                  onChange={(e) => setForm({ ...form, brandName: e.target.value })}
+                  placeholder="e.g. Apex Coding Academy"
+                  style={{ width: '100%', padding: '9px 12px', borderRadius: 6, border: '1px solid #CBD5E1', fontSize: 13 }}
                 />
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#1B2A4A', marginBottom: '5px' }}>
-                  Public Slug
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#475569', marginBottom: 5 }}>
+                  Estimated Annual Online Volume
                 </label>
-                <input
-                  required
-                  placeholder="apex-tutoring"
-                  value={form.orgSlug}
-                  onChange={(e) => setForm((f) => ({ ...f, orgSlug: autoSlug(e.target.value) }))}
-                  style={{
-                    width: '100%',
-                    height: '40px',
-                    padding: '0 12px',
-                    borderRadius: '8px',
-                    border: '1px solid #D3DAE4',
-                    background: '#FAFBFD',
-                    fontSize: '13px',
-                    fontFamily: 'monospace',
-                    boxSizing: 'border-box',
-                  }}
-                />
-                <span style={{ fontSize: '11px', color: '#8A94A6', marginTop: '4px', display: 'block' }}>
-                  bldr.io/providers/{form.orgSlug || 'your-slug'}
-                </span>
-              </div>
-
-              {state === 'error' && (
-                <div
-                  style={{
-                    padding: '10px 14px',
-                    borderRadius: '8px',
-                    background: '#FBEBE9',
-                    border: '1px solid rgba(192, 57, 43, 0.25)',
-                    color: '#C0392B',
-                    fontSize: '12.5px',
-                    fontWeight: 600,
-                  }}
+                <select
+                  value={form.annualProjectedVolume}
+                  onChange={(e) => setForm({ ...form, annualProjectedVolume: e.target.value })}
+                  style={{ width: '100%', padding: '9px 12px', borderRadius: 6, border: '1px solid #CBD5E1', fontSize: 13 }}
                 >
-                  {error}
-                </div>
-              )}
+                  <option>EGP 500K - 1M</option>
+                  <option>EGP 1M - 5M</option>
+                  <option>EGP 5M - 20M</option>
+                  <option>EGP 20M+</option>
+                </select>
+              </div>
 
               <button
                 type="submit"
-                disabled={state === 'loading'}
+                disabled={loading}
                 style={{
-                  marginTop: '8px',
-                  height: '44px',
-                  width: '100%',
-                  borderRadius: '8px',
-                  background: state === 'loading' ? '#1B2A4A' : '#12203C',
+                  background: '#0F172A',
                   color: '#FFFFFF',
-                  fontSize: '14px',
-                  fontWeight: 700,
                   border: 'none',
-                  cursor: state === 'loading' ? 'not-allowed' : 'pointer',
-                  boxShadow: '0 4px 14px rgba(18, 32, 60, 0.25)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  transition: 'all 0.15s ease',
+                  borderRadius: 6,
+                  padding: '10px 16px',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  marginTop: 8,
                 }}
               >
-                {state === 'loading' ? 'Creating Account...' : 'Create Provider Account →'}
+                {loading ? 'Submitting Inquiry...' : 'Submit Partnership Inquiry'}
               </button>
             </form>
-          )}
 
-          <div style={{ textAlign: 'center', marginTop: '20px' }}>
-            <span style={{ fontSize: '13px', color: '#5A6A80' }}>
-              Already registered?{' '}
-            </span>
-            <Link
-              href="/login"
-              style={{
-                fontSize: '13px',
-                fontWeight: 700,
-                color: '#2C5F9E',
-                textDecoration: 'none',
-              }}
-            >
-              Sign In →
-            </Link>
+            <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid #F1F5F9', textAlign: 'center' }}>
+              <Link
+                href="/login"
+                style={{ fontSize: 12.5, color: '#0EA5E9', textDecoration: 'none', fontWeight: 600 }}
+              >
+                Existing Brand Operator? Sign in at portal.bldrmanagement.com &rarr;
+              </Link>
+            </div>
           </div>
-        </div>
-
-        {/* Security / System Footer */}
-        <div
-          style={{
-            background: '#F8FAFC',
-            borderTop: '1px solid #E3E8EF',
-            padding: '14px 24px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            fontSize: '11px',
-            color: '#8A94A6',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-            </svg>
-            <span>256-Bit TLS Secured</span>
-          </div>
-          <span style={{ fontFamily: tokens.fonts.mono, fontSize: '10.5px', color: '#5A6A80' }}>
-            bldr Provider Onboarding
-          </span>
-        </div>
+        )}
       </div>
     </div>
   );

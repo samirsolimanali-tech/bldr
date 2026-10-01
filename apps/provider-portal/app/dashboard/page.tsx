@@ -27,16 +27,16 @@ const MAX_VAL = Math.max(...MONTHLY);
 const STUDYHUB_STUDENTS = [
   { name: 'أحمد حسن (Ahmed Hassan)', email: 'ahmed@email.com', product: 'Full-Stack Bootcamp', amount: 4800, source: 'Fawry Code', date: '2026-09-26' },
   { name: 'سارة محمود (Sara Mahmoud)',   email: 'sara@email.com',  product: 'Full-Stack Bootcamp', amount: 4800, source: 'Vodafone Cash', date: '2026-09-26' },
-  { name: 'عمر فاروق (Omar Farouk)',     email: 'omar@email.com',  product: 'Advanced React Cohort', amount: 3200, source: 'Meeza Card', date: '2026-09-25' },
-  { name: 'فاطمة السيد (Fatima El-Sayed)', email: 'fatima@email.com', product: 'Full-Stack Bootcamp', amount: 4800, source: 'InstaPay', date: '2026-09-25' },
+  { name: 'عمر فاروق (Omar Farouk)',     email: 'omar@email.com',  product: 'Advanced React Cohort', amount: 3200, source: 'Card (Visa)', date: '2026-09-25' },
+  { name: 'فاطمة السيد (Fatima El-Sayed)', email: 'fatima@email.com', product: 'Full-Stack Bootcamp', amount: 4800, source: 'Mobile Wallet', date: '2026-09-25' },
   { name: 'يوسف الأمين (Youssef El-Amin)', email: 'youssef@email.com', product: 'Advanced React Cohort', amount: 3200, source: 'Orange Money', date: '2026-09-24' },
 ];
 
 const BLDR_CUSTOMERS = [
-  { name: 'طارق محمود (Tarek Mahmoud)', email: 'tarek@edtech.eg', product: 'Education Solutions (Enterprise)', amount: 25000, source: 'Bank Transfer', date: '2026-09-26' },
+  { name: 'طارق محمود (Tarek Mahmoud)', email: 'tarek@edtech.eg', product: 'Education Solutions (Enterprise)', amount: 25000, source: 'Card (Geidea)', date: '2026-09-26' },
   { name: 'نور الدين (Nour El-Din)',     email: 'nour@alphamedia.com', product: 'Media Production Sprint', amount: 15000, source: 'Card (Geidea)', date: '2026-09-26' },
   { name: 'كريم زكي (Karim Zaki)',       email: 'karim@zaki.eg', product: 'Business Consulting Retainer', amount: 12000, source: 'Card (Geidea)', date: '2026-09-25' },
-  { name: 'منى سليمان (Mona Soliman)',   email: 'mona@learnpro.io', product: 'Tutor Marketing Package', amount: 6500, source: 'InstaPay', date: '2026-09-24' },
+  { name: 'منى سليمان (Mona Soliman)',   email: 'mona@learnpro.io', product: 'Tutor Marketing Package', amount: 6500, source: 'Mobile Wallet', date: '2026-09-24' },
   { name: 'حازم شريف (Hazem Sherif)',   email: 'hazem@growth.eg', product: 'Corporate Training Workshop', amount: 18000, source: 'Fawry Code', date: '2026-09-23' },
 ];
 
@@ -117,7 +117,7 @@ export default function ProviderDashboard() {
                 {[
                   { label: 'Create Payment Link', href: '/payment-links', color: 'var(--brand)', bg: '#EFF6FF' },
                   { label: 'Master Checkout Studio', href: '/payment-pages', color: '#065F46', bg: '#ECFDF5' },
-                  { label: 'Request Payout', href: '/payouts', color: '#92400E', bg: '#FFFBEB' },
+                  { label: 'View Settlements', href: '/payouts', color: '#92400E', bg: '#FFFBEB' },
                   { label: 'View Paid Users', href: '/students', color: '#5B21B6', bg: '#F5F3FF' },
                 ].map((a) => (
                   <Link key={a.label} href={a.href} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderRadius: 8, background: a.bg, textDecoration: 'none', border: `1px solid ${a.color}20`, transition: 'opacity 0.2s' }}>

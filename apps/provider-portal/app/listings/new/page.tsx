@@ -155,7 +155,7 @@ export default function NewListingPage() {
                         Automatic Master Branded Checkout (Zero extra setup)
                       </div>
                       <div style={{ fontSize: 12, color: '#64748B' }}>
-                        This course will automatically use your Academy Master Template with Fawry, Wallets, and Meeza enabled. No need to create a new page.
+                        This course will automatically use your Academy Master Template with Fawry, Mobile Wallets, and Cards enabled. No need to create a new page.
                       </div>
                     </div>
                     <a href="/payment-pages" target="_blank" style={{ fontSize: 12, fontWeight: 700, color: 'white', background: 'var(--brand)', padding: '6px 12px', borderRadius: 6, textDecoration: 'none', whiteSpace: 'nowrap' }}>

@@ -434,12 +434,12 @@ export const PRODUCTS_CATALOG: ProductItem[] = [
     tags: ['FinTech', 'Summit', 'Networking', 'Executive Pass'],
     tagsAr: ['تكنولوجيا مالية', 'مؤتمر', 'شبكة علاقات', 'تذكرة تنفيذية'],
     syllabus: [
-      { title: 'Morning: Keynotes on Egypt E-Payment Innovations', desc: 'InstaPay, Meeza, and CBE regulatory sandboxes.' },
+      { title: 'Morning: Keynotes on Egypt E-Payment Innovations', desc: 'Mobile wallets, digital acquiring, and CBE regulatory sandboxes.' },
       { title: 'Mid-Day: Technical Masterclasses', desc: 'PCI-DSS compliance, HMAC security, and unified checkout.' },
       { title: 'Evening: Private VIP Investor & Founder Lounge', desc: 'Cocktail networking and 1-on-1 venture deal flow discussions.' },
     ],
     syllabusAr: [
-      { title: 'الفترة الصباحية: كلمات رئيسية حول مستقبل المدفوعات', desc: 'تطور إنستاباي، بطاقات ميزة، وتشريعات البنك المركزي.' },
+      { title: 'الفترة الصباحية: كلمات رئيسية حول مستقبل المدفوعات', desc: 'تطور المحافظ الإلكترونية، بوابات الدفع الرقمية، وتشريعات البنك المركزي.' },
       { title: 'الفترة المسائية: ورش عمل تقنية متقدمة', desc: 'معايير أمان PCI-DSS، التشفير الرقمي، وتكامل الأنظمة.' },
       { title: 'الختام: جلسة تعارف خاصة مع المستثمرين والشركاء', desc: 'لقاءات عمل مباشرة وبحث فرص التمويل والشراكات الاستراتيجية.' },
     ],

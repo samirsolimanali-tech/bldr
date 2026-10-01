@@ -197,7 +197,7 @@ export default function ContactPage() {
               {/* Provider link */}
               <div style={{ borderTop: '1px solid rgba(20,20,22,0.08)', paddingTop: 20 }}>
                 <div style={{ fontSize: 13, color: '#5A6A80', marginBottom: 8 }}>
-                  {isRtl ? 'هل أنت مزود خدمة وترغب بالانضمام؟' : 'Looking for Provider Onboarding?'}
+                  {isRtl ? 'هل ترغب بالشراكة مع bldr؟' : 'Looking to partner with bldr?'}
                 </div>
                 <Link
                   href="/apply-provider"
@@ -211,7 +211,7 @@ export default function ContactPage() {
                     textDecoration: 'none',
                   }}
                 >
-                  {isRtl ? 'انضم كمزود خدمة معتمد في bldr ←' : 'Apply as a certified service provider →'}
+                  {isRtl ? 'استكشف شراكات المشاريع والخدمات مع bldr ←' : 'Partner with bldr on brand incubation →'}
                 </Link>
               </div>
             </div>

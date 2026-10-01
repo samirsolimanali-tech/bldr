@@ -19,11 +19,9 @@ export default function SettingsPage() {
   const [supportPhone, setSupportPhone] = useState('+20 10 1234 5678');
   const [description, setDescription] = useState('Provider services and digital education solutions powered by bldr.');
   
-  // Payout Details
-  const [bankName, setBankName] = useState('Commercial International Bank (CIB)');
-  const [accountHolder, setAccountHolder] = useState('bldr Digital Ventures SAE');
-  const [iban, setIban] = useState('EG380010000000000123456789012');
-  const [mobileWalletNumber, setMobileWalletNumber] = useState('01012345678');
+  // Brand Ledger Settings (Internal)
+  const [internalLedgerCode, setInternalLedgerCode] = useState('BLDR-LEDGER-AC');
+  const [settlementCycle, setSettlementCycle] = useState('Weekly Batch');
 
   // Webhooks
   const [webhookUrl, setWebhookUrl] = useState('https://webhook.site/bldr-provider-demo');
@@ -137,58 +135,51 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            {/* Payout & Banking Details */}
+            {/* Internal Brand Ledger Routing */}
             <div style={{ background: '#FFFFFF', padding: 24, borderRadius: 12, border: '1px solid var(--border)' }}>
-              <h2 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 6px', color: 'var(--text-primary)' }}>
-                Payout Settlement Account
-              </h2>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                <h2 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>
+                  Internal Brand Ledger Routing
+                </h2>
+                <span style={{ fontSize: 11, background: '#F1F5F9', padding: '3px 8px', borderRadius: 4, color: '#475569', fontWeight: 600 }}>
+                  🔒 Governed by Hub Admin
+                </span>
+              </div>
               <p style={{ margin: '0 0 16px', fontSize: 12.5, color: 'var(--text-muted)' }}>
-                Bank transfers and mobile wallet settlements are issued to these verified accounts upon balance liquidation.
+                bldr is the sole merchant of record. Net settlement balances are recorded to your internal brand operating ledger.
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                 <div>
                   <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
-                    Receiving Bank
+                    Internal Ledger Account
                   </label>
                   <input
                     type="text"
-                    value={bankName}
-                    onChange={(e) => setBankName(e.target.value)}
-                    style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: '1px solid var(--border)', fontSize: 13 }}
+                    value={internalLedgerCode}
+                    readOnly
+                    disabled
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: '1px solid var(--border)', fontSize: 13, background: 'var(--bg-canvas)', fontFamily: 'monospace' }}
                   />
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
-                    Account Holder Name
+                    Settlement Cadence
                   </label>
                   <input
                     type="text"
-                    value={accountHolder}
-                    onChange={(e) => setAccountHolder(e.target.value)}
-                    style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: '1px solid var(--border)', fontSize: 13 }}
+                    value={settlementCycle}
+                    readOnly
+                    disabled
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: '1px solid var(--border)', fontSize: 13, background: 'var(--bg-canvas)' }}
                   />
                 </div>
                 <div style={{ gridColumn: 'span 2' }}>
                   <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
-                    IBAN / Account Number
+                    Dispute Reserve Requirement
                   </label>
-                  <input
-                    type="text"
-                    value={iban}
-                    onChange={(e) => setIban(e.target.value)}
-                    style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: '1px solid var(--border)', fontSize: 13, fontFamily: 'monospace' }}
-                  />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
-                    Mobile Wallet Number (Vodafone / Orange / WE)
-                  </label>
-                  <input
-                    type="text"
-                    value={mobileWalletNumber}
-                    onChange={(e) => setMobileWalletNumber(e.target.value)}
-                    style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: '1px solid var(--border)', fontSize: 13 }}
-                  />
+                  <div style={{ padding: '10px 14px', background: 'var(--bg-canvas)', borderRadius: 8, border: '1px solid var(--border)', fontSize: 13, color: 'var(--text-secondary)' }}>
+                    5% rolling dispute and chargeback reserve retained internally per settlement statement.
+                  </div>
                 </div>
               </div>
             </div>

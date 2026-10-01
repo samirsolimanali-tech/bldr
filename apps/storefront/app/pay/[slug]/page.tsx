@@ -331,8 +331,8 @@ function HostedPaymentContent() {
             />
             <span style={{ fontSize: 11, color: '#334155', fontWeight: 600 }}>
               {isRtl
-                ? `معالجة مدفوعات معتمدة PCI-DSS عبر ${activeGatewayName}`
-                : `PCI-DSS Compliant Payment Processing via ${activeGatewayName}`}
+                ? `المدفوعات تُعالج بواسطة ${activeGatewayName}، معتمدة بمعايير PCI-DSS`
+                : `Payments processed by ${activeGatewayName}, PCI-DSS certified`}
             </span>
           </div>
 
