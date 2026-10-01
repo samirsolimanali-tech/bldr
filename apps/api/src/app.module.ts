@@ -16,6 +16,7 @@ import { PayoutsModule } from './payouts/payouts.module';
 import { AdminModule } from './admin/admin.module';
 import { SimulationModule } from './simulation/simulation.module';
 import { CheckoutModule } from './checkout/checkout.module';
+import { ActivationCodesModule } from './activation-codes/activation-codes.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { CheckoutModule } from './checkout/checkout.module';
     AdminModule,
     SimulationModule,
     CheckoutModule,   // Model B: external checkout-session API (POST /v1/checkout/sessions)
+    ActivationCodesModule, // Single-use hashed activation code redemption & failure audit
   ],
 })
 export class AppModule {}

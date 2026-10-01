@@ -5,8 +5,10 @@ import { GatewayType } from '@bldr/shared-types';
 import { PaymentGateway } from './gateway.interface';
 import { GeideaAdapter } from './geidea.adapter';
 import { FawryAdapter } from './fawry.adapter';
+import { PaymobAdapter } from './paymob.adapter';
 import { MockGeideaAdapter } from './mock-geidea.adapter';
 import { MockFawryAdapter } from './mock-fawry.adapter';
+import { MockPaymobAdapter } from './mock-paymob.adapter';
 
 /**
  * GatewayFactory — selects the appropriate PaymentGateway adapter for an order.
@@ -17,8 +19,10 @@ export class GatewayFactory {
   constructor(
     private geideaAdapter: GeideaAdapter,
     private fawryAdapter: FawryAdapter,
+    private paymobAdapter: PaymobAdapter,
     private mockGeideaAdapter: MockGeideaAdapter,
     private mockFawryAdapter: MockFawryAdapter,
+    private mockPaymobAdapter: MockPaymobAdapter,
     private config: ConfigService,
   ) {}
 
@@ -38,6 +42,9 @@ export class GatewayFactory {
     if (defaultGateway === 'fawry') {
       return isSim ? this.mockFawryAdapter : this.fawryAdapter;
     }
+    if (defaultGateway === 'paymob') {
+      return isSim ? this.mockPaymobAdapter : this.paymobAdapter;
+    }
 
     // Default: Geidea (modal flow)
     return isSim ? this.mockGeideaAdapter : this.geideaAdapter;
@@ -48,10 +55,11 @@ export class GatewayFactory {
     switch (type) {
       case GatewayType.FAWRY:
         return isSim ? this.mockFawryAdapter : this.fawryAdapter;
+      case GatewayType.PAYMOB:
+        return isSim ? this.mockPaymobAdapter : this.paymobAdapter;
       case GatewayType.GEIDEA:
       default:
         return isSim ? this.mockGeideaAdapter : this.geideaAdapter;
     }
   }
 }
-

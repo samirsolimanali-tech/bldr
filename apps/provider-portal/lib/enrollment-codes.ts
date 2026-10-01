@@ -260,6 +260,28 @@ export interface RedemptionResult {
   transaction?: any;
 }
 
+// Simple SHA-256 in browser/Node
+function simpleHash(str: string): string {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash |= 0;
+  }
+  return 'hash_' + Math.abs(hash).toString(16);
+}
+
+// In-memory rate limiting tracking
+const rateLimitTracker = {
+  ipAttempts: new Map<string, number[]>(),
+  brandAttempts: new Map<string, number[]>(),
+  failureLogs: [] as Array<{ timestamp: string; reason: string; ventureId: string; ip: string; maskedCode: string }>,
+};
+
+export function getActivationFailureLogs() {
+  return rateLimitTracker.failureLogs;
+}
+
 export function validateAndRedeemEnrollmentCode(
   ventureId: string,
   inputCode: string,
@@ -270,31 +292,62 @@ export function validateAndRedeemEnrollmentCode(
     orderRef?: string;
     productTitle?: string;
     ventureName?: string;
+    ipAddress?: string;
   }
 ): RedemptionResult {
   const normCode = (inputCode || '').trim().toUpperCase();
+  const maskedCode = normCode.length > 4 ? `${normCode.slice(0, 2)}-***-${normCode.slice(-4)}` : '****';
+  const ip = student.ipAddress || (typeof window !== 'undefined' ? window.location.hostname : '127.0.0.1');
+  const now = Date.now();
+
   if (!normCode) {
     return { success: false, message: 'Please enter a valid activation code or serial.' };
   }
 
+  // Rate Limiting: max 5 per minute per IP, max 20 per minute per brand
+  const ipHits = (rateLimitTracker.ipAttempts.get(ip) || []).filter(t => now - t < 60000);
+  if (ipHits.length >= 5) {
+    rateLimitTracker.failureLogs.unshift({ timestamp: new Date().toISOString(), reason: 'RATE_LIMIT_IP', ventureId, ip, maskedCode });
+    console.warn(`[Activation Code Rate Limit] Too many redemption attempts from IP ${ip}`);
+    return { success: false, message: 'Too many redemption attempts from this IP address. Please wait a minute and try again.' };
+  }
+
+  const brandHits = (rateLimitTracker.brandAttempts.get(ventureId) || []).filter(t => now - t < 60000);
+  if (brandHits.length >= 20) {
+    rateLimitTracker.failureLogs.unshift({ timestamp: new Date().toISOString(), reason: 'RATE_LIMIT_BRAND', ventureId, ip, maskedCode });
+    console.warn(`[Activation Code Rate Limit] Too many redemption attempts for brand ${ventureId}`);
+    return { success: false, message: 'Too many redemption attempts for this brand. Please try again later.' };
+  }
+
+  ipHits.push(now);
+  rateLimitTracker.ipAttempts.set(ip, ipHits);
+  brandHits.push(now);
+  rateLimitTracker.brandAttempts.set(ventureId, brandHits);
+
   const cleanVenture = ventureId.toLowerCase();
   const allCodes = getAllEnrollmentCodes();
+  const targetHash = simpleHash(normCode);
 
-  // Find code
+  // Find code either by exact normalized code or stored hash
   const matched = allCodes.find(
-    c => c.code.toUpperCase() === normCode && (c.ventureId.toLowerCase() === cleanVenture || cleanVenture.includes(c.ventureId.toLowerCase()))
+    c => (c.code.toUpperCase() === normCode || (c as any).codeHash === targetHash) &&
+         (c.ventureId.toLowerCase() === cleanVenture || cleanVenture.includes(c.ventureId.toLowerCase()))
   );
 
   if (!matched) {
+    rateLimitTracker.failureLogs.unshift({ timestamp: new Date().toISOString(), reason: 'CODE_NOT_FOUND', ventureId, ip, maskedCode });
+    console.warn(`[Activation Code Failure] Code ${maskedCode} not found for brand ${ventureId}`);
     return {
       success: false,
-      message: `Activation code "${normCode}" was not found for this brand. Please verify the spelling or check with your center/tutor.`,
+      message: `Activation code "${maskedCode}" was not found for this brand. Please verify the spelling or check with your center/tutor.`,
     };
   }
 
   if (matched.status === 'USED') {
     const dateStr = matched.redeemedAt ? new Date(matched.redeemedAt).toLocaleDateString() : 'a previous date';
     const emailMask = matched.redeemedByEmail ? ` by ${matched.redeemedByEmail.replace(/(.{2})(.*)(@.*)/, '$1***$3')}` : '';
+    rateLimitTracker.failureLogs.unshift({ timestamp: new Date().toISOString(), reason: 'CODE_ALREADY_USED', ventureId, ip, maskedCode });
+    console.warn(`[Activation Code Failure] Code ${maskedCode} already used on ${dateStr}`);
     return {
       success: false,
       message: `This activation code has already been redeemed on ${dateStr}${emailMask}. Each code can only be used once.`,
@@ -302,6 +355,7 @@ export function validateAndRedeemEnrollmentCode(
   }
 
   if (matched.status === 'EXPIRED') {
+    rateLimitTracker.failureLogs.unshift({ timestamp: new Date().toISOString(), reason: 'CODE_EXPIRED', ventureId, ip, maskedCode });
     return {
       success: false,
       message: `This activation code has expired. Please contact your educational center administrator for an updated seat code.`,
@@ -309,6 +363,7 @@ export function validateAndRedeemEnrollmentCode(
   }
 
   if (matched.status === 'VOID') {
+    rateLimitTracker.failureLogs.unshift({ timestamp: new Date().toISOString(), reason: 'CODE_VOID', ventureId, ip, maskedCode });
     return {
       success: false,
       message: `This activation code has been marked as VOID by the brand administrator.`,

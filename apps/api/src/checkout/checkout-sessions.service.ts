@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCheckoutSessionDto, ValidatedCheckoutSessionDto } from './checkout-sessions.controller';
-import { createHmac, randomBytes } from 'crypto';
+import { createHmac, createHash, randomBytes } from 'crypto';
 
 // ─── Settlement Calculator ─────────────────────────────────────────────────────
 
@@ -72,13 +72,49 @@ export class CheckoutSessionsService {
       );
     }
 
+    // Canonical request body hashing for strict idempotency verification
+    const canonicalPayload = JSON.stringify({
+      ventureId: dto.ventureId.toUpperCase(),
+      amountPiasters: dto.amountPiasters,
+      currency: dto.currency ?? 'EGP',
+      externalRef: dto.externalRef ?? null,
+      customerEmail: dto.customer?.email?.toLowerCase(),
+      customerName: dto.customer?.name ?? null,
+      customerPhone: dto.customer?.phone ?? null,
+      lineItems: dto.lineItems,
+      successUrl: dto.successUrl,
+      cancelUrl: dto.cancelUrl,
+      paymentMethodsAllowed: (dto.paymentMethodsAllowed ?? []).sort(),
+    });
+    const requestHash = createHash('sha256').update(canonicalPayload).digest('hex');
+
     // Idempotency check
     if (idempotencyKey) {
       const existing = await (this.prisma as any).checkoutSession.findUnique({
         where: { idempotencyKey },
       });
       if (existing) {
-        this.logger.log(`[Idempotency] Returning existing session ${existing.id}`);
+        const existingMeta = (existing.metadata || {}) as Record<string, any>;
+        const existingHash = existingMeta._idempotencyPayloadHash;
+
+        const isExactMatch = existingHash
+          ? existingHash === requestHash
+          : existing.amountPiasters === dto.amountPiasters &&
+            existing.currency === (dto.currency ?? 'EGP') &&
+            existing.customerEmail === dto.customer.email &&
+            existing.successUrl === dto.successUrl &&
+            existing.cancelUrl === dto.cancelUrl;
+
+        if (!isExactMatch) {
+          this.logger.warn(
+            `[Idempotency Conflict] Key "${idempotencyKey}" reused with differing payload for venture "${resolvedVentureCode}". Returning 409 Conflict.`,
+          );
+          throw new ConflictException(
+            `Idempotency-Key "${idempotencyKey}" has already been used with a different request payload. Reusing the same idempotency key with conflicting parameters is prohibited.`,
+          );
+        }
+
+        this.logger.log(`[Idempotency] Returning existing session ${existing.id} for key ${idempotencyKey}`);
         return this.formatSession(existing);
       }
     }
@@ -112,7 +148,10 @@ export class CheckoutSessionsService {
         customerEmail: dto.customer.email,
         customerPhone: dto.customer.phone,
         lineItems: dto.lineItems as object[],
-        metadata: dto.metadata as object ?? {},
+        metadata: {
+          ...((dto.metadata as object) ?? {}),
+          _idempotencyPayloadHash: requestHash,
+        },
         successUrl: dto.successUrl,
         cancelUrl: dto.cancelUrl,
         allowedMethods: dto.paymentMethodsAllowed ?? ['cards', 'wallets', 'fawry'],
@@ -637,6 +676,7 @@ export class CheckoutSessionsService {
     const allowedHosts = new Set<string>([
       'localhost',
       '127.0.0.1',
+      'bldrmanagement.com',
       'bldr.store',
       'studyhub.eg',
       'app.studyhub.eg',

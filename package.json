@@ -8,7 +8,7 @@
     "build": "turbo run build",
     "lint": "turbo run lint",
     "type-check": "turbo run type-check",
-    "test": "ts-node --project tsconfig.seed.json apps/api/src/commission/commission.service.spec.ts && ts-node --project tsconfig.seed.json apps/api/src/webhooks/webhooks.service.spec.ts && ts-node --project tsconfig.seed.json apps/api/src/simulation/simulation.service.spec.ts",
+    "test": "ts-node --project tsconfig.seed.json apps/api/src/commission/commission.service.spec.ts && ts-node --project tsconfig.seed.json apps/api/src/payouts/payouts.service.spec.ts && ts-node --project tsconfig.seed.json apps/api/src/checkout/checkout-sessions.service.spec.ts && ts-node --project tsconfig.seed.json apps/api/src/activation-codes/activation-codes.service.spec.ts && ts-node --project tsconfig.seed.json apps/api/src/webhooks/webhooks.service.spec.ts && ts-node --project tsconfig.seed.json apps/api/src/simulation/simulation.service.spec.ts",
     "db:start": "ts-node --project tsconfig.seed.json scripts/start-db.ts",
     "db:generate": "prisma generate --schema=./prisma/schema.prisma",
     "db:migrate": "prisma migrate dev --schema=./prisma/schema.prisma",

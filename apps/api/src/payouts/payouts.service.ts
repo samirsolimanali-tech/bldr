@@ -94,14 +94,22 @@ export class PayoutsService {
     try {
       metadata = payout.note ? JSON.parse(payout.note) : {};
     } catch {
-      metadata = { createdBy: null };
+      metadata = {};
+    }
+
+    // Fail closed if batch creator information is missing
+    if (!metadata || !metadata.createdBy) {
+      this.logger.error(`[Dual-Control Violation] Batch ${batchId} is missing createdBy metadata. Fails closed.`);
+      throw new ForbiddenException(
+        'Dual control violation: Settlement batch metadata is missing creator information (createdBy). Cannot verify separation of duties.',
+      );
     }
 
     // Server-enforced dual control: batch creator cannot approve their own batch
-    if (metadata.createdBy && metadata.createdBy === approverId) {
+    if (metadata.createdBy === approverId) {
       this.logger.warn(`[Dual-Control Violation] Actor ${approverId} attempted to self-approve batch ${batchId}`);
       throw new ForbiddenException(
-        'Dual control violation: The creator of a settlement batch cannot approve their own batch. A second financial controller or super administrator must review and authorize the disbursement.',
+        'Dual control violation: The creator of a settlement batch cannot approve their own batch. A second financial controller or authorized approver must review and authorize the disbursement.',
       );
     }
 

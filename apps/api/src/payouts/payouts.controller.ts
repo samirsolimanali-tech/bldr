@@ -6,7 +6,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { JwtPayload } from '@bldr/shared-types';
+import { JwtPayload, UserRole } from '@bldr/shared-types';
 
 class MarkAsPaidDto {
   @IsOptional() @IsString() note?: string;
@@ -49,9 +49,14 @@ export class PayoutsController {
 
   @Post('batches/:id/approve')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles(UserRole.APPROVER)
   @ApiBearerAuth()
-  approveBatch(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+  approveBatch(
+    @Param('id') id: string,
+    @CurrentUser() user: JwtPayload,
+    @Body() _ignoredBody?: Record<string, unknown>,
+  ) {
+    // Security: approverId is strictly derived from the authenticated JWT session, never accepted from request body
     return this.svc.approveAndPostSettlementBatch(id, user.sub || user.email);
   }
 

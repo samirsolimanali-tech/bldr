@@ -58,6 +58,7 @@ enum OrderSource {
 
 enum GatewayType {
   GEIDEA
+  PAYMOB
   FAWRY
   EXTERNAL
 }
@@ -75,6 +76,7 @@ enum PayoutStatus {
 
 enum UserRole {
   ADMIN
+  APPROVER
   PROVIDER  // @alias VENTURE_TEAM_MEMBER
   CUSTOMER
 }
@@ -442,7 +444,8 @@ enum EnrollmentCodeSource {
 
 model EnrollmentCode {
   id                  String               @id @default(cuid())
-  code                String
+  code                String               // Masked or display code (e.g. SH-***-F982)
+  codeHash            String?              // SHA-256 hash of normalized code for secure lookup
   serial              String?
   ventureId           String
   productId           String?
@@ -460,5 +463,6 @@ model EnrollmentCode {
   provider            Provider             @relation(fields: [ventureId], references: [id], onDelete: Cascade)
 
   @@unique([ventureId, code])
+  @@index([ventureId, codeHash])
   @@index([ventureId, status])
 }

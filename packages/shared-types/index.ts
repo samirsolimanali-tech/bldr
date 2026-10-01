@@ -51,6 +51,7 @@ export enum PayoutStatus {
 
 export enum UserRole {
   ADMIN = 'ADMIN',
+  APPROVER = 'APPROVER',
   PROVIDER = 'PROVIDER',
   CUSTOMER = 'CUSTOMER',
 }

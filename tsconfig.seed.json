@@ -2,7 +2,10 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "module": "CommonJS",
-    "outDir": "./prisma/dist"
+    "outDir": "./prisma/dist",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "strictPropertyInitialization": false
   },
   "include": ["prisma/seed.ts"]
 }

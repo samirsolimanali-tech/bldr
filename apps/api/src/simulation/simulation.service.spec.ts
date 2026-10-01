@@ -135,8 +135,10 @@ describe('Simulation Engine — Adapters, Signatures, and Guards', () => {
       const factory = new GatewayFactory(
         {} as any,
         {} as any,
+        {} as any,
         new MockGeideaAdapter(config),
         new MockFawryAdapter(config),
+        {} as any,
         config,
       );
 
@@ -151,8 +153,10 @@ describe('Simulation Engine — Adapters, Signatures, and Guards', () => {
       const factory = new GatewayFactory(
         mockRealGeidea,
         {} as any,
+        {} as any,
         new MockGeideaAdapter(config),
         new MockFawryAdapter(config),
+        {} as any,
         config,
       );
 
