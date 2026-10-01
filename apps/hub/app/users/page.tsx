@@ -228,7 +228,7 @@ export default function UsersPage() {
       `Login Email: ${u.email}`,
       `Password: ${u.password || 'Account password as assigned'}`,
       `Role: ${u.role}`,
-      `Security Policy: ADR-001 tenant segregation enforced. You have direct access to your brand's financial statements, orders, and bank payouts.`,
+      `Security Policy: ADR-001 tenant segregation enforced. You have direct access to your brand's financial statements, orders, and brand settlements.`,
     ].join('\n');
 
     navigator.clipboard.writeText(text);
@@ -856,7 +856,7 @@ export default function UsersPage() {
                     color: '#12203C',
                   }}
                 >
-                  <option value="Brand Financial Admin">Brand Financial Admin (Full Access: Statements, Orders, Bank Payouts)</option>
+                  <option value="Brand Financial Admin">Brand Financial Admin (Full Access: Statements, Orders, Brand Settlements)</option>
                   <option value="Brand Operations Admin">Brand Operations Admin (Orders, Students Roster, Payment Links)</option>
                   <option value="Finance Viewer">Finance Viewer (Read-only ledger & statements audit)</option>
                 </select>
