@@ -2277,7 +2277,24 @@ export default function VentureConfigPage() {
                     <input
                       type="number"
                       step="0.5"
-                      defaultValue={5.0}
+                      value={reservePct}
+                      onChange={e => setReservePct(e.target.value)}
+                      style={{ height: 36, width: '100%', boxSizing: 'border-box', border: '1px solid #E3E8EF', borderRadius: 7, padding: '0 8px', fontSize: 13, fontWeight: 700 }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: 10.5, fontWeight: 700, textTransform: 'uppercase', color: '#8A94A6', marginBottom: 4 }}>
+                      Reserve Hold Period (Days)
+                    </label>
+                    <input
+                      type="number"
+                      step="1"
+                      min="0"
+                      max="180"
+                      value={reserveReleaseDays}
+                      onChange={e => setReserveReleaseDays(e.target.value)}
+                      placeholder="14"
                       style={{ height: 36, width: '100%', boxSizing: 'border-box', border: '1px solid #E3E8EF', borderRadius: 7, padding: '0 8px', fontSize: 13, fontWeight: 700 }}
                     />
                   </div>
