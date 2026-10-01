@@ -86,7 +86,7 @@ export const VENTURES_CONFIG: Record<string, VentureConfig> = {
   },
   bm: {
     id: 'bldr',
-    code: 'BM',
+    code: 'BLDR',
     displayName: 'bldr Management',
     supportPhone: '+20 10 0000 0000',
     supportEmail: 'partners@bldr.dev',
@@ -103,6 +103,9 @@ export function getVentureConfig(codeOrId?: string): VentureConfig {
     return VENTURES_CONFIG.bm;
   }
   const key = codeOrId.toLowerCase().trim();
+  if (key === 'bldr' || key === 'bm') {
+    return VENTURES_CONFIG.bm;
+  }
   if (VENTURES_CONFIG[key]) {
     return VENTURES_CONFIG[key];
   }

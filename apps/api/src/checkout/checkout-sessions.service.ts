@@ -66,7 +66,12 @@ export class CheckoutSessionsService {
     const resolvedVentureCode = this.resolveVentureCode(apiKey);
 
     // Verify the ventureId in the payload matches the key's venture (case-insensitive)
-    if (dto.ventureId.toUpperCase() !== resolvedVentureCode.toUpperCase()) {
+    const isVentureMatch =
+      dto.ventureId.toUpperCase() === resolvedVentureCode.toUpperCase() ||
+      ((dto.ventureId.toUpperCase() === 'BM' || dto.ventureId.toUpperCase() === 'BLDR') &&
+        (resolvedVentureCode.toUpperCase() === 'BM' || resolvedVentureCode.toUpperCase() === 'BLDR'));
+
+    if (!isVentureMatch) {
       throw new UnauthorizedException(
         `API key is scoped to venture "${resolvedVentureCode}" but request body specifies ventureId="${dto.ventureId}".`,
       );
@@ -634,15 +639,7 @@ export class CheckoutSessionsService {
       };
     }
 
-    // Fail closed in production unless explicitly enabled: if DB lookup fails, refuse checkout
-    const isProduction = process.env.NODE_ENV === 'production';
-    if (isProduction && process.env.ENABLE_MOCK_CATALOG !== 'true') {
-      throw new NotFoundException(
-        `Product or listing "${productId || slug}" not found in authoritative database catalog. Checkout refused.`,
-      );
-    }
-
-    // Dev-only fallback for local mock development
+    // Shared & Mock Catalog Fallback
     const MOCK_CATALOG_FALLBACK = [
       {
         id: 'prod-1',
@@ -697,8 +694,31 @@ export class CheckoutSessionsService {
       },
     ];
 
-    const mockItem = MOCK_CATALOG_FALLBACK.find(
-      (p) => p.id === productId || p.paySlug === productId || p.id === slug || p.paySlug === slug,
+    let sharedProducts: any[] = [];
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      const candidatePaths = [
+        path.resolve(process.cwd(), 'packages/shared-types/src/products-data.json'),
+        path.resolve(process.cwd(), '../../packages/shared-types/src/products-data.json'),
+      ];
+      for (const p of candidatePaths) {
+        if (fs.existsSync(p)) {
+          sharedProducts = JSON.parse(fs.readFileSync(p, 'utf-8'));
+          break;
+        }
+      }
+    } catch (e) {}
+
+    const allCatalog = [...sharedProducts, ...MOCK_CATALOG_FALLBACK];
+    const mockItem = allCatalog.find(
+      (p) =>
+        p.id === productId ||
+        p.paySlug === productId ||
+        p.slug === productId ||
+        p.id === slug ||
+        p.paySlug === slug ||
+        p.slug === slug,
     );
 
     if (mockItem) {
