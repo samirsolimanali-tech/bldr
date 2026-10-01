@@ -9,9 +9,20 @@ export default function Footer() {
         <div className="bldr-footer-top" style={{ display: 'flex', flexWrap: 'wrap', gap: '44px 36px', alignItems: 'flex-start', justifyContent: 'space-between' }}>
           {/* Brand */}
           <div className="bldr-footer-brand" style={{ flex: '1 1 260px', minWidth: 200, display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-              <div className="bldr-logo-mark" style={{ width: 34, height: 34, fontSize: 14, borderRadius: 8, background: '#D10721', color: '#FFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800 }}>b/</div>
-              <span style={{ fontWeight: 700, fontSize: 20, color: 'rgba(248,250,252,0.95)' }}>bldr</span>
+            <Link href="/" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>
+              <span style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.045em', color: '#FFFFFF', lineHeight: 1 }}>
+                bldr
+                <span
+                  style={{
+                    background: 'linear-gradient(90deg, #D10721, #FD9426)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    display: 'inline-block',
+                  }}
+                >
+                  .
+                </span>
+              </span>
             </Link>
             <p style={{ margin: 0, fontSize: 13.5, color: 'rgba(255, 255, 255, 0.65)', lineHeight: 1.68, maxWidth: 280 }}>
               We build world-class digital platforms and payment infrastructure. From strategy to execution — we're your full-stack growth partner.

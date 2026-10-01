@@ -388,6 +388,7 @@ export interface BrandCheckoutConfig {
   ventureName: string;
   templateId: string;
   brandName: string;
+  tagline?: string;
   brandLogoText: string;
   brandLogoUrl: string;
   accentColor: string;

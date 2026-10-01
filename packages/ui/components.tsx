@@ -229,14 +229,27 @@ export function BldrNav({ lang = 'EN', onLanguageChange, onStartProject }: BldrN
         <a
           href="/"
           style={{
+            fontSize: 26,
+            fontWeight: 700,
+            letterSpacing: '-0.045em',
+            color: tokens.colors.brandDark,
+            textDecoration: 'none',
+            lineHeight: 1,
             display: 'flex',
             alignItems: 'center',
-            gap: 10,
-            textDecoration: 'none',
           }}
         >
-          <div style={{ width: 34, height: 34, borderRadius: 8, background: '#D10721', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 800 }}>b/</div>
-          <span style={{ fontSize: 22, fontWeight: 800, letterSpacing: -0.5, color: '#14141A' }}>bldr</span>
+          bldr
+          <span
+            style={{
+              background: `linear-gradient(90deg, ${tokens.colors.gradientStart}, ${tokens.colors.gradientEnd})`,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              display: 'inline-block',
+            }}
+          >
+            .
+          </span>
         </a>
 
         {/* Navigation */}

@@ -144,9 +144,9 @@ export default function RefundPolicyPage() {
                 <section style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 12, padding: '20px 24px' }}>
                   <h2 style={{ fontSize: 17, fontWeight: 700, color: '#141416', marginBottom: 8 }}>٥. خدمة العملاء ودعم المدفوعات</h2>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 14, color: '#475569' }}>
-                    <div>📍 <strong>المقر الرئيسي:</strong> الجيزة، جمهورية مصر العربية</div>
-                    <div>📞 <strong>الهاتف / واتساب:</strong> <a href="tel:+201030165000" style={{ color: '#D10721', fontWeight: 600, textDecoration: 'none', direction: 'ltr', display: 'inline-block' }}>+20 10 30165000</a></div>
-                    <div>✉️ <strong>البريد الإلكتروني:</strong> <a href="mailto:bldr.management@gmail.com" style={{ color: '#D10721', fontWeight: 600, textDecoration: 'none' }}>bldr.management@gmail.com</a></div>
+                    <div><strong>المقر الرئيسي:</strong> الجيزة، جمهورية مصر العربية</div>
+                    <div><strong>الهاتف / واتساب:</strong> <a href="tel:+201030165000" style={{ color: '#D10721', fontWeight: 600, textDecoration: 'none', direction: 'ltr', display: 'inline-block' }}>+20 10 30165000</a></div>
+                    <div><strong>البريد الإلكتروني:</strong> <a href="mailto:bldr.management@gmail.com" style={{ color: '#D10721', fontWeight: 600, textDecoration: 'none' }}>bldr.management@gmail.com</a></div>
                   </div>
                 </section>
               </div>
@@ -189,9 +189,9 @@ export default function RefundPolicyPage() {
                 <section style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 12, padding: '20px 24px' }}>
                   <h2 style={{ fontSize: 17, fontWeight: 700, color: '#141416', marginBottom: 8 }}>5. Support &amp; Billing Inquiries</h2>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 14, color: '#475569' }}>
-                    <div>📍 <strong>Address:</strong> Giza, Egypt</div>
-                    <div>📞 <strong>Phone / WhatsApp:</strong> <a href="tel:+201030165000" style={{ color: '#D10721', fontWeight: 600, textDecoration: 'none' }}>+20 10 30165000</a></div>
-                    <div>✉️ <strong>Email:</strong> <a href="mailto:bldr.management@gmail.com" style={{ color: '#D10721', fontWeight: 600, textDecoration: 'none' }}>bldr.management@gmail.com</a></div>
+                    <div><strong>Address:</strong> Giza, Egypt</div>
+                    <div><strong>Phone / WhatsApp:</strong> <a href="tel:+201030165000" style={{ color: '#D10721', fontWeight: 600, textDecoration: 'none' }}>+20 10 30165000</a></div>
+                    <div><strong>Email:</strong> <a href="mailto:bldr.management@gmail.com" style={{ color: '#D10721', fontWeight: 600, textDecoration: 'none' }}>bldr.management@gmail.com</a></div>
                   </div>
                 </section>
               </div>

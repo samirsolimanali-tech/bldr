@@ -332,27 +332,53 @@ function HostedPaymentContent() {
           gap: 10,
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <button
+            type="button"
+            onClick={() => {
+              if (typeof window !== 'undefined' && window.history.length > 1) {
+                window.history.back();
+              } else {
+                router.push('/products');
+              }
+            }}
             style={{
-              width: 26,
-              height: 26,
-              borderRadius: 6,
-              background: '#0F172A',
-              color: '#FFFFFF',
+              background: '#FFFFFF',
+              border: '1px solid #CBD5E1',
+              cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 900,
-              fontSize: 13,
-              letterSpacing: '-0.02em',
+              gap: 6,
+              fontSize: 12,
+              fontWeight: 700,
+              color: '#334155',
+              padding: '5px 12px',
+              borderRadius: 20,
+              boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
             }}
           >
-            b
-          </div>
-          <span style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', letterSpacing: '-0.01em' }}>
-            bldr <span style={{ fontWeight: 400, color: '#64748B' }}>/ {isRtl ? 'بوابة الدفع والتسجيل' : 'Hosted Checkout'}</span>
-          </span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: isRtl ? 'scaleX(-1)' : 'none' }}>
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            <span>{isRtl ? 'رجوع' : 'Back'}</span>
+          </button>
+
+          <a
+            href="/"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              textDecoration: 'none',
+            }}
+          >
+            <span style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-0.04em', color: '#0F172A', lineHeight: 1 }}>
+              bldr<span style={{ color: '#D10721' }}>.</span>
+            </span>
+            <span style={{ fontSize: 13, fontWeight: 500, color: '#64748B' }}>
+              / {isRtl ? 'بوابة الدفع والتسجيل' : 'Hosted Checkout'}
+            </span>
+          </a>
         </div>
 
         {/* Verifiable Gateway Trust Cue & Language Switcher */}
@@ -402,7 +428,7 @@ function HostedPaymentContent() {
               boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
             }}
           >
-            <span>{isRtl ? '🇬🇧 English' : '🇪🇬 العربية'}</span>
+            <span>{isRtl ? 'English' : 'العربية'}</span>
           </button>
         </div>
       </div>
@@ -649,7 +675,10 @@ function HostedPaymentContent() {
               >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 20 }}>💳</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0F172A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect width="20" height="14" x="2" y="5" rx="2"/>
+                      <line x1="2" x2="22" y1="10" y2="10"/>
+                    </svg>
                     <strong style={{ fontSize: 15, color: '#0F172A' }}>
                       {isRtl ? 'الدفع الإلكتروني وفوري' : 'Pay Online / Fawry'}
                     </strong>
@@ -695,7 +724,12 @@ function HostedPaymentContent() {
                 >
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ fontSize: 20 }}>🎟️</span>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0F172A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/>
+                        <path d="M13 5v2"/>
+                        <path d="M13 17v2"/>
+                        <path d="M13 11v2"/>
+                      </svg>
                       <strong style={{ fontSize: 15, color: '#0F172A' }}>
                         {isRtl ? 'تفعيل كود مسبق الدفع' : 'Activate a Code'}
                       </strong>
@@ -756,19 +790,24 @@ function HostedPaymentContent() {
                 type="button"
                 onClick={() => setStep(1)}
                 style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#64748B',
-                  fontSize: 13,
+                  background: '#F1F5F9',
+                  border: '1px solid #CBD5E1',
+                  color: '#334155',
+                  fontSize: 12.5,
                   fontWeight: 700,
                   cursor: 'pointer',
-                  padding: 0,
+                  padding: '6px 12px',
+                  borderRadius: 6,
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 4,
+                  gap: 6,
+                  transition: 'background 0.15s',
                 }}
               >
-                <span>{isRtl ? '→ العودة للاختيار' : '← Back to Options'}</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: isRtl ? 'scaleX(-1)' : 'none' }}>
+                  <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                <span>{isRtl ? 'العودة للاختيار' : 'Back to Options'}</span>
               </button>
               <span style={{ fontSize: 11, fontWeight: 700, color: '#059669', background: '#ECFDF5', padding: '3px 8px', borderRadius: 4 }}>
                 {isRtl ? 'تفعيل مباشر بدون رسوم' : 'Direct Zero-Fee Activation'}
@@ -948,19 +987,24 @@ function HostedPaymentContent() {
                 type="button"
                 onClick={() => setStep(1)}
                 style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#64748B',
-                  fontSize: 13,
+                  background: '#F1F5F9',
+                  border: '1px solid #CBD5E1',
+                  color: '#334155',
+                  fontSize: 12.5,
                   fontWeight: 700,
                   cursor: 'pointer',
-                  padding: 0,
+                  padding: '6px 12px',
+                  borderRadius: 6,
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 4,
+                  gap: 6,
+                  transition: 'background 0.15s',
                 }}
               >
-                <span>{isRtl ? '→ العودة للاختيار' : '← Back to Options'}</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: isRtl ? 'scaleX(-1)' : 'none' }}>
+                  <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                <span>{isRtl ? 'العودة للاختيار' : 'Back to Options'}</span>
               </button>
               <span style={{ fontSize: 11, fontWeight: 700, color: '#0F172A', background: '#F1F5F9', padding: '3px 8px', borderRadius: 4 }}>
                 {isRtl ? 'بوابة الدفع الإلكتروني' : 'Electronic Checkout'}
@@ -1116,7 +1160,10 @@ function HostedPaymentContent() {
                     </span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, height: 16 }}>
-                    <span style={{ fontSize: 14 }}>📱</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0F172A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect width="14" height="20" x="5" y="2" rx="2" ry="2"/>
+                      <path d="M12 18h.01"/>
+                    </svg>
                   </div>
                   <span style={{ fontSize: 10, color: '#64748B' }}>Vodafone, Orange, WE</span>
                 </div>
