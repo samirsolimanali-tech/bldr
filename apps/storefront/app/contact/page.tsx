@@ -13,9 +13,7 @@ export default function ContactPage() {
     name: '',
     email: '',
     phone: '',
-    company: '',
-    serviceInterest: 'Software & Web Platforms',
-    budget: 'EGP 50,000 - EGP 100,000',
+    subject: 'General Inquiry',
     message: '',
   });
 
@@ -28,7 +26,7 @@ export default function ContactPage() {
     setTimeout(() => {
       setLoading(false);
       setSubmitted(true);
-    }, 600);
+    }, 500);
   };
 
   return (
@@ -49,10 +47,10 @@ export default function ContactPage() {
         onStartProject={() => setIsContactOpen(true)}
       />
 
-      <main style={{ flex: 1, padding: '48px 32px 84px' }}>
-        <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+      <main style={{ flex: 1, padding: '40px 24px 80px' }}>
+        <div style={{ maxWidth: 1060, margin: '0 auto' }}>
           {/* Breadcrumbs */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#5A6A80', marginBottom: 28 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#5A6A80', marginBottom: 24 }}>
             <Link href="/" style={{ color: '#8A94A6', textDecoration: 'none' }}>
               {isRtl ? 'الرئيسية' : 'Home'}
             </Link>
@@ -68,9 +66,9 @@ export default function ContactPage() {
               background: '#FFFFFF',
               borderRadius: 20,
               border: '1px solid rgba(20,20,22,0.08)',
-              padding: '48px 40px',
-              marginBottom: 36,
-              boxShadow: '0 4px 20px rgba(20,20,22,0.04)',
+              padding: '40px 36px',
+              marginBottom: 32,
+              boxShadow: '0 4px 20px rgba(20,20,22,0.03)',
               textAlign: 'center',
             }}
           >
@@ -85,221 +83,189 @@ export default function ContactPage() {
                 color: '#D10721',
                 fontSize: 13,
                 fontWeight: 700,
-                marginBottom: 16,
+                marginBottom: 12,
               }}
             >
-              ✦ {isRtl ? 'ابدأ مشروعك الرقمي' : "Let's Build Something Extraordinary"}
+              ✦ {isRtl ? 'فريق الدعم والشراكات' : 'Direct Support & Partnerships'}
             </div>
             <h1
               style={{
                 fontFamily: isRtl ? "'Readex Pro', sans-serif" : tokens.fonts.display,
-                fontSize: 'clamp(28px, 4vw, 44px)',
+                fontSize: 'clamp(28px, 3.8vw, 40px)',
                 fontWeight: 800,
                 letterSpacing: '-0.03em',
                 color: '#141416',
-                lineHeight: 1.2,
-                margin: '0 0 16px',
+                margin: '0 0 12px',
               }}
             >
-              {isRtl ? 'تواصل مع فريق bldr للحلول الرقمية' : 'Start Your Next Breakthrough with Bldr'}
+              {isRtl ? 'تواصل مع فريق bldr' : 'Contact bldr'}
             </h1>
             <p
               style={{
-                fontSize: 16,
+                fontSize: 15.5,
                 color: '#5A6A80',
-                maxWidth: 620,
+                maxWidth: 600,
                 margin: '0 auto',
-                lineHeight: 1.7,
+                lineHeight: 1.68,
               }}
             >
               {isRtl
-                ? 'سواء كنت بحاجة إلى تطوير منصة تقنية، إطلاق حملات نمو مدفوعة، أو بناء هوية بصرية متميزة — فريقنا مستعد لتحويل رؤيتك إلى واقع ملموس.'
-                : 'Whether you need full-stack software development, performance growth campaigns, or brand transformation — our partners and technical leads are ready to deliver.'}
+                ? 'نحن هنا للإجابة على استفساراتك حول الدورات التدريبية، بوابات الدفع، أو شراكات إطلاق وتطوير المشاريع الرقمية.'
+                : 'Have questions about course enrollments, payments, or partner integrations? Reach out to our team directly.'}
             </p>
           </div>
 
-          {/* Content Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.35fr', gap: 32, alignItems: 'start' }}>
-            {/* Direct Channels Card */}
+          {/* Grid Layout */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.35fr)', gap: 28, alignItems: 'start' }}>
+            {/* Direct Contact Info Card */}
             <div
               style={{
                 background: '#FFFFFF',
-                borderRadius: 16,
+                borderRadius: 18,
                 border: '1px solid rgba(20,20,22,0.08)',
-                padding: '36px 32px',
+                padding: '32px 28px',
                 boxShadow: '0 2px 12px rgba(20,20,22,0.03)',
               }}
             >
               <h2
                 style={{
-                  fontFamily: isRtl ? "'Readex Pro', sans-serif" : tokens.fonts.display,
-                  fontSize: 20,
+                  fontSize: 19,
                   fontWeight: 700,
                   color: '#141416',
-                  margin: '0 0 10px',
+                  margin: '0 0 8px',
                 }}
               >
-                {isRtl ? 'قنوات التواصل المباشرة' : 'Direct Channels'}
+                {isRtl ? 'بيانات التواصل الرسمية' : 'Official Contact Info'}
               </h2>
-              <p style={{ fontSize: 14, color: '#5A6A80', lineHeight: 1.6, margin: '0 0 28px' }}>
+              <p style={{ fontSize: 13.5, color: '#5A6A80', lineHeight: 1.6, margin: '0 0 24px' }}>
                 {isRtl
-                  ? 'تحدث مباشرة مع مهندسينا ومستشاري الأعمال. نرد على كافة الاستفسارات المؤهلة خلال ٤ ساعات عمل.'
-                  : 'Speak directly with our technical partners and strategy leads. We respond to all inquiries within 4 business hours.'}
+                  ? 'يمكنك التواصل معنا عبر الهاتف أو الواتساب أو البريد الإلكتروني وسنرد عليك خلال ساعات العمل الرسمية.'
+                  : 'Get in touch via phone, WhatsApp, or email. We respond to all inquiries promptly.'}
               </p>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 20, marginBottom: 32 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 28 }}>
+                {/* Location */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 14px', borderRadius: 12, background: '#F8FAFC', border: '1px solid #E2E8F0' }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 10, background: '#FEF3C7', color: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 18 }}>
+                    📍
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 11, color: '#64748B', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      {isRtl ? 'المقر الرئيسي' : 'Headquarters'}
+                    </div>
+                    <div style={{ fontSize: 14.5, fontWeight: 700, color: '#141416' }}>
+                      {isRtl ? 'الجيزة، جمهورية مصر العربية' : 'Giza, Egypt'}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Phone */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 14px', borderRadius: 12, background: '#F8FAFC', border: '1px solid #E2E8F0' }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 10, background: '#ECFDF5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 18 }}>
+                    📞
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 11, color: '#64748B', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      {isRtl ? 'الهاتف / واتساب' : 'Phone / WhatsApp'}
+                    </div>
+                    <a href="tel:+201030165000" style={{ fontSize: 14.5, fontWeight: 700, color: '#141416', textDecoration: 'none', direction: 'ltr', display: 'inline-block' }}>
+                      +20 10 30165000
+                    </a>
+                  </div>
+                </div>
+
                 {/* Email */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '12px 14px', borderRadius: 12, background: '#F8FAFC', border: '1px solid #E2E8F0' }}>
-                  <div style={{ width: 42, height: 42, borderRadius: 10, background: '#EFF6FF', color: '#2563EB', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 14px', borderRadius: 12, background: '#F8FAFC', border: '1px solid #E2E8F0' }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 10, background: '#EFF6FF', color: '#2563EB', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 18 }}>
+                    ✉️
                   </div>
                   <div>
-                    <div style={{ fontSize: 11, color: '#64748B', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      {isRtl ? 'البريد الإلكتروني للشركاء' : 'Inquiries & Partnerships'}
+                    <div style={{ fontSize: 11, color: '#64748B', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      {isRtl ? 'البريد الإلكتروني' : 'Email Address'}
                     </div>
-                    <a href="mailto:partnerships@bldr.dev" style={{ fontSize: 14, fontWeight: 700, color: '#141416', textDecoration: 'none' }}>
-                      partnerships@bldr.dev
+                    <a href="mailto:bldr.management@gmail.com" style={{ fontSize: 14.5, fontWeight: 700, color: '#141416', textDecoration: 'none' }}>
+                      bldr.management@gmail.com
                     </a>
-                  </div>
-                </div>
-
-                {/* WhatsApp */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '12px 14px', borderRadius: 12, background: '#F8FAFC', border: '1px solid #E2E8F0' }}>
-                  <div style={{ width: 42, height: 42, borderRadius: 10, background: '#ECFDF5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 11, color: '#64748B', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      {isRtl ? 'واتساب مباشر' : 'WhatsApp Direct Line'}
-                    </div>
-                    <a href="https://wa.me/966500000000" target="_blank" rel="noreferrer" style={{ fontSize: 14, fontWeight: 700, color: '#141416', textDecoration: 'none' }}>
-                      +966 50 000 0000
-                    </a>
-                  </div>
-                </div>
-
-                {/* Locations */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '12px 14px', borderRadius: 12, background: '#F8FAFC', border: '1px solid #E2E8F0' }}>
-                  <div style={{ width: 42, height: 42, borderRadius: 10, background: '#FEF3C7', color: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 11, color: '#64748B', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      {isRtl ? 'المقرات الإقليمية' : 'Regional Hubs'}
-                    </div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: '#141416' }}>
-                      {isRtl ? 'الرياض، المملكة العربية السعودية & القاهرة' : 'Riyadh, KSA & Cairo, Egypt'}
-                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Provider link */}
-              <div style={{ borderTop: '1px solid rgba(20,20,22,0.08)', paddingTop: 20 }}>
-                <div style={{ fontSize: 13, color: '#5A6A80', marginBottom: 8 }}>
-                  {isRtl ? 'هل ترغب بالشراكة مع bldr؟' : 'Looking to partner with bldr?'}
-                </div>
-                <Link
-                  href="/apply-provider"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 6,
-                    fontSize: 13.5,
-                    fontWeight: 700,
-                    color: '#D10721',
-                    textDecoration: 'none',
-                  }}
-                >
-                  {isRtl ? 'استكشف شراكات المشاريع والخدمات مع bldr ←' : 'Partner with bldr on brand incubation →'}
-                </Link>
+              {/* Operating Entity Note */}
+              <div style={{ borderTop: '1px solid rgba(20,20,22,0.08)', paddingTop: 18, fontSize: 12.5, color: '#64748B', lineHeight: 1.6 }}>
+                <div><strong>{isRtl ? 'الكيان القانوني المشغل:' : 'Operating Entity:'}</strong></div>
+                <div>Evolve bldr for Business Management</div>
+                <div>Giza, Egypt</div>
               </div>
             </div>
 
-            {/* Inquiry Form Card */}
+            {/* Inquiry Form */}
             <div
               style={{
                 background: '#FFFFFF',
-                borderRadius: 16,
+                borderRadius: 18,
                 border: '1px solid rgba(20,20,22,0.08)',
-                padding: '36px 36px',
-                boxShadow: '0 4px 16px rgba(20,20,22,0.05)',
+                padding: '32px 32px',
+                boxShadow: '0 4px 16px rgba(20,20,22,0.04)',
               }}
             >
               {submitted ? (
-                <div style={{ textAlign: 'center', padding: '48px 16px' }}>
+                <div style={{ textAlign: 'center', padding: '40px 16px' }}>
                   <div
                     style={{
-                      width: 60,
-                      height: 60,
+                      width: 56,
+                      height: 56,
                       borderRadius: '50%',
                       background: '#ECFDF5',
                       color: '#059669',
-                      fontSize: 28,
+                      fontSize: 26,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      margin: '0 auto 18px',
+                      margin: '0 auto 16px',
                     }}
                   >
                     ✓
                   </div>
-                  <h3
-                    style={{
-                      fontFamily: isRtl ? "'Readex Pro', sans-serif" : tokens.fonts.display,
-                      fontSize: 22,
-                      fontWeight: 700,
-                      color: '#141416',
-                      marginBottom: 10,
-                    }}
-                  >
-                    {isRtl ? 'تم استلام طلبك بنجاح!' : 'Inquiry Dispatched!'}
+                  <h3 style={{ fontSize: 20, fontWeight: 700, color: '#141416', marginBottom: 8 }}>
+                    {isRtl ? 'تم استلام رسالتك بنجاح!' : 'Message Received!'}
                   </h3>
-                  <p style={{ color: '#5A6A80', fontSize: 15, lineHeight: 1.6, maxWidth: 420, margin: '0 auto 24px' }}>
+                  <p style={{ color: '#5A6A80', fontSize: 14.5, lineHeight: 1.6, maxWidth: 380, margin: '0 auto 20px' }}>
                     {isRtl
-                      ? `شكراً لك ${formState.name}، سيقوم مستشار المشروع بمراجعة التفاصيل والتواصل معك خلال ٤ ساعات عمل.`
-                      : `Thank you ${formState.name}. A technical partner will review your requirements and reach out within 4 business hours.`}
+                      ? `شكراً لك ${formState.name}، سيقوم فريق خدمة العملاء بمراجعة استفسارك والتواصل معك في أقرب وقت.`
+                      : `Thank you ${formState.name}. Our team will review your inquiry and follow up shortly.`}
                   </p>
                   <button
                     type="button"
                     onClick={() => setSubmitted(false)}
                     style={{
-                      background: '#F1F5F9',
-                      color: '#141416',
-                      border: '1px solid #CBD5E1',
-                      borderRadius: 10,
-                      padding: '10px 22px',
-                      fontSize: 14,
+                      background: '#141416',
+                      color: '#FFFFFF',
+                      border: 'none',
+                      borderRadius: 8,
+                      padding: '10px 20px',
+                      fontSize: 13.5,
                       fontWeight: 600,
                       cursor: 'pointer',
                     }}
                   >
-                    {isRtl ? 'إرسال استفسار جديد' : 'Submit Another Inquiry'}
+                    {isRtl ? 'إرسال رسالة أخرى' : 'Send Another Message'}
                   </button>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                  <h2
-                    style={{
-                      fontFamily: isRtl ? "'Readex Pro', sans-serif" : tokens.fonts.display,
-                      fontSize: 20,
-                      fontWeight: 700,
-                      color: '#141416',
-                      margin: '0 0 4px',
-                    }}
-                  >
-                    {isRtl ? 'تفاصيل المشروع واحتياجاتك' : 'Project Specifications'}
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  <h2 style={{ fontSize: 19, fontWeight: 700, color: '#141416', margin: '0 0 2px' }}>
+                    {isRtl ? 'أرسل لنا رسالة مباشرة' : 'Send us a Message'}
                   </h2>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                     <div>
-                      <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#141416', marginBottom: 6 }}>
+                      <label style={{ display: 'block', fontSize: 12.5, fontWeight: 600, color: '#141416', marginBottom: 5 }}>
                         {isRtl ? 'الاسم الكامل *' : 'Full Name *'}
                       </label>
                       <input
                         required
                         type="text"
-                        placeholder={isRtl ? 'مثال: عمر المنصور' : 'e.g. Omar Al-Mansour'}
+                        placeholder={isRtl ? 'مثال: أحمد سامي' : 'e.g. John Smith'}
                         value={formState.name}
                         onChange={(e) => setFormState({ ...formState, name: e.target.value })}
                         style={{
@@ -307,21 +273,22 @@ export default function ContactPage() {
                           background: '#FFFFFF',
                           border: '1px solid #CBD5E1',
                           borderRadius: 8,
-                          padding: '10px 14px',
+                          padding: '10px 12px',
                           color: '#141416',
-                          fontSize: 14,
+                          fontSize: 13.5,
                           outline: 'none',
+                          boxSizing: 'border-box',
                         }}
                       />
                     </div>
                     <div>
-                      <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#141416', marginBottom: 6 }}>
-                        {isRtl ? 'البريد الإلكتروني للعمل *' : 'Work Email *'}
+                      <label style={{ display: 'block', fontSize: 12.5, fontWeight: 600, color: '#141416', marginBottom: 5 }}>
+                        {isRtl ? 'البريد الإلكتروني *' : 'Email Address *'}
                       </label>
                       <input
                         required
                         type="email"
-                        placeholder="omar@company.com"
+                        placeholder="you@email.com"
                         value={formState.email}
                         onChange={(e) => setFormState({ ...formState, email: e.target.value })}
                         style={{
@@ -329,44 +296,24 @@ export default function ContactPage() {
                           background: '#FFFFFF',
                           border: '1px solid #CBD5E1',
                           borderRadius: 8,
-                          padding: '10px 14px',
+                          padding: '10px 12px',
                           color: '#141416',
-                          fontSize: 14,
+                          fontSize: 13.5,
                           outline: 'none',
+                          boxSizing: 'border-box',
                         }}
                       />
                     </div>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                     <div>
-                      <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#141416', marginBottom: 6 }}>
-                        {isRtl ? 'اسم الشركة أو العلامة التجارية' : 'Company / Brand'}
-                      </label>
-                      <input
-                        type="text"
-                        placeholder={isRtl ? 'اسم الشركة' : 'Company Name'}
-                        value={formState.company}
-                        onChange={(e) => setFormState({ ...formState, company: e.target.value })}
-                        style={{
-                          width: '100%',
-                          background: '#FFFFFF',
-                          border: '1px solid #CBD5E1',
-                          borderRadius: 8,
-                          padding: '10px 14px',
-                          color: '#141416',
-                          fontSize: 14,
-                          outline: 'none',
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#141416', marginBottom: 6 }}>
-                        {isRtl ? 'رقم الهاتف أو واتساب' : 'Phone / WhatsApp'}
+                      <label style={{ display: 'block', fontSize: 12.5, fontWeight: 600, color: '#141416', marginBottom: 5 }}>
+                        {isRtl ? 'رقم الهاتف / واتساب' : 'Phone / WhatsApp'}
                       </label>
                       <input
                         type="tel"
-                        placeholder="+966 5x xxx xxxx"
+                        placeholder="+20 10 0000 0000"
                         value={formState.phone}
                         onChange={(e) => setFormState({ ...formState, phone: e.target.value })}
                         style={{
@@ -374,80 +321,49 @@ export default function ContactPage() {
                           background: '#FFFFFF',
                           border: '1px solid #CBD5E1',
                           borderRadius: 8,
-                          padding: '10px 14px',
+                          padding: '10px 12px',
                           color: '#141416',
-                          fontSize: 14,
+                          fontSize: 13.5,
                           outline: 'none',
+                          boxSizing: 'border-box',
                         }}
                       />
                     </div>
-                  </div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                     <div>
-                      <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#141416', marginBottom: 6 }}>
-                        {isRtl ? 'الخدمة المطلوبة' : 'Service Focus'}
+                      <label style={{ display: 'block', fontSize: 12.5, fontWeight: 600, color: '#141416', marginBottom: 5 }}>
+                        {isRtl ? 'موضوع الاستفسار' : 'Inquiry Subject'}
                       </label>
                       <select
-                        value={formState.serviceInterest}
-                        onChange={(e) => setFormState({ ...formState, serviceInterest: e.target.value })}
+                        value={formState.subject}
+                        onChange={(e) => setFormState({ ...formState, subject: e.target.value })}
                         style={{
                           width: '100%',
                           background: '#FFFFFF',
                           border: '1px solid #CBD5E1',
                           borderRadius: 8,
-                          padding: '10px 14px',
+                          padding: '10px 12px',
                           color: '#141416',
-                          fontSize: 14,
+                          fontSize: 13.5,
                           outline: 'none',
+                          boxSizing: 'border-box',
                         }}
                       >
-                        <option value="Software & Web Platforms">Web & Platform Engineering</option>
-                        <option value="Performance Ads & Growth">Performance Ads & Growth</option>
-                        <option value="Brand Identity & Creative">Brand Identity & Strategy</option>
-                        <option value="Media & Video Production">Media & Video Production</option>
-                        <option value="EdTech & Cohort Platform">EdTech / Cohort Platform</option>
-                        <option value="Strategic Consulting">Strategic Consulting / Audit</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#141416', marginBottom: 6 }}>
-                        {isRtl ? 'الميزانية التقديرية' : 'Budget Scope'}
-                      </label>
-                      <select
-                        value={formState.budget}
-                        onChange={(e) => setFormState({ ...formState, budget: e.target.value })}
-                        style={{
-                          width: '100%',
-                          background: '#FFFFFF',
-                          border: '1px solid #CBD5E1',
-                          borderRadius: 8,
-                          padding: '10px 14px',
-                          color: '#141416',
-                          fontSize: 14,
-                          outline: 'none',
-                        }}
-                      >
-                        <option value="EGP 20k - EGP 50k">EGP 20,000 - EGP 50,000</option>
-                        <option value="EGP 50k - EGP 100k">EGP 50,000 - EGP 100,000</option>
-                        <option value="EGP 100k - EGP 250k">EGP 100,000 - EGP 250,000</option>
-                        <option value="EGP 250k+">EGP 250,000+</option>
+                        <option value="Course Enrollment">{isRtl ? 'التسجيل في الدورات والبرامج' : 'Course & Program Enrollment'}</option>
+                        <option value="Payment Inquiry">{isRtl ? 'استفسارات الدفع والفواتير' : 'Payment & Billing Inquiry'}</option>
+                        <option value="Provider Partnership">{isRtl ? 'شراكات المعلمين والأكاديميات' : 'Provider / Instructor Partnership'}</option>
+                        <option value="General Inquiry">{isRtl ? 'استفسار عام' : 'General Inquiry'}</option>
                       </select>
                     </div>
                   </div>
 
                   <div>
-                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#141416', marginBottom: 6 }}>
-                      {isRtl ? 'تفاصيل فكرة المشروع وأهدافه *' : 'Project Brief & Objectives *'}
+                    <label style={{ display: 'block', fontSize: 12.5, fontWeight: 600, color: '#141416', marginBottom: 5 }}>
+                      {isRtl ? 'تفاصيل الرسالة *' : 'Message *'}
                     </label>
                     <textarea
                       required
                       rows={4}
-                      placeholder={
-                        isRtl
-                          ? 'أخبرنا عن فكرة مشروعك، التحديات الحالية، والموعد المستهدف للإطلاق...'
-                          : 'Tell us about your project vision, current bottlenecks, and desired launch timeline...'
-                      }
+                      placeholder={isRtl ? 'اكتب تفاصيل استفسارك هنا...' : 'Write your question or request here...'}
                       value={formState.message}
                       onChange={(e) => setFormState({ ...formState, message: e.target.value })}
                       style={{
@@ -455,11 +371,12 @@ export default function ContactPage() {
                         background: '#FFFFFF',
                         border: '1px solid #CBD5E1',
                         borderRadius: 8,
-                        padding: '10px 14px',
+                        padding: '10px 12px',
                         color: '#141416',
-                        fontSize: 14,
+                        fontSize: 13.5,
                         outline: 'none',
                         resize: 'vertical',
+                        boxSizing: 'border-box',
                       }}
                     />
                   </div>
@@ -468,20 +385,19 @@ export default function ContactPage() {
                     type="submit"
                     disabled={loading}
                     style={{
-                      background: 'linear-gradient(135deg, #141416 0%, #2A2A30 100%)',
+                      background: '#141416',
                       color: '#FFFFFF',
                       border: 'none',
-                      borderRadius: 10,
-                      padding: '14px 28px',
-                      fontSize: 15,
+                      borderRadius: 8,
+                      padding: '12px 24px',
+                      fontSize: 14,
                       fontWeight: 700,
                       cursor: loading ? 'not-allowed' : 'pointer',
-                      boxShadow: '0 4px 12px rgba(20, 20, 22, 0.2)',
                       transition: 'all 0.15s ease',
                       marginTop: 4,
                     }}
                   >
-                    {loading ? (isRtl ? 'جاري الإرسال...' : 'Submitting...') : (isRtl ? 'إرسال طلب المشروع ←' : 'Submit Project Brief →')}
+                    {loading ? (isRtl ? 'جاري الإرسال...' : 'Sending...') : (isRtl ? 'إرسال الرسالة ←' : 'Send Message →')}
                   </button>
                 </form>
               )}
@@ -490,7 +406,7 @@ export default function ContactPage() {
         </div>
       </main>
 
-      <BldrFooter />
+      <BldrFooter lang={lang} />
 
       <ProjectContactModal
         isOpen={isContactOpen}

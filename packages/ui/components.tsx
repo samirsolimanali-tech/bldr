@@ -564,11 +564,11 @@ export function BldrFooter({ lang = 'EN' }: { lang?: 'EN' | 'AR' } = {}) {
   return (
     <footer dir={isRtl ? 'rtl' : 'ltr'} style={{ background: tokens.colors.brandDark, color: '#FFFFFF', fontFamily: isRtl ? "'Readex Pro', sans-serif" : tokens.fonts.display }}>
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '64px 32px 34px' }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '44px 40px', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '44px 36px', alignItems: 'flex-start', justifyContent: 'space-between' }}>
           
           {/* Studio Brand */}
           <div style={{ flex: '1 1 260px', minWidth: 200, display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div style={{ fontSize: 26, fontWeight: 500, letterSpacing: '-0.045em', lineHeight: 1 }}>
+            <div style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.045em', lineHeight: 1 }}>
               bldr
               <span style={{
                 background: `linear-gradient(90deg, ${tokens.colors.gradientStart}, ${tokens.colors.gradientEnd})`,
@@ -576,8 +576,10 @@ export function BldrFooter({ lang = 'EN' }: { lang?: 'EN' | 'AR' } = {}) {
                 WebkitTextFillColor: 'transparent',
               }}>.</span>
             </div>
-            <p style={{ margin: 0, fontSize: 14, fontWeight: 300, lineHeight: 1.68, color: 'rgba(255, 255, 255, 0.6)', maxWidth: 260 }}>
-              A venture studio in Cairo. Specialist units, one accountability line.
+            <p style={{ margin: 0, fontSize: 13.5, fontWeight: 300, lineHeight: 1.68, color: 'rgba(255, 255, 255, 0.65)', maxWidth: 280 }}>
+              {isRtl 
+                ? 'استوديو بناء المشاريع الرقمية والبنية التحتية للمدفوعات في القاهرة والجيزة. وحدات متخصصة بخط مسؤولية موحد.'
+                : 'A venture studio & payments infrastructure in Cairo & Giza. Specialist units, one single accountability line.'}
             </p>
             <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
               {['LinkedIn', 'Instagram', 'X'].map((net) => (
@@ -594,42 +596,72 @@ export function BldrFooter({ lang = 'EN' }: { lang?: 'EN' | 'AR' } = {}) {
             </div>
           </div>
 
-          {/* Company Links */}
-          <div style={{ flex: '0 1 180px', minWidth: 150, display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <div style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.42)' }}>
-              Company
+          {/* Contact Us Info */}
+          <div style={{ flex: '1 1 240px', minWidth: 220, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: tokens.colors.gradientEnd }}>
+              {isRtl ? 'تواصل معنا' : 'Contact Us'}
             </div>
-            <a href="/#built" style={{ fontSize: 14, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>How we&apos;re built</a>
-            <a href="/#education" style={{ fontSize: 14, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>Education &amp; EdTech</a>
-            <a href="http://localhost:3011" target="_blank" rel="noreferrer" style={{ fontSize: 14, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>Payment Hub ↗</a>
-            <a href="http://localhost:3012/dashboard" target="_blank" rel="noreferrer" style={{ fontSize: 14, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>Super Admin ↗</a>
-            <a href="http://localhost:3013/login" target="_blank" rel="noreferrer" style={{ fontSize: 14, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>Provider Portal ↗</a>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13.5, fontWeight: 300, color: 'rgba(255,255,255,0.85)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ color: tokens.colors.gradientEnd }}>📍</span>
+                <span>{isRtl ? 'الجيزة، جمهورية مصر العربية' : 'Giza, Egypt'}</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ color: tokens.colors.gradientEnd }}>📞</span>
+                <a href="tel:+201030165000" style={{ color: '#FFFFFF', textDecoration: 'none', fontWeight: 500, direction: 'ltr', unicodeBidi: 'embed' }}>
+                  +20 10 30165000
+                </a>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ color: tokens.colors.gradientEnd }}>✉️</span>
+                <a href="mailto:bldr.management@gmail.com" style={{ color: '#FFFFFF', textDecoration: 'none', fontWeight: 400 }}>
+                  bldr.management@gmail.com
+                </a>
+              </div>
+              <div style={{ marginTop: 4 }}>
+                <a href="/contact" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12.5, fontWeight: 600, color: tokens.colors.gradientEnd, textDecoration: 'none' }}>
+                  <span>{isRtl ? 'صفحة التواصل ونموذج الاستفسار ←' : 'Contact Page & Inquiry Form →'}</span>
+                </a>
+              </div>
+            </div>
           </div>
 
-          {/* Ecosystem Ventures */}
-          <div style={{ flex: '0 1 180px', minWidth: 150, display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <div style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.42)' }}>
-              Ecosystem
+          {/* Legal & Policies */}
+          <div style={{ flex: '0 1 180px', minWidth: 160, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)' }}>
+              {isRtl ? 'السياسات والشروط' : 'Legal & Policies'}
             </div>
-            <span style={{ fontSize: 14, fontWeight: 300, color: 'rgba(255,255,255,0.82)' }}>bldr Management</span>
-            <span style={{ fontSize: 14, fontWeight: 300, color: 'rgba(255,255,255,0.82)' }}>Tech House</span>
-            <span style={{ fontSize: 14, fontWeight: 300, color: 'rgba(255,255,255,0.82)' }}>Sidekick</span>
-            <span style={{ fontSize: 14, fontWeight: 300, color: 'rgba(255,255,255,0.82)' }}>Career Hub</span>
-            <span style={{ fontSize: 14, fontWeight: 300, color: 'rgba(255,255,255,0.82)' }}>StudyHub</span>
-            <span style={{ fontSize: 14, fontWeight: 300, color: 'rgba(255,255,255,0.82)' }}>منصة الحصة</span>
+            <a href="/privacy-policy" style={{ fontSize: 13.5, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>
+              {isRtl ? 'سياسة الخصوصية' : 'Privacy Policy'}
+            </a>
+            <a href="/terms" style={{ fontSize: 13.5, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>
+              {isRtl ? 'شروط الخدمة' : 'Terms of Service'}
+            </a>
+            <a href="/refund-policy" style={{ fontSize: 13.5, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>
+              {isRtl ? 'سياسة الاسترجاع والإلغاء' : 'Refund Policy'}
+            </a>
+            <a href="/contact" style={{ fontSize: 13.5, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>
+              {isRtl ? 'تواصل معنا' : 'Contact Us'}
+            </a>
           </div>
 
-          {/* Legal / Contact */}
-          <div style={{ flex: '1 1 280px', minWidth: 240, display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <div style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.42)' }}>
-              Legal &amp; Registration
+          {/* Company & Portals */}
+          <div style={{ flex: '0 1 180px', minWidth: 150, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)' }}>
+              {isRtl ? 'الشركة والمنصات' : 'Company & Portals'}
             </div>
-            <div style={{ fontSize: 13.5, fontWeight: 300, lineHeight: 1.72, color: 'rgba(255,255,255,0.82)' }}>
-              <div style={{ color: '#FFFFFF', fontWeight: 400 }}>Evolve bldr for Business Management</div>
-              <div>Commercial Registration: Cairo, Egypt</div>
-              <div>Tax Registration: Licensed Venture Studio</div>
-              <div style={{ marginTop: 8 }}>Support: support@bldr.io</div>
-            </div>
+            <a href="/" style={{ fontSize: 13.5, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>
+              {isRtl ? 'الرئيسية' : 'Home'}
+            </a>
+            <a href="/products" style={{ fontSize: 13.5, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>
+              {isRtl ? 'المنتجات والدورات' : 'Courses & Programs'}
+            </a>
+            <a href="/apply-provider" style={{ fontSize: 13.5, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>
+              {isRtl ? 'كن شريكاً معنا' : 'Partner with bldr'}
+            </a>
+            <a href="http://localhost:3011" target="_blank" rel="noreferrer" style={{ fontSize: 13.5, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>
+              Payment Hub ↗
+            </a>
           </div>
         </div>
 
@@ -639,7 +671,7 @@ export function BldrFooter({ lang = 'EN' }: { lang?: 'EN' | 'AR' } = {}) {
         {/* Payment and Compliance Badges */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
-            {['VISA', 'Mastercard', 'Mobile Wallets', 'Fawry', 'Geidea'].map((badge) => (
+            {['VISA', 'Mastercard', 'Meeza', 'Mobile Wallets', 'Fawry Pay', 'Geidea'].map((badge) => (
               <span key={badge} style={{
                 height: 26,
                 padding: '0 10px',
@@ -657,7 +689,7 @@ export function BldrFooter({ lang = 'EN' }: { lang?: 'EN' | 'AR' } = {}) {
             ))}
           </div>
           <div style={{ fontSize: 12, fontWeight: 300, color: 'rgba(255,255,255,0.5)' }}>
-            © {new Date().getFullYear()} bldr. Operated by Evolve bldr for Business Management.
+            © {new Date().getFullYear()} bldr. Operated by Evolve bldr for Business Management, Giza, Egypt.
           </div>
         </div>
       </div>

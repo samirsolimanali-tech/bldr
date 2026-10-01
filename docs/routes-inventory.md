@@ -1,22 +1,22 @@
 # BLDR Platform — Complete Authoritative Route Inventory
 
-> **Generated on**: 2026-10-01T13:50:00.198Z via `scripts/list-routes`
+> **Generated on**: 2026-10-01T14:01:04.425Z via `scripts/list-routes`
 > **Source of Truth**: Active filesystem scan across all 5 monorepo applications
 
 ## Summary Statistics
 
 | Application | Target Audience / Purpose | Pages | API Routes | Total Endpoints |
 |---|---|---|---|---|
-| **Storefront** | Learner Storefront, Catalog & Hosted Checkout | 26 | 5 | **31** |
+| **Storefront** | Learner Storefront, Catalog & Hosted Checkout | 28 | 5 | **33** |
 | **Admin Portal** | Studio Store Builder & Operations | 17 | 1 | **18** |
 | **Hub (Central Payment Hub)** | Central Financial Governance, Settlements & Ventures | 20 | 0 | **20** |
 | **Provider Portal** | Venture Team Member Self-Service Portal | 20 | 0 | **20** |
 | **API (NestJS)** | Central Backend REST & Gateway Webhooks | 0 | 77 | **77** |
-| **TOTAL** | *Across 5 monorepo applications* | **83** | **83** | **166** |
+| **TOTAL** | *Across 5 monorepo applications* | **85** | **83** | **168** |
 
 ## Detailed Routes by Application
 
-### Storefront (31 routes)
+### Storefront (33 routes)
 
 | Method / Type | Route Path | Source File |
 |---|---|---|
@@ -39,6 +39,7 @@
 | *Page* | `/orders/[id]/success` | [`apps/storefront/app/orders/[id]/success/page.tsx`](file:////Users/samirrashed/.gemini/antigravity-ide/scratch/bldr/apps/storefront/app/orders/[id]/success/page.tsx) |
 | *Page* | `/pay/[slug]` | [`apps/storefront/app/pay/[slug]/page.tsx`](file:////Users/samirrashed/.gemini/antigravity-ide/scratch/bldr/apps/storefront/app/pay/[slug]/page.tsx) |
 | *Page* | `/privacy` | [`apps/storefront/app/privacy/page.tsx`](file:////Users/samirrashed/.gemini/antigravity-ide/scratch/bldr/apps/storefront/app/privacy/page.tsx) |
+| *Page* | `/privacy-policy` | [`apps/storefront/app/privacy-policy/page.tsx`](file:////Users/samirrashed/.gemini/antigravity-ide/scratch/bldr/apps/storefront/app/privacy-policy/page.tsx) |
 | *Page* | `/products` | [`apps/storefront/app/products/page.tsx`](file:////Users/samirrashed/.gemini/antigravity-ide/scratch/bldr/apps/storefront/app/products/page.tsx) |
 | *Page* | `/products/[id]` | [`apps/storefront/app/products/[id]/page.tsx`](file:////Users/samirrashed/.gemini/antigravity-ide/scratch/bldr/apps/storefront/app/products/[id]/page.tsx) |
 | *Page* | `/projects` | [`apps/storefront/app/projects/page.tsx`](file:////Users/samirrashed/.gemini/antigravity-ide/scratch/bldr/apps/storefront/app/projects/page.tsx) |
@@ -51,6 +52,7 @@
 | *Page* | `/simulate/fawry-checkout/[orderId]` | [`apps/storefront/app/simulate/fawry-checkout/[orderId]/page.tsx`](file:////Users/samirrashed/.gemini/antigravity-ide/scratch/bldr/apps/storefront/app/simulate/fawry-checkout/[orderId]/page.tsx) |
 | *Page* | `/simulate/provider-store/[providerId]` | [`apps/storefront/app/simulate/provider-store/[providerId]/page.tsx`](file:////Users/samirrashed/.gemini/antigravity-ide/scratch/bldr/apps/storefront/app/simulate/provider-store/[providerId]/page.tsx) |
 | *Page* | `/terms` | [`apps/storefront/app/terms/page.tsx`](file:////Users/samirrashed/.gemini/antigravity-ide/scratch/bldr/apps/storefront/app/terms/page.tsx) |
+| *Page* | `/terms-of-service` | [`apps/storefront/app/terms-of-service/page.tsx`](file:////Users/samirrashed/.gemini/antigravity-ide/scratch/bldr/apps/storefront/app/terms-of-service/page.tsx) |
 
 ### Admin Portal (18 routes)
 
