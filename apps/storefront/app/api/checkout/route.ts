@@ -26,6 +26,28 @@ export async function POST(request: Request) {
       // Handled below
     }
 
+    // Fallback: If not resolved via apps/api, lookup in shared products catalog
+    if (!matchedProduct) {
+      try {
+        const { PRODUCTS_CATALOG } = await import('../../products/data');
+        const localItem = PRODUCTS_CATALOG.find(
+          (p: any) => p.id === productId || p.slug === productId || p.paySlug === productId
+        );
+        if (localItem) {
+          matchedProduct = {
+            id: localItem.id,
+            title: localItem.title,
+            titleAr: localItem.titleAr,
+            priceEGP: localItem.priceEGP,
+            ventureId: localItem.ventureId || localItem.providerCode || 'BLDR',
+            providerCode: localItem.providerCode || 'BLDR',
+            slug: localItem.slug,
+            saleMode: localItem.saleMode || 'DIRECT',
+          };
+        }
+      } catch (e) {}
+    }
+
     if (!matchedProduct) {
       return NextResponse.json(
         { error: `Invalid product or listing ID "${productId}". Product not found in catalog or database.` },

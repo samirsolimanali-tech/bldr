@@ -200,6 +200,24 @@ export function BldrNav({ lang = 'EN', onLanguageChange, onStartProject }: BldrN
     },
   ];
 
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const [mobileExpandedSection, setMobileExpandedSection] = React.useState<'services' | 'products' | 'projects' | null>(null);
+
+  React.useEffect(() => {
+    if (typeof document !== 'undefined') {
+      if (mobileMenuOpen) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = '';
+      }
+    }
+    return () => {
+      if (typeof document !== 'undefined') {
+        document.body.style.overflow = '';
+      }
+    };
+  }, [mobileMenuOpen]);
+
   return (
     <div
       dir={isRtl ? 'rtl' : 'ltr'}
@@ -214,7 +232,23 @@ export function BldrNav({ lang = 'EN', onLanguageChange, onStartProject }: BldrN
         fontFamily: isRtl ? "'Readex Pro', sans-serif" : tokens.fonts.display,
       }}
     >
+      <style>{`
+        @media (max-width: 960px) {
+          .bldr-nav-container { padding: 0 16px !important; height: 64px !important; }
+          .bldr-desktop-nav { display: none !important; }
+          .bldr-desktop-actions { display: none !important; }
+          .bldr-mobile-actions { display: flex !important; align-items: center; gap: 8px; }
+        }
+        @media (min-width: 961px) {
+          .bldr-desktop-nav { display: flex !important; }
+          .bldr-desktop-actions { display: flex !important; }
+          .bldr-mobile-actions { display: none !important; }
+          .bldr-mobile-drawer { display: none !important; }
+        }
+      `}</style>
+
       <div
+        className="bldr-nav-container"
         style={{
           maxWidth: 1280,
           margin: '0 auto',
@@ -252,8 +286,8 @@ export function BldrNav({ lang = 'EN', onLanguageChange, onStartProject }: BldrN
           </span>
         </a>
 
-        {/* Navigation */}
-        <nav style={{ display: 'flex', alignItems: 'center', gap: 4, position: 'relative' }}>
+        {/* Desktop Navigation */}
+        <nav className="bldr-desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: 4, position: 'relative' }}>
 
           {/* Services */}
           <div
@@ -324,14 +358,14 @@ export function BldrNav({ lang = 'EN', onLanguageChange, onStartProject }: BldrN
               onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(20,20,22,0.05)'; }}
               onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
             >
-              {isRtl ? 'المنتجات' : 'Products'}
+              {isRtl ? 'البرامج والمنتجات' : 'Products'}
               <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4.5l4 3.5 4-3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </button>
             {activeDropdown === 'products' && (
               <div
                 style={{
                   position: 'absolute', top: '100%', left: 0, zIndex: 200,
-                  background: '#FFFFFF', borderRadius: 12, minWidth: 220,
+                  background: '#FFFFFF', borderRadius: 12, minWidth: 200,
                   boxShadow: '0 8px 32px rgba(20,20,22,0.12)', border: '1px solid rgba(20,20,22,0.08)',
                   padding: '8px 0', marginTop: 6,
                 }}
@@ -410,8 +444,8 @@ export function BldrNav({ lang = 'EN', onLanguageChange, onStartProject }: BldrN
 
         </nav>
 
-        {/* Right Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        {/* Desktop Right Actions */}
+        <div className="bldr-desktop-actions" style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <div
             style={{
               display: 'flex',
@@ -478,7 +512,329 @@ export function BldrNav({ lang = 'EN', onLanguageChange, onStartProject }: BldrN
             {isRtl ? 'ابدأ مشروعك' : 'Start a project'}
           </button>
         </div>
+
+        {/* Mobile Right Actions */}
+        <div className="bldr-mobile-actions" style={{ display: 'none' }}>
+          <button
+            type="button"
+            onClick={() => onLanguageChange?.(lang === 'EN' ? 'AR' : 'EN')}
+            style={{
+              background: 'rgba(20, 20, 22, 0.05)',
+              border: '1px solid rgba(20, 20, 22, 0.08)',
+              borderRadius: 8,
+              padding: '6px 10px',
+              fontSize: 12,
+              fontWeight: 700,
+              color: tokens.colors.brandDark,
+              cursor: 'pointer',
+            }}
+          >
+            {lang === 'EN' ? 'عربي' : 'EN'}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+            style={{
+              width: 38,
+              height: 38,
+              borderRadius: 8,
+              background: mobileMenuOpen ? '#141416' : '#FFFFFF',
+              color: mobileMenuOpen ? '#FFFFFF' : '#141416',
+              border: '1px solid rgba(20, 20, 22, 0.12)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              padding: 0,
+              transition: 'all 0.15s ease',
+            }}
+          >
+            {mobileMenuOpen ? (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            ) : (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="4" y1="7" x2="20" y2="7" />
+                <line x1="4" y1="12" x2="20" y2="12" />
+                <line x1="4" y1="17" x2="20" y2="17" />
+              </svg>
+            )}
+          </button>
+        </div>
       </div>
+
+      {/* Brand gradient progress bar */}
+      <div style={{ height: 2, background: 'rgba(20, 20, 22, 0.05)' }}>
+        <div style={{ height: 2, background: `linear-gradient(90deg, ${tokens.colors.gradientStart}, ${tokens.colors.gradientEnd})`, width: '100%' }} />
+      </div>
+
+      {/* Mobile Drawer Overlay */}
+      {mobileMenuOpen && (
+        <div
+          className="bldr-mobile-drawer"
+          style={{
+            position: 'fixed',
+            top: 66,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(15, 23, 42, 0.5)',
+            backdropFilter: 'blur(8px)',
+            zIndex: 999,
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setMobileMenuOpen(false);
+          }}
+        >
+          <div
+            style={{
+              background: '#FFFFFF',
+              borderBottom: '1px solid rgba(20, 20, 22, 0.1)',
+              boxShadow: '0 12px 36px rgba(0, 0, 0, 0.15)',
+              maxHeight: 'calc(100vh - 66px)',
+              overflowY: 'auto',
+              padding: '20px 20px 28px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 12,
+            }}
+          >
+            {/* Services Accordion */}
+            <div style={{ borderBottom: '1px solid rgba(20, 20, 22, 0.06)', paddingBottom: 10 }}>
+              <div
+                onClick={() => setMobileExpandedSection(mobileExpandedSection === 'services' ? null : 'services')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '10px 4px',
+                  cursor: 'pointer',
+                  fontWeight: 700,
+                  fontSize: 16,
+                  color: '#141416',
+                }}
+              >
+                <span>{isRtl ? 'الخدمات المتخصصة' : 'Services'}</span>
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{
+                    transform: mobileExpandedSection === 'services' ? 'rotate(180deg)' : 'none',
+                    transition: 'transform 0.2s',
+                  }}
+                >
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </div>
+              {mobileExpandedSection === 'services' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: '4px 0 10px', marginInlineStart: 12 }}>
+                  <a
+                    href="/services"
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{ fontSize: 14, fontWeight: 700, color: '#D10721', textDecoration: 'none', padding: '6px 0' }}
+                  >
+                    {isRtl ? 'استعراض كافة الخدمات ←' : 'View All Services →'}
+                  </a>
+                  {servicesList.map((s) => (
+                    <a
+                      key={s.slug}
+                      href={`/services/${s.slug}`}
+                      onClick={() => setMobileMenuOpen(false)}
+                      style={{ fontSize: 13.5, color: '#475569', textDecoration: 'none', padding: '6px 0' }}
+                    >
+                      {s.title}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Products Accordion */}
+            <div style={{ borderBottom: '1px solid rgba(20, 20, 22, 0.06)', paddingBottom: 10 }}>
+              <div
+                onClick={() => setMobileExpandedSection(mobileExpandedSection === 'products' ? null : 'products')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '10px 4px',
+                  cursor: 'pointer',
+                  fontWeight: 700,
+                  fontSize: 16,
+                  color: '#141416',
+                }}
+              >
+                <span>{isRtl ? 'البرامج والمنتجات' : 'Products & Courses'}</span>
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{
+                    transform: mobileExpandedSection === 'products' ? 'rotate(180deg)' : 'none',
+                    transition: 'transform 0.2s',
+                  }}
+                >
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </div>
+              {mobileExpandedSection === 'products' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: '4px 0 10px', marginInlineStart: 12 }}>
+                  <a
+                    href="/products"
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{ fontSize: 14, fontWeight: 700, color: '#D10721', textDecoration: 'none', padding: '6px 0' }}
+                  >
+                    {isRtl ? 'تصفح كافة الدورات والمنتجات ←' : 'Explore All Products →'}
+                  </a>
+                  {productsList.map((p) => (
+                    <a
+                      key={p.href}
+                      href={p.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      style={{ fontSize: 13.5, color: '#475569', textDecoration: 'none', padding: '6px 0' }}
+                    >
+                      {p.title}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Projects Accordion */}
+            <div style={{ borderBottom: '1px solid rgba(20, 20, 22, 0.06)', paddingBottom: 10 }}>
+              <div
+                onClick={() => setMobileExpandedSection(mobileExpandedSection === 'projects' ? null : 'projects')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '10px 4px',
+                  cursor: 'pointer',
+                  fontWeight: 700,
+                  fontSize: 16,
+                  color: '#141416',
+                }}
+              >
+                <span>{isRtl ? 'المشاريع وسوابق الأعمال' : 'Projects & Work'}</span>
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{
+                    transform: mobileExpandedSection === 'projects' ? 'rotate(180deg)' : 'none',
+                    transition: 'transform 0.2s',
+                  }}
+                >
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </div>
+              {mobileExpandedSection === 'projects' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: '4px 0 10px', marginInlineStart: 12 }}>
+                  <a
+                    href="/projects"
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{ fontSize: 14, fontWeight: 700, color: '#D10721', textDecoration: 'none', padding: '6px 0' }}
+                  >
+                    {isRtl ? 'استعراض كافة دراسات الحالة ←' : 'All Case Studies →'}
+                  </a>
+                  {projectsList.map((p) => (
+                    <a
+                      key={p.href}
+                      href={p.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      style={{ fontSize: 13.5, color: '#475569', textDecoration: 'none', padding: '6px 0' }}
+                    >
+                      {p.title}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Single Links */}
+            <a
+              href="/apply-provider"
+              onClick={() => setMobileMenuOpen(false)}
+              style={{
+                display: 'block',
+                padding: '10px 4px',
+                fontSize: 15,
+                fontWeight: 600,
+                color: '#141416',
+                textDecoration: 'none',
+              }}
+            >
+              {isRtl ? 'كن شريكاً معنا (Partner with bldr)' : 'Partner with bldr'}
+            </a>
+
+            <a
+              href="/contact"
+              onClick={() => setMobileMenuOpen(false)}
+              style={{
+                display: 'block',
+                padding: '10px 4px',
+                fontSize: 15,
+                fontWeight: 600,
+                color: '#141416',
+                textDecoration: 'none',
+              }}
+            >
+              {isRtl ? 'تواصل معنا' : 'Contact Us'}
+            </a>
+
+            {/* CTA Button in Drawer */}
+            <div style={{ paddingTop: 8 }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onStartProject?.();
+                }}
+                style={{
+                  width: '100%',
+                  height: 48,
+                  borderRadius: 999,
+                  background: tokens.colors.brandDark,
+                  color: '#FFFFFF',
+                  fontSize: 15,
+                  fontWeight: 700,
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                  boxShadow: '0 4px 14px rgba(20,20,22,0.18)',
+                }}
+              >
+                <span>{isRtl ? 'ابدأ مشروعك معنا ←' : 'Start a Project →'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Brand gradient progress bar */}
       <div style={{ height: 2, background: 'rgba(20, 20, 22, 0.05)' }}>
@@ -543,22 +899,25 @@ export function ProjectContactModal({ isOpen, onClose, lang = 'EN' }: ProjectCon
         style={{
           width: '100%',
           maxWidth: 540,
+          maxHeight: '92vh',
           background: '#FFFFFF',
           borderRadius: 18,
           boxShadow: '0 24px 60px rgba(0,0,0,0.3)',
           overflow: 'hidden',
           position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
         <div style={{ height: 4, background: `linear-gradient(90deg, ${tokens.colors.gradientStart}, ${tokens.colors.gradientEnd})` }} />
 
-        <div style={{ padding: '28px 32px 32px' }}>
+        <div style={{ padding: '24px 20px 28px', overflowY: 'auto', flex: 1 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
             <div>
-              <h2 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: '#12203C' }}>
+              <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: '#12203C' }}>
                 {isRtl ? 'ابدأ مشروعك مع bldr' : 'Start a Project with bldr'}
               </h2>
-              <p style={{ margin: '6px 0 0', fontSize: 13.5, color: '#5A6A80' }}>
+              <p style={{ margin: '6px 0 0', fontSize: 13, color: '#5A6A80' }}>
                 {isRtl ? 'أخبرنا عن مشروعك أو الخدمة المطلوبة وسنتواصل معك خلال 24 ساعة.' : 'Tell us about your venture, product, or campaign. We will get back within 24 hours.'}
               </p>
             </div>
@@ -611,7 +970,7 @@ export function ProjectContactModal({ isOpen, onClose, lang = 'EN' }: ProjectCon
             </div>
           ) : (
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
                 <div>
                   <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#1B2A4A', marginBottom: 5 }}>
                     {isRtl ? 'الاسم الكامل' : 'Full Name'}
@@ -639,7 +998,7 @@ export function ProjectContactModal({ isOpen, onClose, lang = 'EN' }: ProjectCon
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
                 <div>
                   <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#1B2A4A', marginBottom: 5 }}>
                     {isRtl ? 'رقم الهاتف / واتساب' : 'Phone / WhatsApp'}
@@ -717,8 +1076,14 @@ export function BldrFooter({ lang = 'EN' }: { lang?: 'EN' | 'AR' } = {}) {
   const isRtl = lang === 'AR';
   return (
     <footer dir={isRtl ? 'rtl' : 'ltr'} style={{ background: tokens.colors.brandDark, color: '#FFFFFF', fontFamily: isRtl ? "'Readex Pro', sans-serif" : tokens.fonts.display }}>
-      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '64px 32px 34px' }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '44px 36px', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+      <style>{`
+        @media (max-width: 768px) {
+          .bldr-footer-wrapper { padding: 48px 20px 28px !important; }
+          .bldr-footer-columns { gap: 32px 20px !important; }
+        }
+      `}</style>
+      <div className="bldr-footer-wrapper" style={{ maxWidth: 1280, margin: '0 auto', padding: '64px 32px 34px' }}>
+        <div className="bldr-footer-columns" style={{ display: 'flex', flexWrap: 'wrap', gap: '44px 36px', alignItems: 'flex-start', justifyContent: 'space-between' }}>
           
           {/* Studio Brand */}
           <div style={{ flex: '1 1 260px', minWidth: 200, display: 'flex', flexDirection: 'column', gap: 16 }}>

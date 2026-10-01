@@ -107,7 +107,7 @@ function ServicesContent() {
         onStartProject={() => setIsContactOpen(true)}
       />
 
-      <main style={{ flex: 1, padding: '56px 32px 84px' }}>
+      <main style={{ flex: 1, padding: 'clamp(24px, 4vw, 56px) clamp(16px, 4vw, 32px) 84px' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           {/* Header */}
           <div style={{ maxWidth: 760, marginBottom: 44 }}>
@@ -162,7 +162,7 @@ function ServicesContent() {
           </div>
 
           {/* Services Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: 24 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))', gap: 24 }}>
             {filteredServices.map((service) => {
               const isTargeted = highlightedSlug === service.slug;
 

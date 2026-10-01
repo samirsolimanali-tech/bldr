@@ -10,8 +10,61 @@ function SingleProductContent() {
   const params = useParams();
   const searchParams = useSearchParams();
   const rawId = (params?.id as string) || 'prod-1';
-  const product: ProductItem =
-    PRODUCTS_CATALOG.find((p) => p.id === rawId || p.slug === rawId) || PRODUCTS_CATALOG[0];
+  const [product, setProduct] = useState<ProductItem>(
+    () => PRODUCTS_CATALOG.find((p) => p.id === rawId || p.slug === rawId) || PRODUCTS_CATALOG[0]
+  );
+
+  useEffect(() => {
+    fetch('/api/products')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data && data.success && Array.isArray(data.data)) {
+          const item = data.data.find((p: any) => p.id === rawId || p.slug === rawId || p.paySlug === rawId);
+          if (item) {
+            setProduct({
+              id: item.id,
+              slug: item.slug || item.id,
+              title: item.title,
+              titleAr: item.titleAr || item.title,
+              provider: item.provider || item.brand || 'bldr Partner',
+              providerCode: item.providerCode || (item.brand === 'bldr' ? 'BLDR' : 'PARTNER'),
+              providerLogoText: (item.provider || item.brand || 'B').slice(0, 2).toUpperCase(),
+              providerLogoBg: '#E8EEF7',
+              providerLogoFg: '#1C2B3F',
+              chipBg: '#F4F5F7',
+              chipFg: '#141416',
+              type: item.type || 'Course',
+              typeAr: item.typeAr || (item.type === 'Course' ? 'دورة تدريبية' : item.type),
+              shortDesc: item.shortDesc || item.title,
+              shortDescAr: item.shortDescAr || item.titleAr || item.title,
+              fullDesc: item.fullDesc || item.shortDesc || item.title,
+              fullDescAr: item.fullDescAr || item.shortDescAr || item.titleAr || item.title,
+              priceEGP: Number(item.priceEGP || item.price) || 0,
+              duration: item.duration || 'Flexible',
+              durationAr: item.durationAr || 'مرن',
+              rating: item.rating || 4.9,
+              enrolled: item.enrolled || 0,
+              thumbnailGradient: item.thumbnailGradient || 'linear-gradient(135deg, #12203C 0%, #2C5F9E 100%)',
+              thumbnailIcon: item.thumbnailIcon || (item.type === 'Book' ? 'book' : 'code'),
+              paySlug: item.paySlug || item.slug || item.id,
+              tags: item.tags || [item.type || 'Course', item.brand || 'bldr'],
+              tagsAr: item.tagsAr || ['معتمد', 'bldr'],
+              syllabus: item.syllabus || [],
+              syllabusAr: item.syllabusAr || [],
+              whatIncluded: item.whatIncluded || ['Full Lifetime Access', 'Certificate of Completion'],
+              whatIncludedAr: item.whatIncludedAr || ['وصول دائم وشامل للمحتوى', 'شهادة إتمام معتمدة'],
+              providerWebsiteUrl: item.redirectUrl || `/products/${item.id}`,
+              ventureId: item.ventureId || 'bldr',
+              saleMode: item.saleMode || 'DIRECT',
+              redirectUrl: item.redirectUrl,
+              ctaLabel: item.saleMode === 'REDIRECT' ? 'Visit Provider' : 'Enroll Now',
+              ctaLabelAr: item.saleMode === 'REDIRECT' ? 'الانتقال للمزود' : 'سجل الآن',
+            });
+          }
+        }
+      })
+      .catch(() => {});
+  }, [rawId]);
 
   const queryPaid = searchParams?.get('paid') === 'true';
   const [isPaid, setIsPaid] = useState(false);

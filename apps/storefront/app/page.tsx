@@ -82,6 +82,7 @@ export default function HomePage() {
       <main style={{ flex: 1 }}>
         {/* ─── Hero Section with Blueprint Gradient Reveal ──────────────────────── */}
         <section
+          className="hero-section-responsive"
           style={{
             position: 'relative',
             padding: '92px 36px 104px',
@@ -101,6 +102,7 @@ export default function HomePage() {
           }}
         >
           <div
+            className="hero-grid-responsive"
             style={{
               maxWidth: 1280,
               width: '100%',
@@ -139,7 +141,7 @@ export default function HomePage() {
                 {heroSubtitle}
               </p>
 
-              <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
+              <div className="hero-cta-group" style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
                 <button
                   type="button"
                   onClick={() => setIsContactOpen(true)}
@@ -189,6 +191,7 @@ export default function HomePage() {
 
             {/* Right Half: Open Canvas revealing the Blueprint sketches */}
             <div
+              className="hero-canvas-column"
               style={{
                 minHeight: 380,
                 display: 'flex',
@@ -201,8 +204,8 @@ export default function HomePage() {
         </section>
 
         {/* ─── What's Broken Section ─────────────────────────────── */}
-        <section style={{ padding: '0 32px 84px', background: '#F4F5F7' }}>
-          <div style={{
+        <section className="whats-broken-section-responsive" style={{ padding: '0 32px 84px', background: '#F4F5F7' }}>
+          <div className="whats-broken-inner-responsive" style={{
             maxWidth: 1280,
             margin: '0 auto',
             background: '#FFFFFF',
@@ -231,6 +234,7 @@ export default function HomePage() {
               ]).map((card: any, i: number) => (
                 <div
                   key={i}
+                  className="whats-broken-card-responsive"
                   style={{
                     background: '#F4F5F7',
                     border: '1px solid rgba(20,20,22,0.08)',
@@ -250,9 +254,9 @@ export default function HomePage() {
         </section>
 
         {/* ─── How We're Built ───────────────────────────────────── */}
-        <section id="built" style={{ padding: '56px 32px 84px', background: '#F4F5F7' }}>
-          <div style={{ maxWidth: 1280, margin: '0 auto', display: 'grid', gridTemplateColumns: 'minmax(0, 0.9fr) minmax(0, 1.1fr)', gap: 64, alignItems: 'start' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 18, position: 'sticky', top: 110 }}>
+        <section id="built" className="how-were-built-section-responsive" style={{ padding: '56px 32px 84px', background: '#F4F5F7' }}>
+          <div className="how-were-built-grid-responsive" style={{ maxWidth: 1280, margin: '0 auto', display: 'grid', gridTemplateColumns: 'minmax(0, 0.9fr) minmax(0, 1.1fr)', gap: 64, alignItems: 'start' }}>
+            <div className="how-were-built-sidebar-responsive" style={{ display: 'flex', flexDirection: 'column', gap: 18, position: 'sticky', top: 110 }}>
               <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#D10721' }}>
                 {isRtl ? (cms?.howWereBuilt?.tagAr || 'هيكلية عملنا') : (cms?.howWereBuilt?.tag || "How We're Built")}
               </span>
@@ -266,7 +270,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14, position: 'relative', [isRtl ? 'paddingRight' : 'paddingLeft']: 24, [isRtl ? 'borderRight' : 'borderLeft']: '2px solid rgba(20,20,22,0.08)' }}>
+            <div className="how-were-built-timeline-responsive" style={{ display: 'flex', flexDirection: 'column', gap: 14, position: 'relative', [isRtl ? 'paddingRight' : 'paddingLeft']: 24, [isRtl ? 'borderRight' : 'borderLeft']: '2px solid rgba(20,20,22,0.08)' }}>
               {(cms?.howWereBuilt?.units || [
                 {
                   title: 'Marketing & Branding',
@@ -354,7 +358,7 @@ export default function HomePage() {
         </section>
 
         {/* ─── Featured Projects & Portfolio Showcase ────────────── */}
-        <section id="projects" style={{ background: '#141416', padding: '84px 32px', color: '#FFFFFF', position: 'relative', overflow: 'hidden' }}>
+        <section id="projects" className="projects-showcase-section-responsive" style={{ background: '#141416', padding: '84px 32px', color: '#FFFFFF', position: 'relative', overflow: 'hidden' }}>
           {/* Subtle background ambient glow */}
           <div
             style={{
@@ -370,7 +374,7 @@ export default function HomePage() {
             }}
           />
 
-          <div style={{ maxWidth: 1280, margin: '0 auto', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.15fr)', gap: 56, alignItems: 'center' }}>
+          <div className="projects-showcase-grid-responsive" style={{ maxWidth: 1280, margin: '0 auto', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.15fr)', gap: 56, alignItems: 'center' }}>
             {/* Left Side: Strategic Copy & CTA */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 24, zIndex: 1 }}>
               <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#FD9426' }}>
@@ -388,7 +392,7 @@ export default function HomePage() {
               </p>
 
               {/* Fast Proof Metrics */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, maxWidth: 480, paddingTop: 6 }}>
+              <div className="projects-metrics-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, maxWidth: 480, paddingTop: 6 }}>
                 {(cms?.projectsShowcase?.metrics || [
                   { value: '38k+', label: 'Patients Managed', labelAr: 'مريض مسجل ومنتظم' },
                   { value: '45k+', label: 'Enrolled Students', labelAr: 'طالب في المنصات' },
@@ -404,7 +408,7 @@ export default function HomePage() {
               </div>
 
               {/* Action Buttons */}
-              <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', alignItems: 'center', paddingTop: 6 }}>
+              <div className="projects-cta-group" style={{ display: 'flex', gap: 14, flexWrap: 'wrap', alignItems: 'center', paddingTop: 6 }}>
                 <Link
                   href="/projects"
                   style={{
@@ -470,9 +474,9 @@ export default function HomePage() {
         </section>
 
         {/* ─── How We Work Section ───────────────────────────────── */}
-        <section id="work" style={{ padding: '84px 32px', background: '#F4F5F7' }}>
-          <div style={{ maxWidth: 1280, margin: '0 auto', background: '#FFFFFF', border: '1px solid rgba(20,20,22,0.08)', borderRadius: 22, padding: '48px 42px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 0.9fr) minmax(0, 1.1fr)', gap: 54, alignItems: 'start' }}>
+        <section id="work" className="how-we-work-section-responsive" style={{ padding: '84px 32px', background: '#F4F5F7' }}>
+          <div className="how-we-work-card-responsive" style={{ maxWidth: 1280, margin: '0 auto', background: '#FFFFFF', border: '1px solid rgba(20,20,22,0.08)', borderRadius: 22, padding: '48px 42px' }}>
+            <div className="how-we-work-grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 0.9fr) minmax(0, 1.1fr)', gap: 54, alignItems: 'start' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#D10721' }}>
                   {isRtl ? 'خطوات التعاقد' : 'How We Work'}

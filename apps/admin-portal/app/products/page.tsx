@@ -204,6 +204,26 @@ export default function AdminProductsPage() {
     aggregatedOnBldrStore: true,
   });
 
+  // Fetch persisted products on mount
+  React.useEffect(() => {
+    fetch('/api/products')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data && data.success && Array.isArray(data.data) && data.data.length > 0) {
+          setProducts(data.data);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const syncProductsToApi = (updated: Product[]) => {
+    fetch('/api/products', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updated),
+    }).catch(() => {});
+  };
+
   const ventureMap: Record<string, string> = {
     'bldr': 'bldr',
     'StudyHub': 'venture_studyhub',
@@ -240,27 +260,31 @@ export default function AdminProductsPage() {
   const handleAdd = () => {
     if (!newProduct.title) return;
     const isFirstParty = newProduct.brand === 'bldr';
-    setProducts(prev => [
-      {
-        id: `pr${Date.now()}`,
-        title: newProduct.title,
-        brand: newProduct.brand,
-        ventureId: newProduct.ventureId,
-        originBrand: isFirstParty ? 'bldr Direct' : `${newProduct.brand} Academy`,
-        isFirstParty,
-        aggregatedOnBldrStore: newProduct.aggregatedOnBldrStore,
-        featuredOnBldr: false,
-        saleMode: newProduct.saleMode,
-        redirectUrl: newProduct.saleMode === 'REDIRECT' ? newProduct.redirectUrl : undefined,
-        provider: newProduct.provider || (isFirstParty ? 'bldr Team' : 'Unassigned Provider'),
-        type: newProduct.type,
-        price: Number(newProduct.price) || 0,
-        status: newProduct.status as 'Published' | 'Draft',
-        enrolled: 0,
-        created: new Date().toISOString().split('T')[0],
-      },
-      ...prev,
-    ]);
+    const created: Product = {
+      id: `pr${Date.now()}`,
+      title: newProduct.title,
+      brand: newProduct.brand,
+      ventureId: newProduct.ventureId,
+      originBrand: isFirstParty ? 'bldr Direct' : `${newProduct.brand} Academy`,
+      isFirstParty,
+      aggregatedOnBldrStore: newProduct.aggregatedOnBldrStore,
+      featuredOnBldr: true,
+      saleMode: newProduct.saleMode,
+      redirectUrl: newProduct.saleMode === 'REDIRECT' ? newProduct.redirectUrl : undefined,
+      provider: newProduct.provider || (isFirstParty ? 'bldr Team' : 'Unassigned Provider'),
+      type: newProduct.type,
+      price: Number(newProduct.price) || 0,
+      status: newProduct.status as 'Published' | 'Draft',
+      enrolled: 0,
+      created: new Date().toISOString().split('T')[0],
+    };
+
+    setProducts(prev => {
+      const next = [created, ...prev];
+      syncProductsToApi(next);
+      return next;
+    });
+
     setShowAdd(false);
     setNewProduct({
       title: '',
@@ -277,31 +301,51 @@ export default function AdminProductsPage() {
   };
 
   const toggleStatus = (id: string) => {
-    setProducts(prev => prev.map(p => p.id === id ? { ...p, status: p.status === 'Published' ? 'Draft' : 'Published' } : p));
+    setProducts(prev => {
+      const next = prev.map(p => p.id === id ? { ...p, status: (p.status === 'Published' ? 'Draft' : 'Published') as 'Published' | 'Draft' } : p);
+      syncProductsToApi(next);
+      return next;
+    });
   };
 
   const toggleSaleMode = (id: string) => {
-    setProducts(prev => prev.map(p => {
-      if (p.id !== id) return p;
-      const nextMode = p.saleMode === 'DIRECT' ? 'REDIRECT' : 'DIRECT';
-      return {
-        ...p,
-        saleMode: nextMode,
-        redirectUrl: nextMode === 'REDIRECT' && !p.redirectUrl ? `https://${p.brand.toLowerCase().replace(/\s+/g, '')}.com/course/${p.id}` : p.redirectUrl,
-      };
-    }));
+    setProducts(prev => {
+      const next = prev.map(p => {
+        if (p.id !== id) return p;
+        const nextMode = p.saleMode === 'DIRECT' ? 'REDIRECT' : 'DIRECT';
+        return {
+          ...p,
+          saleMode: nextMode as 'DIRECT' | 'REDIRECT',
+          redirectUrl: nextMode === 'REDIRECT' && !p.redirectUrl ? `https://${p.brand.toLowerCase().replace(/\s+/g, '')}.com/course/${p.id}` : p.redirectUrl,
+        };
+      });
+      syncProductsToApi(next);
+      return next;
+    });
   };
 
   const toggleAggregated = (id: string) => {
-    setProducts(prev => prev.map(p => p.id === id ? { ...p, aggregatedOnBldrStore: !p.aggregatedOnBldrStore } : p));
+    setProducts(prev => {
+      const next = prev.map(p => p.id === id ? { ...p, aggregatedOnBldrStore: !p.aggregatedOnBldrStore } : p);
+      syncProductsToApi(next);
+      return next;
+    });
   };
 
   const toggleFeatured = (id: string) => {
-    setProducts(prev => prev.map(p => p.id === id ? { ...p, featuredOnBldr: !p.featuredOnBldr } : p));
+    setProducts(prev => {
+      const next = prev.map(p => p.id === id ? { ...p, featuredOnBldr: !p.featuredOnBldr } : p);
+      syncProductsToApi(next);
+      return next;
+    });
   };
 
   const deleteProduct = (id: string) => {
-    setProducts(prev => prev.filter(p => p.id !== id));
+    setProducts(prev => {
+      const next = prev.filter(p => p.id !== id);
+      syncProductsToApi(next);
+      return next;
+    });
   };
 
   const aggregatedCount = products.filter(p => p.aggregatedOnBldrStore).length;

@@ -116,7 +116,7 @@ export default function ContactPage() {
           </div>
 
           {/* Grid Layout */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.35fr)', gap: 28, alignItems: 'start' }}>
+          <div className="responsive-two-col" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.35fr)', gap: 28, alignItems: 'start' }}>
             {/* Direct Contact Info Card */}
             <div
               style={{

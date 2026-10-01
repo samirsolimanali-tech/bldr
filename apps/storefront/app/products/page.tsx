@@ -10,11 +10,66 @@ export default function ProductsPage() {
   const [selectedType, setSelectedType] = useState<string>('All');
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [paidMap, setPaidMap] = useState<Record<string, boolean>>({});
+  const [products, setProducts] = useState<ProductItem[]>(PRODUCTS_CATALOG);
+
+  useEffect(() => {
+    // Fetch live products (including courses added from Admin Portal)
+    fetch('/api/products')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data && data.success && Array.isArray(data.data)) {
+          const mapped: ProductItem[] = data.data.map((p: any) => ({
+            id: p.id,
+            slug: p.slug || p.id,
+            title: p.title,
+            titleAr: p.titleAr || p.title,
+            provider: p.provider || p.brand || 'bldr Partner',
+            providerCode: p.providerCode || (p.brand === 'bldr' ? 'BLDR' : 'PARTNER'),
+            providerLogoText: (p.provider || p.brand || 'B').slice(0, 2).toUpperCase(),
+            providerLogoBg: '#E8EEF7',
+            providerLogoFg: '#1C2B3F',
+            chipBg: '#F4F5F7',
+            chipFg: '#141416',
+            type: p.type || 'Course',
+            typeAr: p.typeAr || (p.type === 'Course' ? 'دورة تدريبية' : p.type),
+            shortDesc: p.shortDesc || p.title,
+            shortDescAr: p.shortDescAr || p.titleAr || p.title,
+            fullDesc: p.fullDesc || p.shortDesc || p.title,
+            fullDescAr: p.fullDescAr || p.shortDescAr || p.titleAr || p.title,
+            priceEGP: Number(p.priceEGP || p.price) || 0,
+            duration: p.duration || 'Flexible',
+            durationAr: p.durationAr || 'مرن',
+            rating: p.rating || 4.9,
+            enrolled: p.enrolled || 0,
+            thumbnailGradient: p.thumbnailGradient || (p.brand === 'bldr' ? 'linear-gradient(135deg, #12203C 0%, #2C5F9E 100%)' : 'linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%)'),
+            thumbnailIcon: p.thumbnailIcon || (p.type === 'Book' ? 'book' : 'code'),
+            paySlug: p.paySlug || p.slug || p.id,
+            tags: p.tags || [p.type || 'Course', p.brand || 'bldr'],
+            tagsAr: p.tagsAr || ['معتمد', 'bldr'],
+            syllabus: p.syllabus || [],
+            syllabusAr: p.syllabusAr || [],
+            whatIncluded: p.whatIncluded || ['Full Lifetime Access', 'Certificate of Completion'],
+            whatIncludedAr: p.whatIncludedAr || ['وصول دائم وشامل للمحتوى', 'شهادة إتمام معتمدة'],
+            providerWebsiteUrl: p.redirectUrl || `/products/${p.id}`,
+            ventureId: p.ventureId || 'bldr',
+            saleMode: p.saleMode || 'DIRECT',
+            redirectUrl: p.redirectUrl,
+            ctaLabel: p.saleMode === 'REDIRECT' ? 'Visit Provider' : 'Enroll Now',
+            ctaLabelAr: p.saleMode === 'REDIRECT' ? 'الانتقال للمزود' : 'سجل الآن',
+          }));
+
+          const liveIds = new Set(mapped.map((m) => m.id));
+          const merged = [...mapped, ...PRODUCTS_CATALOG.filter((p) => !liveIds.has(p.id))];
+          setProducts(merged);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     try {
       const map: Record<string, boolean> = {};
-      PRODUCTS_CATALOG.forEach((p) => {
+      products.forEach((p) => {
         if (
           localStorage.getItem(`bldr_paid_${p.id}`) === 'true' ||
           localStorage.getItem(`bldr_paid_${p.paySlug}`) === 'true'
@@ -24,7 +79,7 @@ export default function ProductsPage() {
       });
       setPaidMap(map);
     } catch (e) {}
-  }, []);
+  }, [products]);
 
   const isRtl = lang === 'AR';
 
@@ -33,8 +88,8 @@ export default function ProductsPage() {
     : ['All', 'Course', 'Workshop', 'Book', 'Event', 'Assessment'];
 
   const filteredProducts = selectedType === 'All' || selectedType === 'الكل'
-    ? PRODUCTS_CATALOG
-    : PRODUCTS_CATALOG.filter((p) => {
+    ? products
+    : products.filter((p) => {
         if (selectedType === 'الدورات والمعسكرات' && p.type === 'Course') return true;
         if (selectedType === 'ورش العمل' && p.type === 'Workshop') return true;
         if (selectedType === 'الكتب والأدلة' && p.type === 'Book') return true;
@@ -60,7 +115,7 @@ export default function ProductsPage() {
         onStartProject={() => setIsContactOpen(true)}
       />
 
-      <main style={{ flex: 1, padding: '48px 32px 84px' }}>
+      <main style={{ flex: 1, padding: 'clamp(24px, 4vw, 48px) clamp(16px, 4vw, 32px) 84px' }}>
         <div style={{ maxWidth: 1240, margin: '0 auto' }}>
           {/* Header */}
           <div style={{ marginBottom: 36, textAlign: isRtl ? 'right' : 'left' }}>
@@ -116,7 +171,7 @@ export default function ProductsPage() {
           </div>
 
           {/* Products Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: 28 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))', gap: 24 }}>
             {filteredProducts.map((prod) => (
               <div
                 key={prod.id}

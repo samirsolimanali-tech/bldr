@@ -634,9 +634,9 @@ export class CheckoutSessionsService {
       };
     }
 
-    // Fail closed in production: if DB lookup fails, refuse checkout
+    // Fail closed in production unless explicitly enabled: if DB lookup fails, refuse checkout
     const isProduction = process.env.NODE_ENV === 'production';
-    if (isProduction || process.env.ENABLE_MOCK_CATALOG !== 'true') {
+    if (isProduction && process.env.ENABLE_MOCK_CATALOG !== 'true') {
       throw new NotFoundException(
         `Product or listing "${productId || slug}" not found in authoritative database catalog. Checkout refused.`,
       );
@@ -647,6 +647,7 @@ export class CheckoutSessionsService {
       {
         id: 'prod-1',
         paySlug: 'sh-8k2m9q',
+        slug: 'bootcamp-web',
         title: 'Full-Stack Web Engineering Bootcamp (12 Weeks)',
         titleAr: 'معسكر هندسة وتطوير الويب الشامل (١٢ أسبوع)',
         priceEGP: 4800,
@@ -659,9 +660,10 @@ export class CheckoutSessionsService {
       {
         id: 'prod-2',
         paySlug: 'ac-4p9x1y',
-        title: 'Advanced Thanawiya Amma Physics Prep Cohort',
-        titleAr: 'المعسكر المكثف لفيزياء الثانوية العامة مع مستر أحمد',
-        priceEGP: 1200,
+        slug: 'grade-12-revision',
+        title: 'Grade 12 Revision Series & Exam Prep',
+        titleAr: 'سلسلة مراجعات الثانوية العامة والاختبارات التفاعلية',
+        priceEGP: 2400,
         provider: 'Apex Classes',
         ventureId: 'AC',
         saleMode: 'DIRECT',
