@@ -4,12 +4,10 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 
+// Active navigation links (services, projects, contact kept as pending-decision routes on disk, hidden from nav)
 const NAV_LINKS = [
   { href: '/',           label: 'Home' },
-  { href: '/services',   label: 'Services' },
   { href: '/products',   label: 'Products' },
-  { href: '/projects',   label: 'Projects' },
-  { href: '/contact',    label: 'Contact' },
 ];
 
 export default function Navbar() {

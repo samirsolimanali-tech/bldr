@@ -466,3 +466,14 @@ model EnrollmentCode {
   @@index([ventureId, codeHash])
   @@index([ventureId, status])
 }
+
+// ─── Activation Code Rate Limiting (DB-backed, survives restarts) ─────────────
+model ActivationAttempt {
+  id          String   @id @default(cuid())
+  ipAddress   String
+  ventureId   String
+  attemptedAt DateTime @default(now())
+
+  @@index([ipAddress, attemptedAt])
+  @@index([ventureId, attemptedAt])
+}

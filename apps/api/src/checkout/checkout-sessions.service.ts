@@ -433,15 +433,15 @@ export class CheckoutSessionsService {
     lastError?: string | null;
   }> = [];
 
-  // Exponential retry schedule over ~24 hours: [1m, 5m, 30m, 2h, 6h, 12h, 24h]
+  // Exact ~24h retry ladder: [1m, 5m, 15m, 1h, 3h, 6h, 14h] (~24.35 hours total span)
   private readonly RETRY_SCHEDULE_MS = [
     60_000,       // Attempt 2: 1 min
     300_000,      // Attempt 3: 5 min
-    1_800_000,    // Attempt 4: 30 min
-    7_200_000,    // Attempt 5: 2 hours
-    21_600_000,   // Attempt 6: 6 hours
-    43_200_000,   // Attempt 7: 12 hours
-    86_400_000,   // Attempt 8: 24 hours
+    900_000,      // Attempt 4: 15 min
+    3_600_000,    // Attempt 5: 1 hour
+    10_800_000,   // Attempt 6: 3 hours
+    21_600_000,   // Attempt 7: 6 hours
+    50_400_000,   // Attempt 8: 14 hours
   ];
 
   // ─── Dispatch Webhook with 24-Hour Exponential Backoff Schedule ───────────────

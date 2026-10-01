@@ -7,11 +7,34 @@ import { HttpException, ConflictException, NotFoundException } from '@nestjs/com
 describe('ActivationCodesService - Security, Hashing, Race Safety & Rate Limiting', () => {
   let service: ActivationCodesService;
   let codesDb: Map<string, any>;
+  let mockPrisma: any;
 
   beforeEach(() => {
     codesDb = new Map();
 
-    const mockPrisma = {
+    const attemptsDb: Array<{ id: string; ipAddress: string; ventureId: string; attemptedAt: Date }> = [];
+
+    mockPrisma = {
+      activationAttempt: {
+        create: async ({ data }: any) => {
+          const item = {
+            id: `att-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+            attemptedAt: new Date(),
+            ...data,
+          };
+          attemptsDb.push(item);
+          return item;
+        },
+        count: async ({ where }: any) => {
+          return attemptsDb.filter((att) => {
+            if (where.ipAddress && att.ipAddress !== where.ipAddress) return false;
+            if (where.ventureId && att.ventureId !== where.ventureId) return false;
+            if (where.attemptedAt?.gte && att.attemptedAt < where.attemptedAt.gte) return false;
+            return true;
+          }).length;
+        },
+        deleteMany: async () => ({ count: 0 }),
+      },
       provider: {
         findFirst: async ({ where }: any) => {
           return { id: 'prov-studyhub', slug: 'studyhub' };
@@ -205,5 +228,46 @@ describe('ActivationCodesService - Security, Hashing, Race Safety & Rate Limitin
     assert.equal(logs[0].ipAddress, ip);
     assert.equal(logs[0].ventureId, 'studyhub');
     assert.ok(logs[0].maskedCode.includes('***'));
+  });
+
+  test('rate-limit state persists across service instances (DB-backed, survives service restart)', async () => {
+    const ip = '197.200.50.99';
+
+    // 5 attempts on first service pod/instance
+    for (let i = 0; i < 5; i++) {
+      try {
+        await service.redeemCode({
+          ventureId: 'studyhub',
+          code: `RESTART-CODE-${i}`,
+          studentName: 'Student',
+          studentEmail: 'student@example.com',
+          ipAddress: ip,
+        });
+      } catch (err: any) {
+        assert.ok(err instanceof NotFoundException);
+      }
+    }
+
+    // Simulate pod restart or second API pod instance with fresh in-memory state, sharing same mockPrisma DB
+    const serviceInstance2 = new ActivationCodesService(mockPrisma);
+
+    // 6th attempt on new instance must still be blocked by DB rate limit
+    await assert.rejects(
+      async () => {
+        await serviceInstance2.redeemCode({
+          ventureId: 'studyhub',
+          code: 'RESTART-CODE-BLOCKED',
+          studentName: 'Student',
+          studentEmail: 'student@example.com',
+          ipAddress: ip,
+        });
+      },
+      (err: any) => {
+        assert.ok(err instanceof HttpException);
+        assert.equal(err.getStatus(), 429);
+        assert.match(err.message, /too many redemption attempts from this ip/i);
+        return true;
+      },
+    );
   });
 });

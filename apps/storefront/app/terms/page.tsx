@@ -51,7 +51,7 @@ export default function TermsPage() {
             <section>
               <h2 style={{ fontSize: 17, fontWeight: 800, color: '#0F172A', marginBottom: 8 }}>2. Payment Processing &amp; Currencies</h2>
               <p style={{ margin: 0 }}>
-                All transactions are denominated and billed in Egyptian Pounds (EGP) in minor units. Payments are securely acquired via our certified payment partners (Geidea, Paymob, and Fawry Pay). bldr adheres to PCI-DSS Level 1 compliance standards and does not store raw payment card data on our servers.
+                All transactions are denominated and billed in Egyptian Pounds (EGP) in minor units. Payments are securely acquired via authorized, PCI-DSS certified payment gateways (Geidea, Paymob, and Fawry Pay). bldr does not store raw payment card data on our servers.
               </p>
             </section>
 

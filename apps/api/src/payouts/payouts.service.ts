@@ -105,12 +105,22 @@ export class PayoutsService {
       );
     }
 
+    // ─── Dual Control Separation of Duties ─────────────────────────────────────────
+    // Configuration Note: Dual control mandates two distinct accounts with APPROVER role.
+    // Interim Policy Option (for a one-person bootstrap team, pending executive sign-off):
+    // Setting ALLOW_SINGLE_OPERATOR_DUAL_CONTROL="true" permits self-approval while logging
+    // a HIGH_RISK forensic audit entry. In production (default), self-approval strictly fails closed (403).
+    const allowSingleOperator = process.env.ALLOW_SINGLE_OPERATOR_DUAL_CONTROL === 'true';
+
     // Server-enforced dual control: batch creator cannot approve their own batch
     if (metadata.createdBy === approverId) {
       this.logger.warn(`[Dual-Control Violation] Actor ${approverId} attempted to self-approve batch ${batchId}`);
-      throw new ForbiddenException(
-        'Dual control violation: The creator of a settlement batch cannot approve their own batch. A second financial controller or authorized approver must review and authorize the disbursement.',
-      );
+      if (!allowSingleOperator) {
+        throw new ForbiddenException(
+          'Dual control violation: The creator of a settlement batch cannot approve their own batch. A second financial controller or authorized approver must review and authorize the disbursement. (Interim override: set ALLOW_SINGLE_OPERATOR_DUAL_CONTROL=true in dev).',
+        );
+      }
+      this.logger.warn(`[Dual-Control Override] Single-operator interim policy active: self-approval logged for batch ${batchId}`);
     }
 
     const journalRef = `TR-INT-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${batchId.slice(-6).toUpperCase()}`;

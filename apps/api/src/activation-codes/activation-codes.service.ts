@@ -34,17 +34,15 @@ export interface ActivationFailureLog {
 export class ActivationCodesService {
   private readonly logger = new Logger(ActivationCodesService.name);
 
-  // Failure logs for forensic security review
+  // Failure logs for forensic security review (capped in-memory; in production use a structured log sink)
   private readonly failureLogs: ActivationFailureLog[] = [];
 
-  // In-memory rate limit trackers: Key -> [timestamps in ms]
-  private readonly ipAttempts = new Map<string, number[]>();
-  private readonly brandAttempts = new Map<string, number[]>();
-
-  // Thresholds: max 5 attempts / min per IP, max 20 attempts / min per brand
-  private readonly IP_RATE_LIMIT = 5;
-  private readonly BRAND_RATE_LIMIT = 20;
-  private readonly WINDOW_MS = 60 * 1000;
+  // ─── Rate limit thresholds ───────────────────────────────────────────────────
+  // State is DB-backed (ActivationAttempt table) — survives restarts and scales
+  // across multiple API instances without shared cache.
+  private readonly IP_RATE_LIMIT    = 5;        // max attempts per IP per window
+  private readonly BRAND_RATE_LIMIT = 20;       // max attempts per brand per window
+  private readonly WINDOW_MS        = 60_000;   // 60-second sliding window
 
   constructor(private readonly prisma: PrismaService) {}
 
@@ -63,34 +61,47 @@ export class ActivationCodesService {
     return `${firstTwo}-***-${lastFour}`;
   }
 
-  // ─── Rate Limiter ───────────────────────────────────────────────────────────
+  // ─── DB-backed Rate Limiter ─────────────────────────────────────────────────
+  //
+  // Counts rows in ActivationAttempt within the sliding WINDOW_MS window.
+  // Recording always happens before the check so the current attempt is counted.
+  // Any excess rows older than 1 hour are pruned asynchronously.
 
-  private checkRateLimit(ip: string, ventureId: string): void {
-    const now = Date.now();
+  private async checkAndRecordAttempt(ip: string, ventureId: string): Promise<void> {
+    const windowStart = new Date(Date.now() - this.WINDOW_MS);
 
-    // Check IP
-    const ipTimestamps = (this.ipAttempts.get(ip) || []).filter((t) => now - t < this.WINDOW_MS);
-    if (ipTimestamps.length >= this.IP_RATE_LIMIT) {
+    // Record this attempt first (then count)
+    await (this.prisma as any).activationAttempt.create({
+      data: { ipAddress: ip, ventureId },
+    });
+
+    // Count IP attempts in window
+    const ipCount = await (this.prisma as any).activationAttempt.count({
+      where: { ipAddress: ip, attemptedAt: { gte: windowStart } },
+    });
+    if (ipCount > this.IP_RATE_LIMIT) {
       throw new HttpException(
         'Too many redemption attempts from this IP address. Please wait a minute and try again.',
         HttpStatus.TOO_MANY_REQUESTS,
       );
     }
 
-    // Check Brand
-    const brandTimestamps = (this.brandAttempts.get(ventureId) || []).filter((t) => now - t < this.WINDOW_MS);
-    if (brandTimestamps.length >= this.BRAND_RATE_LIMIT) {
+    // Count brand attempts in window
+    const brandCount = await (this.prisma as any).activationAttempt.count({
+      where: { ventureId, attemptedAt: { gte: windowStart } },
+    });
+    if (brandCount > this.BRAND_RATE_LIMIT) {
       throw new HttpException(
         'Too many redemption attempts for this brand. Rate limit exceeded; please try again later.',
         HttpStatus.TOO_MANY_REQUESTS,
       );
     }
 
-    ipTimestamps.push(now);
-    this.ipAttempts.set(ip, ipTimestamps);
-
-    brandTimestamps.push(now);
-    this.brandAttempts.set(ventureId, brandTimestamps);
+    // Prune stale rows asynchronously (older than 1 h)
+    const pruneStart = new Date(Date.now() - 3_600_000);
+    (this.prisma as any).activationAttempt
+      .deleteMany({ where: { attemptedAt: { lt: pruneStart } } })
+      .catch(() => { /* non-fatal */ });
   }
 
   // ─── Record Failure Log ─────────────────────────────────────────────────────
@@ -190,9 +201,9 @@ export class ActivationCodesService {
       throw new BadRequestException('Student name and email are required for registration.');
     }
 
-    // 1. Enforce Rate Limiting (per-IP and per-brand)
+    // 1. Enforce Rate Limiting (DB-backed per-IP and per-brand, survives restarts)
     try {
-      this.checkRateLimit(ip, ventureId);
+      await this.checkAndRecordAttempt(ip, ventureId);
     } catch (rlErr: any) {
       this.logFailure('RATE_LIMIT_EXCEEDED', ip, ventureId, masked, rlErr?.message);
       throw rlErr;
