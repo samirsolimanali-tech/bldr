@@ -35,8 +35,8 @@ const VENTURE_REGISTRY: Record<string, any> = {
     platformFeeModel: 'PERCENTAGE',
     platformFeePct: '3.00',
     platformFeeFlat: '0',
-    vatOnFeesEnabled: true,
-    vatRate: '14.00',
+    vatOnFeesEnabled: false,
+    vatRate: '0.00',
     reservePct: '5.00',
     reserveReleaseDays: '14',
     payoutCadence: 'weekly',
@@ -73,8 +73,8 @@ const VENTURE_REGISTRY: Record<string, any> = {
     platformFeeModel: 'PERCENTAGE',
     platformFeePct: '3.00',
     platformFeeFlat: '500',
-    vatOnFeesEnabled: true,
-    vatRate: '14.00',
+    vatOnFeesEnabled: false,
+    vatRate: '0.00',
     reservePct: '5.00',
     reserveReleaseDays: '14',
     payoutCadence: 'weekly',
@@ -111,8 +111,8 @@ const VENTURE_REGISTRY: Record<string, any> = {
     platformFeeModel: 'COMBINED',
     platformFeePct: '2.50',
     platformFeeFlat: '300',
-    vatOnFeesEnabled: true,
-    vatRate: '14.00',
+    vatOnFeesEnabled: false,
+    vatRate: '0.00',
     reservePct: '5.00',
     reserveReleaseDays: '14',
     payoutCadence: 'weekly',
@@ -148,8 +148,8 @@ const VENTURE_REGISTRY: Record<string, any> = {
     platformFeeModel: 'PERCENTAGE',
     platformFeePct: '3.50',
     platformFeeFlat: '0',
-    vatOnFeesEnabled: true,
-    vatRate: '14.00',
+    vatOnFeesEnabled: false,
+    vatRate: '0.00',
     reservePct: '5.00',
     reserveReleaseDays: '14',
     payoutCadence: 'weekly',
@@ -185,8 +185,8 @@ const VENTURE_REGISTRY: Record<string, any> = {
     platformFeeModel: 'FLAT_PER_TXN',
     platformFeePct: '0.00',
     platformFeeFlat: '1500',
-    vatOnFeesEnabled: true,
-    vatRate: '14.00',
+    vatOnFeesEnabled: false,
+    vatRate: '0.00',
     reservePct: '3.00',
     reserveReleaseDays: '7',
     payoutCadence: 'daily',
@@ -292,8 +292,8 @@ export default function VentureConfigPage() {
   const [platformFeeModel, setPlatformFeeModel] = useState<'PERCENTAGE' | 'FLAT_PER_TXN' | 'COMBINED'>('PERCENTAGE');
   const [platformFeePct, setPlatformFeePct] = useState('3.00');
   const [platformFeeFlat, setPlatformFeeFlat] = useState('0');
-  const [vatOnFeesEnabled, setVatOnFeesEnabled] = useState(true);
-  const [vatRate, setVatRate] = useState('14.00');
+  const [vatOnFeesEnabled, setVatOnFeesEnabled] = useState(false);
+  const [vatRate, setVatRate] = useState('0.00');
   const [reservePct, setReservePct] = useState('5.00');
   const [reserveReleaseDays, setReserveReleaseDays] = useState('14');
   const [payoutCadence, setPayoutCadence] = useState<'daily' | 'weekly' | 'manual'>('weekly');

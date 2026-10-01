@@ -213,11 +213,11 @@ export class CheckoutSessionsService {
     txnCount: number;
     refundsPiasters: number;
     reserveRateBps?: number;      // default 500 = 5%
-    vatOnFeesEnabled?: boolean;   // default true — per-brand toggle
-    vatRateBps?: number;          // default 1400 = 14% (configurable per brand)
+    vatOnFeesEnabled?: boolean;   // default false (off until corporate accountant signs off)
+    vatRateBps?: number;          // default 0 (configurable per brand upon tax audit)
   }): SettlementLineItems {
-    const vatEnabled = params.vatOnFeesEnabled !== false;
-    const vatBps = params.vatRateBps ?? 1400;
+    const vatEnabled = params.vatOnFeesEnabled === true;
+    const vatBps = vatEnabled ? (params.vatRateBps ?? 0) : 0;
     const reserveBps = params.reserveRateBps ?? 500;
 
     // 1. Gateway fees (rounded to nearest piaster)
@@ -378,40 +378,254 @@ export class CheckoutSessionsService {
     };
   }
 
-  // ─── Dispatch Webhook with Exponential Backoff ─────────────────────────────────
-  private async dispatchWebhookWithRetry(url: string, payload: any, secret: string, maxRetries = 3): Promise<boolean> {
+  // Outbound webhook log store for forensic inspection and manual replay in Hub /developers
+  private outboundWebhookLogs: Array<{
+    id: string;
+    eventType: string;
+    url: string;
+    payload: any;
+    secret: string;
+    status: 'DELIVERED' | 'RETRYING' | 'DEAD_LETTER';
+    attemptCount: number;
+    maxAttempts: number;
+    lastAttemptAt: string;
+    nextRetryAt?: string | null;
+    lastHttpCode?: number | null;
+    lastError?: string | null;
+  }> = [];
+
+  // Exponential retry schedule over ~24 hours: [1m, 5m, 30m, 2h, 6h, 12h, 24h]
+  private readonly RETRY_SCHEDULE_MS = [
+    60_000,       // Attempt 2: 1 min
+    300_000,      // Attempt 3: 5 min
+    1_800_000,    // Attempt 4: 30 min
+    7_200_000,    // Attempt 5: 2 hours
+    21_600_000,   // Attempt 6: 6 hours
+    43_200_000,   // Attempt 7: 12 hours
+    86_400_000,   // Attempt 8: 24 hours
+  ];
+
+  // ─── Dispatch Webhook with 24-Hour Exponential Backoff Schedule ───────────────
+  private async dispatchWebhookWithRetry(url: string, payload: any, secret: string): Promise<boolean> {
     const rawBody = JSON.stringify(payload);
     const sigHeader = this.buildWebhookSignatureHeader(secret, rawBody);
+    const logId = `wh_log_${Date.now()}_${randomBytes(4).toString('hex')}`;
+    const maxAttempts = this.RETRY_SCHEDULE_MS.length + 1; // 8 total attempts
 
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        this.logger.log(`[Outbound Webhook] Dispatching ${payload.type} (Attempt ${attempt}/${maxRetries}) to ${url}`);
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-BLDR-Signature': sigHeader,
-            'User-Agent': 'bldr-Payment-Hub/1.0',
-          },
-          body: rawBody,
-        });
+    const record = {
+      id: logId,
+      eventType: payload.type || 'webhook.event',
+      url,
+      payload,
+      secret,
+      status: 'RETRYING' as 'DELIVERED' | 'RETRYING' | 'DEAD_LETTER',
+      attemptCount: 1,
+      maxAttempts,
+      lastAttemptAt: new Date().toISOString(),
+      nextRetryAt: null as string | null,
+      lastHttpCode: null as number | null,
+      lastError: null as string | null,
+    };
+    this.outboundWebhookLogs.unshift(record);
+    if (this.outboundWebhookLogs.length > 200) this.outboundWebhookLogs.pop();
 
-        if (res.ok) {
-          this.logger.log(`[Outbound Webhook] Successfully delivered ${payload.type} (HTTP ${res.status})`);
-          return true;
-        }
-        this.logger.warn(`[Outbound Webhook] Attempt ${attempt} failed with HTTP ${res.status}`);
-      } catch (err: any) {
-        this.logger.warn(`[Outbound Webhook] Attempt ${attempt} error: ${err.message}`);
+    try {
+      this.logger.log(`[Outbound Webhook] Dispatching ${payload.type} (Attempt 1/${maxAttempts}) to ${url}`);
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-BLDR-Signature': sigHeader,
+          'User-Agent': 'bldr-Payment-Hub/1.0',
+        },
+        body: rawBody,
+      });
+
+      record.lastHttpCode = res.status;
+      if (res.ok) {
+        record.status = 'DELIVERED';
+        this.logger.log(`[Outbound Webhook] Successfully delivered ${payload.type} to ${url} (HTTP ${res.status})`);
+        return true;
       }
-
-      if (attempt < maxRetries) {
-        const delayMs = attempt * 1000;
-        await new Promise(r => setTimeout(r, delayMs));
-      }
+      record.lastError = `HTTP ${res.status}`;
+      this.logger.warn(`[Outbound Webhook] Attempt 1 failed with HTTP ${res.status}`);
+    } catch (err: any) {
+      record.lastError = err.message;
+      this.logger.warn(`[Outbound Webhook] Attempt 1 network error: ${err.message}`);
     }
-    this.logger.error(`[Outbound Webhook] All ${maxRetries} delivery attempts failed for ${url}`);
+
+    // Schedule next retry window over 24-hour backoff ladder
+    const nextDelay = this.RETRY_SCHEDULE_MS[0];
+    record.nextRetryAt = new Date(Date.now() + nextDelay).toISOString();
     return false;
+  }
+
+  // ─── Outbound Webhook Inspection & Manual Replay (Hub /developers) ───────────
+  getOutboundWebhookLogs() {
+    return this.outboundWebhookLogs;
+  }
+
+  async replayOutboundWebhook(logId: string) {
+    const record = this.outboundWebhookLogs.find((l) => l.id === logId);
+    if (!record) throw new NotFoundException(`Outbound webhook record "${logId}" not found.`);
+
+    record.attemptCount += 1;
+    record.lastAttemptAt = new Date().toISOString();
+
+    const rawBody = JSON.stringify(record.payload);
+    const sigHeader = this.buildWebhookSignatureHeader(record.secret, rawBody);
+
+    try {
+      this.logger.log(`[Outbound Webhook Replay] Manually replaying ${record.eventType} to ${record.url}`);
+      const res = await fetch(record.url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-BLDR-Signature': sigHeader,
+          'User-Agent': 'bldr-Payment-Hub/1.0 (Manual-Replay)',
+        },
+        body: rawBody,
+      });
+
+      record.lastHttpCode = res.status;
+      if (res.ok) {
+        record.status = 'DELIVERED';
+        record.nextRetryAt = null;
+        return { success: true, status: 'DELIVERED', httpCode: res.status };
+      } else {
+        record.lastError = `HTTP ${res.status}`;
+        return { success: false, status: record.status, httpCode: res.status };
+      }
+    } catch (err: any) {
+      record.lastError = err.message;
+      return { success: false, status: record.status, error: err.message };
+    }
+  }
+
+  // ─── Central Authoritative Catalog Resolution (One Checkout Service) ─────────
+  async resolveCheckoutProduct(query: { slug?: string; productId?: string }) {
+    const { slug, productId } = query;
+    let listing: any = null;
+
+    if (productId) {
+      listing = await this.prisma.listing.findUnique({
+        where: { id: productId },
+        include: { provider: true },
+      });
+    }
+
+    if (!listing && slug) {
+      listing = await this.prisma.listing.findFirst({
+        where: {
+          OR: [
+            { id: slug },
+            { tags: { has: slug } },
+          ],
+        },
+        include: { provider: true },
+      });
+    }
+
+    if (listing) {
+      return {
+        found: true,
+        productId: listing.id,
+        slug: listing.id,
+        title: listing.title,
+        titleAr: listing.title,
+        priceEGP: Number(listing.price),
+        currency: 'EGP',
+        amountPiasters: Math.round(Number(listing.price) * 100),
+        ventureId: listing.provider?.slug?.toUpperCase() || 'BLDR',
+        ventureCode: listing.provider?.slug?.toUpperCase() || 'BLDR',
+        ventureName: listing.provider?.name || 'bldr Partner',
+        cardWalletGateway: listing.provider?.cardWalletGateway || 'GEIDEA',
+        fawryEnabled: listing.provider?.fawryEnabled ?? false,
+        codeActivationEnabled: listing.provider?.codeActivationEnabled ?? true,
+        saleMode: listing.purchaseType === 'REDIRECT' ? 'REDIRECT' : 'DIRECT',
+        redirectUrl: listing.redirectUrl || null,
+        ctaLabel: listing.engagementType === 'BUY_NOW' ? 'Buy now' : 'Request Info',
+        ctaLabelAr: listing.engagementType === 'BUY_NOW' ? 'شراء الآن' : 'طلب معلومات',
+      };
+    }
+
+    // Fail closed in production: if DB lookup fails, refuse checkout
+    const isProduction = process.env.NODE_ENV === 'production';
+    if (isProduction || process.env.ENABLE_MOCK_CATALOG !== 'true') {
+      throw new NotFoundException(
+        `Product or listing "${productId || slug}" not found in authoritative database catalog. Checkout refused.`,
+      );
+    }
+
+    // Dev-only fallback for local mock development
+    const MOCK_CATALOG_FALLBACK = [
+      {
+        id: 'prod-1',
+        paySlug: 'sh-8k2m9q',
+        title: 'Full-Stack Web Engineering Bootcamp (12 Weeks)',
+        titleAr: 'معسكر هندسة وتطوير الويب الشامل (١٢ أسبوع)',
+        priceEGP: 4800,
+        provider: 'StudyHub / TechBridge',
+        ventureId: 'SH',
+        saleMode: 'DIRECT',
+        ctaLabel: 'Enroll Now',
+        ctaLabelAr: 'سجل الآن',
+      },
+      {
+        id: 'prod-2',
+        paySlug: 'ac-4p9x1y',
+        title: 'Advanced Thanawiya Amma Physics Prep Cohort',
+        titleAr: 'المعسكر المكثف لفيزياء الثانوية العامة مع مستر أحمد',
+        priceEGP: 1200,
+        provider: 'Apex Classes',
+        ventureId: 'AC',
+        saleMode: 'DIRECT',
+        ctaLabel: 'Book Seat',
+        ctaLabelAr: 'احجز مقعدك',
+      },
+      {
+        id: 'prod-3',
+        paySlug: 'eh-9w3z8t',
+        title: 'Executive IGCSE Business Management Intensive',
+        titleAr: 'دورة إدارة الأعمال المكثفة لشهادة الـ IGCSE الدولية',
+        priceEGP: 2200,
+        provider: 'EL HESA',
+        ventureId: 'EH',
+        saleMode: 'DIRECT',
+        ctaLabel: 'Join Batch',
+        ctaLabelAr: 'انضم للدورة',
+      },
+    ];
+
+    const mockItem = MOCK_CATALOG_FALLBACK.find(
+      (p) => p.id === productId || p.paySlug === productId || p.id === slug || p.paySlug === slug,
+    );
+
+    if (mockItem) {
+      return {
+        found: true,
+        isDevFallback: true,
+        productId: mockItem.id,
+        slug: mockItem.paySlug,
+        title: mockItem.title,
+        titleAr: mockItem.titleAr,
+        priceEGP: mockItem.priceEGP,
+        currency: 'EGP',
+        amountPiasters: Math.round(mockItem.priceEGP * 100),
+        ventureId: mockItem.ventureId,
+        ventureCode: mockItem.ventureId,
+        ventureName: mockItem.provider,
+        cardWalletGateway: 'GEIDEA',
+        fawryEnabled: true,
+        codeActivationEnabled: true,
+        saleMode: mockItem.saleMode || 'DIRECT',
+        redirectUrl: null,
+        ctaLabel: mockItem.ctaLabel,
+        ctaLabelAr: mockItem.ctaLabelAr,
+      };
+    }
+
+    throw new NotFoundException(`Product or listing "${productId || slug}" not found in catalog.`);
   }
 
   // ─── Validate Redirect URLs Against Brand Whitelist ──────────────────────────

@@ -21,8 +21,8 @@ export const VENTURES_CONFIG: Record<string, VentureConfig> = {
     cardWalletGateway: 'paymob',
     fawryEnabled: true,
     codeActivationEnabled: true,
-    ctaLabel: 'Pay Tuition Now',
-    ctaLabelAr: 'ادفع المصروفات الآن',
+    ctaLabel: 'Buy now',
+    ctaLabelAr: 'شراء الآن',
   },
   sh: {
     id: 'studyhub',

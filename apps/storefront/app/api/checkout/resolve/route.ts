@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { PRODUCTS_CATALOG } from '../../../products/data';
 import { getVentureConfig } from '../../../../lib/ventures';
 
 export async function GET(request: Request) {
@@ -10,74 +9,51 @@ export async function GET(request: Request) {
 
     const API_BASE = process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
-    let matchedProduct: any = null;
-
-    // 1. Check local catalog first
-    if (productId) {
-      matchedProduct = PRODUCTS_CATALOG.find(
-        (p) => p.id === productId || p.slug === productId || p.paySlug === productId
+    // ── Call One Central Authoritative Checkout Service (apps/api) ───────────
+    try {
+      const apiRes = await fetch(
+        `${API_BASE}/v1/checkout/sessions/resolve?slug=${encodeURIComponent(slug)}&productId=${encodeURIComponent(productId)}`,
+        { next: { revalidate: 30 } }
       );
-    }
-    if (!matchedProduct && slug) {
-      matchedProduct = PRODUCTS_CATALOG.find(
-        (p) => p.paySlug === slug || p.slug === slug || p.id === slug
-      );
-    }
 
-    // 2. Fall back to PostgreSQL database API if not found in static catalog
-    if (!matchedProduct && productId) {
-      try {
-        const dbRes = await fetch(`${API_BASE}/listings/${productId}`, {
-          next: { revalidate: 60 },
+      if (apiRes.ok) {
+        const item = await apiRes.json();
+        const venture = getVentureConfig(item.ventureCode || item.ventureId);
+        return NextResponse.json({
+          found: true,
+          productId: item.productId,
+          slug: item.slug,
+          title: item.title,
+          titleAr: item.titleAr,
+          priceEGP: item.priceEGP,
+          currency: 'EGP',
+          ventureId: venture.id,
+          ventureCode: venture.code,
+          ventureName: item.ventureName || venture.displayName,
+          supportPhone: venture.supportPhone,
+          supportEmail: venture.supportEmail,
+          cardWalletGateway: venture.cardWalletGateway,
+          fawryEnabled: venture.fawryEnabled,
+          codeActivationEnabled: venture.codeActivationEnabled,
+          ctaLabel: item.ctaLabel || venture.ctaLabel || 'Buy now',
+          ctaLabelAr: item.ctaLabelAr || venture.ctaLabelAr || 'شراء الآن',
+          saleMode: item.saleMode || 'DIRECT',
+          redirectUrl: item.redirectUrl || null,
         });
-        if (dbRes.ok) {
-          const item = await dbRes.json();
-          if (item) {
-            matchedProduct = {
-              id: item.id,
-              slug: item.id,
-              paySlug: item.id,
-              title: item.title,
-              titleAr: item.title,
-              priceEGP: Number(item.price),
-              provider: item.provider?.name || 'bldr Partner',
-              providerCode: item.provider?.slug?.toUpperCase() || 'BLDR',
-              ventureId: item.provider?.slug?.toUpperCase() || 'BLDR',
-              saleMode: item.purchaseType === 'REDIRECT' ? 'REDIRECT' : 'DIRECT',
-              redirectUrl: item.redirectUrl || null,
-              ctaLabel: item.engagementType === 'BUY_NOW' ? 'Buy now' : 'Request Info',
-              ctaLabelAr: item.engagementType === 'BUY_NOW' ? 'شراء الآن' : 'طلب معلومات',
-            };
-          }
-        }
-      } catch {
-        // Fallback to static resolution if API is offline
+      } else if (apiRes.status === 404 && process.env.NODE_ENV === 'production') {
+        // Fail closed in production if product not found in authoritative catalog
+        return NextResponse.json(
+          { error: 'Product or listing not found in catalog. Checkout refused.' },
+          { status: 404 }
+        );
       }
-    }
-
-    if (matchedProduct) {
-      const venture = getVentureConfig(matchedProduct.ventureId || matchedProduct.providerCode);
-      return NextResponse.json({
-        found: true,
-        productId: matchedProduct.id,
-        slug: matchedProduct.paySlug,
-        title: matchedProduct.title,
-        titleAr: matchedProduct.titleAr,
-        priceEGP: matchedProduct.priceEGP,
-        currency: 'EGP',
-        ventureId: venture.id,
-        ventureCode: venture.code,
-        ventureName: matchedProduct.provider,
-        supportPhone: venture.supportPhone,
-        supportEmail: venture.supportEmail,
-        cardWalletGateway: venture.cardWalletGateway,
-        fawryEnabled: venture.fawryEnabled,
-        codeActivationEnabled: venture.codeActivationEnabled,
-        ctaLabel: matchedProduct.ctaLabel || venture.ctaLabel || 'Buy now',
-        ctaLabelAr: matchedProduct.ctaLabelAr || venture.ctaLabelAr || 'شراء الآن',
-        saleMode: matchedProduct.saleMode || 'DIRECT',
-        redirectUrl: matchedProduct.redirectUrl || null,
-      });
+    } catch (err: any) {
+      if (process.env.NODE_ENV === 'production') {
+        return NextResponse.json(
+          { error: 'Authoritative checkout service unavailable. Checkout refused.' },
+          { status: 503 }
+        );
+      }
     }
 
     // Fallback for direct payment link slugs without a product catalog entry

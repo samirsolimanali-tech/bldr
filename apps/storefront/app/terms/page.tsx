@@ -28,8 +28,16 @@ export default function TermsPage() {
           <h1 style={{ fontSize: 28, fontWeight: 900, color: '#0F172A', margin: '8px 0 16px', letterSpacing: '-0.03em' }}>
             Terms of Service
           </h1>
-          <div style={{ fontSize: 12, color: '#64748B', marginBottom: 28 }}>
+          <div style={{ fontSize: 12, color: '#64748B', marginBottom: 20 }}>
             Effective Date: October 1, 2026 · Governed by the Laws of the Arab Republic of Egypt
+          </div>
+
+          {/* Draft Legal Review Notice */}
+          <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 10, padding: '12px 16px', marginBottom: 28, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontSize: 16 }}>⚠️</span>
+            <div style={{ fontSize: 13, color: '#92400E', fontWeight: 600 }}>
+              DRAFT — PENDING FORMAL LEGAL COUNSEL REVIEW. This document is an operational policy draft subject to final review by corporate legal advisors before commercial execution.
+            </div>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24, fontSize: 14, lineHeight: 1.7, color: '#334155' }}>

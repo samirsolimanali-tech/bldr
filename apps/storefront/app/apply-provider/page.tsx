@@ -20,9 +20,28 @@ export default function ApplyProviderPage() {
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitting(true);
+
+    try {
+      const api = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      await fetch(`${api}/leads`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formState.contactName || formState.businessName,
+          email: formState.email,
+          phone: formState.phone,
+          message: `Brand: ${formState.businessName} | Category: ${formState.category} | Volume: ${formState.annualVolume} | Website: ${formState.website}`,
+          engagementType: 'REQUEST_QUOTE',
+        }),
+      });
+    } catch {}
+
+    setSubmitting(false);
     setSubmitted(true);
   };
 

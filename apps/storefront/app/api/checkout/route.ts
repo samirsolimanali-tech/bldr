@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { PRODUCTS_CATALOG } from '../../products/data';
 import { getVentureConfig } from '../../../lib/ventures';
 
 const API_BASE = process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
@@ -14,33 +13,17 @@ export async function POST(request: Request) {
 
     // ── PRICE & CATALOG SECURITY ──────────────────────────────────────────────
     // Checkout must NEVER take price from client request body or URL parameters.
-    // Price, currency, title, and owning venture MUST be resolved strictly on the server.
-    let matchedProduct: any = PRODUCTS_CATALOG.find(
-      (p) => p.id === productId || p.slug === productId || p.paySlug === productId
-    );
-
-    // Fall back to database API if not found in static catalog
-    if (!matchedProduct && productId) {
-      try {
-        const dbRes = await fetch(`${API_BASE}/listings/${productId}`);
-        if (dbRes.ok) {
-          const item = await dbRes.json();
-          if (item) {
-            matchedProduct = {
-              id: item.id,
-              slug: item.id,
-              paySlug: item.id,
-              title: item.title,
-              priceEGP: Number(item.price),
-              provider: item.provider?.name || 'bldr Partner',
-              providerCode: item.provider?.slug?.toUpperCase() || 'BLDR',
-              ventureId: item.provider?.slug?.toUpperCase() || 'BLDR',
-            };
-          }
-        }
-      } catch {
-        // Fallback continues
+    // Price, currency, title, and owning venture MUST be resolved strictly on the server via apps/api.
+    let matchedProduct: any = null;
+    try {
+      const resolveRes = await fetch(
+        `${API_BASE}/v1/checkout/sessions/resolve?productId=${encodeURIComponent(productId)}`,
+      );
+      if (resolveRes.ok) {
+        matchedProduct = await resolveRes.json();
       }
+    } catch {
+      // Handled below
     }
 
     if (!matchedProduct) {

@@ -28,15 +28,23 @@ export default function RefundPolicyPage() {
           <h1 style={{ fontSize: 28, fontWeight: 900, color: '#0F172A', margin: '8px 0 16px', letterSpacing: '-0.03em' }}>
             Refund &amp; Cancellation Policy
           </h1>
-          <div style={{ fontSize: 12, color: '#64748B', marginBottom: 28 }}>
-            Standard Egyptian Consumer Protection Guidelines · Updated October 2026
+          <div style={{ fontSize: 12, color: '#64748B', marginBottom: 20 }}>
+            Egyptian Consumer Protection Law No. 181 of 2018 · Updated October 2026
+          </div>
+
+          {/* Draft Legal Review Notice */}
+          <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 10, padding: '12px 16px', marginBottom: 28, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontSize: 16 }}>⚠️</span>
+            <div style={{ fontSize: 13, color: '#92400E', fontWeight: 600 }}>
+              DRAFT — PENDING FORMAL LEGAL COUNSEL REVIEW. Subject to compliance review under Egyptian Consumer Protection Law No. 181 of 2018 before commercial launch.
+            </div>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24, fontSize: 14, lineHeight: 1.7, color: '#334155' }}>
             <section>
               <h2 style={{ fontSize: 17, fontWeight: 800, color: '#0F172A', marginBottom: 8 }}>1. Standard Refund Window (14 Days)</h2>
               <p style={{ margin: 0 }}>
-                In accordance with Egyptian Consumer Protection Law, students are eligible for a refund on live course cohorts within fourteen (14) calendar days of initial payment, provided that fewer than 25% of live lectures or digital modules have been accessed.
+                In accordance with Egyptian Consumer Protection Law No. 181 of 2018, students are eligible for a refund on live course cohorts within fourteen (14) calendar days of initial payment, provided that fewer than 25% of live lectures or digital modules have been accessed.
               </p>
             </section>
 

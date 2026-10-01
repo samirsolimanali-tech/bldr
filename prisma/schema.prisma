@@ -153,8 +153,8 @@ model Provider {
   // ─── VAT on Fees Configuration ────────────────────────────────────────────
   // Controls whether VAT is applied to gateway fees + platform fee at settlement.
   // Both the on/off toggle and the rate are configurable per brand.
-  vatOnFeesEnabled    Boolean          @default(true)
-  vatRate             Decimal          @default(0.1400) @db.Decimal(5, 4) // e.g. 0.1400 = 14%
+  vatOnFeesEnabled    Boolean          @default(false)
+  vatRate             Decimal          @default(0.0000) @db.Decimal(5, 4) // default 0.00 until accountant signs off
 
   // ─── Reserve / Hold-Back ─────────────────────────────────────────────────
   // Internal risk buffer. Protects bldr's cash position against refund/chargeback.

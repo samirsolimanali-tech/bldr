@@ -13,6 +13,7 @@ import {
   Logger,
   UsePipes,
   ValidationPipe,
+  Query,
 } from '@nestjs/common';
 import { CheckoutSessionsService } from './checkout-sessions.service';
 import { IsString, IsOptional, IsNumber, IsArray, IsObject } from 'class-validator';
@@ -268,6 +269,37 @@ export class CheckoutSessionsController {
     );
 
     return this.service.createSession(apiKey, validatedDto, idempotencyKey);
+  }
+
+  /**
+   * GET /v1/checkout/sessions/resolve
+   * Central authoritative catalog price and venture resolution.
+   * Fails closed in production if not in PostgreSQL catalog.
+   */
+  @Get('resolve')
+  async resolve(
+    @Query('slug') slug?: string,
+    @Query('productId') productId?: string,
+  ) {
+    return this.service.resolveCheckoutProduct({ slug, productId });
+  }
+
+  /**
+   * GET /v1/checkout/sessions/outbound-webhooks
+   * Outbound webhook delivery logs for Hub /developers.
+   */
+  @Get('outbound-webhooks')
+  async listOutboundWebhooks() {
+    return this.service.getOutboundWebhookLogs();
+  }
+
+  /**
+   * POST /v1/checkout/sessions/outbound-webhooks/:id/replay
+   * Trigger manual replay of a failed or dead-letter outbound LMS webhook.
+   */
+  @Post('outbound-webhooks/:id/replay')
+  async replayOutboundWebhook(@Param('id') id: string) {
+    return this.service.replayOutboundWebhook(id);
   }
 
   /**

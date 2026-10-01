@@ -28,8 +28,16 @@ export default function PrivacyPage() {
           <h1 style={{ fontSize: 28, fontWeight: 900, color: '#0F172A', margin: '8px 0 16px', letterSpacing: '-0.03em' }}>
             Privacy Policy
           </h1>
-          <div style={{ fontSize: 12, color: '#64748B', marginBottom: 28 }}>
+          <div style={{ fontSize: 12, color: '#64748B', marginBottom: 20 }}>
             Compliance with Egyptian Personal Data Protection Law (Law No. 151 of 2020) · Updated October 2026
+          </div>
+
+          {/* Draft Legal Review Notice */}
+          <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 10, padding: '12px 16px', marginBottom: 28, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontSize: 16 }}>⚠️</span>
+            <div style={{ fontSize: 13, color: '#92400E', fontWeight: 600 }}>
+              DRAFT — PENDING FORMAL LEGAL COUNSEL REVIEW. Subject to compliance audit under Executive Regulations of PDPL Law No. 151 of 2020 before commercial launch.
+            </div>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24, fontSize: 14, lineHeight: 1.7, color: '#334155' }}>
