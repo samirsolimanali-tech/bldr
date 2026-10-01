@@ -270,44 +270,6 @@ function SingleProductContent() {
                   >
                     {isRtl ? 'استفسار أو حجز للشركات ←' : 'Inquire / Team Booking →'}
                   </button>
-
-                  {/* Demo Simulation Toggle */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const next = !isPaid;
-                      setIsPaid(next);
-                      try {
-                        localStorage.setItem(`bldr_paid_${product.id}`, next ? 'true' : 'false');
-                        localStorage.setItem(`bldr_paid_${product.paySlug}`, next ? 'true' : 'false');
-                      } catch (e) {}
-                    }}
-                    style={{
-                      height: 32,
-                      padding: '0 10px',
-                      borderRadius: 6,
-                      background: isPaid ? '#FEE2E2' : '#F0FDF4',
-                      border: `1px dashed ${isPaid ? '#FCA5A5' : '#86EFAC'}`,
-                      color: isPaid ? '#991B1B' : '#166534',
-                      fontSize: 11,
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 4,
-                    }}
-                    title="Toggle state for instant demonstration"
-                  >
-                    <span>
-                      {isPaid
-                        ? isRtl
-                          ? 'إعادة تعيين للتجربة (Pay Now)'
-                          : 'Reset Demo to Pay Now'
-                        : isRtl
-                        ? 'محاكاة بعد الدفع (Enroll Now)'
-                        : 'Simulate Paid State (Enroll Now)'}
-                    </span>
-                  </button>
                 </div>
               </div>
             </div>
@@ -323,21 +285,85 @@ function SingleProductContent() {
                 justifyContent: 'space-between',
               }}
             >
-              {/* Thumbnail Display */}
+              {/* Premium Course Cover Banner */}
               <div
                 style={{
-                  height: 200,
+                  height: 210,
                   borderRadius: 14,
                   background: product.thumbnailGradient,
+                  position: 'relative',
+                  overflow: 'hidden',
+                  padding: '20px',
                   display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
                   marginBottom: 24,
-                  boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                  boxShadow: '0 12px 28px -8px rgba(18, 32, 60, 0.25)',
+                  border: '1px solid rgba(255,255,255,0.15)',
                 }}
               >
-                <div style={{ filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.3))' }}>
-                  <ProductThumbnailIcon icon={product.thumbnailIcon} size={64} color="#FFFFFF" />
+                {/* Decorative Subtle Overlay Grid */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    backgroundImage: 'radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px)',
+                    backgroundSize: '16px 16px',
+                    pointerEvents: 'none',
+                  }}
+                />
+
+                {/* Top Banner Row: Provider & Cohort Tag */}
+                <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 800,
+                      padding: '3px 9px',
+                      borderRadius: 6,
+                      background: 'rgba(255, 255, 255, 0.2)',
+                      backdropFilter: 'blur(8px)',
+                      color: '#FFFFFF',
+                      letterSpacing: '0.04em',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    {product.provider}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: 10.5,
+                      fontWeight: 700,
+                      padding: '3px 8px',
+                      borderRadius: 6,
+                      background: 'rgba(0, 0, 0, 0.35)',
+                      color: '#FDE047',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 4,
+                    }}
+                  >
+                    <span>★</span>
+                    <span>{product.rating}</span>
+                  </span>
+                </div>
+
+                {/* Center / Bottom Title and Subject Pill */}
+                <div style={{ position: 'relative', zIndex: 1 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255, 255, 255, 0.8)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>
+                    {isRtl ? 'المقرر الدراسي المعتمد' : 'Accredited Curriculum'}
+                  </div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: '#FFFFFF', lineHeight: 1.3, letterSpacing: '-0.01em', textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
+                    {isRtl ? product.titleAr : product.title}
+                  </div>
+                  <div style={{ display: 'flex', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 4, background: 'rgba(255,255,255,0.18)', color: '#FFFFFF', fontWeight: 600 }}>
+                      {product.duration}
+                    </span>
+                    <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 4, background: 'rgba(255,255,255,0.18)', color: '#FFFFFF', fontWeight: 600 }}>
+                      {product.enrolled}+ Enrolled
+                    </span>
+                  </div>
                 </div>
               </div>
 

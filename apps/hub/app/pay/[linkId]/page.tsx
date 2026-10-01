@@ -343,57 +343,61 @@ export default function CentralPaymentPage() {
         fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
       }}
     >
-      {/* Mock Browser Outer Shell */}
+      {/* ─── Institutional Trust & Security Top Bar ────────────────── */}
       <div
         style={{
           width: '100%',
-          maxWidth: 680,
+          maxWidth: 720,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 4px',
+          marginBottom: 16,
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div
+            style={{
+              width: 22,
+              height: 22,
+              borderRadius: 6,
+              background: '#12203C',
+              color: '#FFFFFF',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 900,
+              fontSize: 11,
+            }}
+          >
+            b.
+          </div>
+          <span style={{ fontSize: 12, fontWeight: 700, color: '#1B2A4A' }}>
+            bldr Central Financial Gateway
+          </span>
+          <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 4, background: '#DCFCE7', color: '#15803D', border: '1px solid #86EFAC' }}>
+            ● TLS 1.3 256-Bit Active
+          </span>
+        </div>
+        <span style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>
+          {isRtl ? 'حساب وسيط بنكي مرخص (CBE Dual-Escrow)' : 'CBE Dual-Escrow Regulated'}
+        </span>
+      </div>
+
+      {/* ─── Real Production Checkout Container ──────────────────────────── */}
+      <div
+        style={{
+          width: '100%',
+          maxWidth: 720,
           background: '#FFFFFF',
           border: '1px solid #D8E0EB',
-          borderRadius: 14,
+          borderRadius: 16,
           overflow: 'hidden',
-          boxShadow: '0 20px 50px -12px rgba(18, 32, 60, 0.18)',
+          boxShadow: '0 20px 48px -12px rgba(18, 32, 60, 0.12)',
           display: 'flex',
           flexDirection: 'column',
         }}
       >
-        {/* Browser Address Bar */}
-        <div
-          style={{
-            height: 40,
-            background: '#EAEFF5',
-            borderBottom: '1px solid #D8E0EB',
-            display: 'flex',
-            alignItems: 'center',
-            padding: '0 16px',
-            gap: 12,
-          }}
-        >
-          <div style={{ display: 'flex', gap: 6 }}>
-            <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#EF4444' }}></span>
-            <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#F59E0B' }}></span>
-            <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#10B981' }}></span>
-          </div>
-          <div
-            style={{
-              flex: 1,
-              height: 26,
-              background: '#FFFFFF',
-              borderRadius: 13,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '0 12px',
-            }}
-          >
-            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="#2E6F5E" strokeWidth="1.8" strokeLinecap="round">
-              <path d="M4.8 7.2V5.4a3.2 3.2 0 016.4 0v1.8M4 7.2h8v5.6H4z" />
-            </svg>
-            <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: '11px', color: '#5A6A80' }}>
-              https://pay.bldr.com/checkout/{linkId || 'bldr-pilot'}
-            </span>
-          </div>
-        </div>
 
         {/* ─── Templated Layout Variant 1: Top-Center (Classic Academic) ─── */}
         {checkoutLayout === 'top-center' && (

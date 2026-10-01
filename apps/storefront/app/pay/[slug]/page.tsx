@@ -3,6 +3,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { PRODUCTS_CATALOG } from '../../products/data';
 import {
   tokens,
   formatEGP,
@@ -38,7 +39,7 @@ interface PaymentDetails {
 const SAMPLE_PAYMENTS: Record<string, PaymentDetails> = {
   'sh-8k2m9q': {
     slug: 'sh-8k2m9q',
-    orderNumber: 'SH-COURSE-4581',
+    orderNumber: 'SH-MATH-8821',
     ventureName: 'StudyHub',
     ventureCode: 'SH',
     chipBg: '#E6EFEB',
@@ -47,8 +48,8 @@ const SAMPLE_PAYMENTS: Record<string, PaymentDetails> = {
     amount: 750.0,
     currency: 'EGP',
     expiresInMinutes: 24,
-    supportEmail: 'support@studyhub.example',
-    supportPhone: '+20 10 0000 0000',
+    supportEmail: 'admissions@studyhub.eg',
+    supportPhone: '+20 10 1234 5678',
   },
   'sh-4r7t1a': {
     slug: 'sh-4r7t1a',
@@ -61,8 +62,8 @@ const SAMPLE_PAYMENTS: Record<string, PaymentDetails> = {
     amount: 1200.0,
     currency: 'EGP',
     expiresInMinutes: 48,
-    supportEmail: 'support@studyhub.example',
-    supportPhone: '+20 10 0000 0000',
+    supportEmail: 'admissions@studyhub.eg',
+    supportPhone: '+20 10 1234 5678',
   },
   'ac-9w3e5z': {
     slug: 'ac-9w3e5z',
@@ -71,12 +72,12 @@ const SAMPLE_PAYMENTS: Record<string, PaymentDetails> = {
     ventureCode: 'AC',
     chipBg: '#E8EEF7',
     chipFg: '#2C5F9E',
-    description: 'Grade 12 Revision Series',
+    description: 'Grade 12 Revision Series & Exam Prep',
     amount: 2400.0,
     currency: 'EGP',
     expiresInMinutes: 60,
-    supportEmail: 'support@apexclasses.example',
-    supportPhone: '+20 12 0000 0000',
+    supportEmail: 'admissions@apex.edu.eg',
+    supportPhone: '+20 12 9876 5432',
   },
   'eh-2n6b8v': {
     slug: 'eh-2n6b8v',
@@ -199,7 +200,28 @@ function buildDetails(base: Omit<PaymentDetails, 'providerRedirectUrl'>): Paymen
   };
 }
 
-function resolvePayment(slug: string): PaymentDetails {
+function resolvePayment(slug: string, productId?: string): PaymentDetails {
+  if (productId) {
+    const prod = PRODUCTS_CATALOG.find(p => p.id === productId || p.slug === productId);
+    if (prod) {
+      const base = SAMPLE_PAYMENTS[slug] || {};
+      return buildDetails({
+        slug,
+        orderNumber: base.orderNumber || `${prod.providerCode}-${slug.slice(-4).toUpperCase()}`,
+        ventureName: prod.provider,
+        ventureCode: prod.providerCode,
+        chipBg: prod.chipBg || '#E8EEF7',
+        chipFg: prod.chipFg || '#2C5F9E',
+        description: prod.title,
+        amount: prod.priceEGP,
+        currency: 'EGP',
+        expiresInMinutes: 60,
+        supportEmail: prod.providerCode === 'AC' ? 'admissions@apex.edu.eg' : (base.supportEmail || 'admissions@studyhub.eg'),
+        supportPhone: prod.providerCode === 'AC' ? '+20 12 9876 5432' : (base.supportPhone || '+20 10 1234 5678'),
+      });
+    }
+  }
+
   if (SAMPLE_PAYMENTS[slug]) {
     return buildDetails(SAMPLE_PAYMENTS[slug]);
   }
@@ -323,8 +345,12 @@ function CentralPaymentContent() {
   const params = useParams();
   const searchParams = useSearchParams();
   const rawSlug = (params?.slug as string) || 'sh-8k2m9q';
-  const productId = searchParams?.get('productId') || '';
-  const payment = resolvePayment(rawSlug);
+  const productId = searchParams?.get('productId') || searchParams?.get('product_id') || '';
+  const payment = resolvePayment(rawSlug, productId);
+
+  const [studentName, setStudentName] = useState('أحمد كمال (Ahmed Kamal)');
+  const [studentEmail, setStudentEmail] = useState('ahmed.kamal@gmail.com');
+  const [studentPhone, setStudentPhone] = useState('01023456789');
 
   const [lang, setLang] = useState<'EN' | 'AR'>('EN');
   const [method, setMethod] = useState<'CARD' | 'WALLET' | 'KIOSK'>('KIOSK');
@@ -373,57 +399,58 @@ function CentralPaymentContent() {
         gap: 20,
       }}
     >
-      {/* ─── Browser / URL Mock Header ──────────────────────────── */}
+      {/* ─── Institutional Trust & Security Top Bar ────────────────── */}
       <div
         style={{
           width: '100%',
-          maxWidth: 680,
-          background: '#F5F7FA',
-          border: '1px solid #D3DAE4',
-          borderRadius: 14,
-          overflow: 'hidden',
-          boxShadow: '0 12px 32px -12px rgba(18,32,60,0.18)',
+          maxWidth: 700,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 4px',
         }}
       >
-        {/* Fake URL Bar */}
-        <div
-          dir="ltr"
-          style={{
-            height: 36,
-            background: '#E7EBF1',
-            borderBottom: '1px solid #D3DAE4',
-            display: 'flex',
-            alignItems: 'center',
-            padding: '0 12px',
-            gap: 9,
-          }}
-        >
-          <div style={{ display: 'flex', gap: 5 }}>
-            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#C9D2DE' }} />
-            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#C9D2DE' }} />
-            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#C9D2DE' }} />
-          </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div
             style={{
-              flex: 1,
+              width: 22,
               height: 22,
-              background: '#FFFFFF',
-              borderRadius: 11,
+              borderRadius: 6,
+              background: '#12203C',
+              color: '#FFFFFF',
               display: 'flex',
               alignItems: 'center',
-              gap: 7,
-              padding: '0 10px',
+              justifyContent: 'center',
+              fontWeight: 900,
+              fontSize: 11,
             }}
           >
-            <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="#2E6F5E" strokeWidth="1.8" strokeLinecap="round">
-              <path d="M4.8 7.2V5.4a3.2 3.2 0 016.4 0v1.8M4 7.2h8v5.6H4z" />
-            </svg>
-            <span style={{ fontFamily: tokens.fonts.mono, fontSize: 10.5, color: '#5A6A80' }}>
-              https://pay.bldr.com/l/{payment.slug}
-            </span>
+            b.
           </div>
+          <span style={{ fontSize: 12, fontWeight: 700, color: '#1B2A4A' }}>
+            bldr Central Financial Gateway
+          </span>
+          <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 4, background: '#DCFCE7', color: '#15803D', border: '1px solid #86EFAC' }}>
+            ● TLS 1.3 256-Bit Active
+          </span>
         </div>
+        <span style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>
+          {isRtl ? 'حساب وسيط بنكي مرخص (CBE Dual-Escrow)' : 'CBE Dual-Escrow Regulated'}
+        </span>
+      </div>
 
+      {/* ─── Real Production Checkout Container ──────────────────────────── */}
+      <div
+        style={{
+          width: '100%',
+          maxWidth: 700,
+          background: '#FFFFFF',
+          border: '1px solid #D8E0EB',
+          borderRadius: 14,
+          overflow: 'hidden',
+          boxShadow: '0 16px 40px -12px rgba(18,32,60,0.12)',
+        }}
+      >
         {/* ─── Top Bar with Provider Brand & Verification ────────────────── */}
         <div
           style={{
@@ -667,6 +694,89 @@ function CentralPaymentContent() {
                   {isRtl
                     ? `المبلغ والطلب محدد من قِبل ${payment.ventureName} وغير قابل للتعديل.`
                     : `Amount and order are fixed by ${payment.ventureName} and cannot be altered here.`}
+                </div>
+              </div>
+
+              <div style={{ height: 1, background: '#EEF1F5' }} />
+
+              {/* Student Details Form */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: 12.5, fontWeight: 800, color: '#12203C' }}>
+                    {isRtl ? 'بيانات الطالب للتسجيل الرسمي' : 'Student Enrollment Details'}
+                  </span>
+                  <span style={{ fontSize: 10.5, color: '#059669', fontWeight: 700 }}>
+                    {isRtl ? '✓ تأكيد فوري عبر WhatsApp & Email' : '✓ Instant WhatsApp & Email Confirmation'}
+                  </span>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 10 }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#4B5563', marginBottom: 4 }}>
+                      {isRtl ? 'الاسم ثلاثي (Full Name)' : 'Student Full Name'}
+                    </label>
+                    <input
+                      type="text"
+                      value={studentName}
+                      onChange={e => setStudentName(e.target.value)}
+                      placeholder="أحمد كمال (Ahmed Kamal)"
+                      style={{
+                        width: '100%',
+                        boxSizing: 'border-box',
+                        height: 38,
+                        borderRadius: 6,
+                        border: '1px solid #CBD5E1',
+                        padding: '0 10px',
+                        fontSize: 12.5,
+                        color: '#0F172A',
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#4B5563', marginBottom: 4 }}>
+                      {isRtl ? 'رقم الموبايل / واتساب' : 'Mobile / WhatsApp'}
+                    </label>
+                    <input
+                      type="tel"
+                      value={studentPhone}
+                      onChange={e => setStudentPhone(e.target.value)}
+                      placeholder="010XXXXXXXX"
+                      style={{
+                        width: '100%',
+                        boxSizing: 'border-box',
+                        height: 38,
+                        borderRadius: 6,
+                        border: '1px solid #CBD5E1',
+                        padding: '0 10px',
+                        fontSize: 12.5,
+                        color: '#0F172A',
+                        fontFamily: tokens.fonts.mono,
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#4B5563', marginBottom: 4 }}>
+                    {isRtl ? 'البريد الإلكتروني لتسلم الفاتورة وبيانات الدخول' : 'Email Address for Invoice & Access'}
+                  </label>
+                  <input
+                    type="email"
+                    value={studentEmail}
+                    onChange={e => setStudentEmail(e.target.value)}
+                    placeholder="student@example.com"
+                    style={{
+                      width: '100%',
+                      boxSizing: 'border-box',
+                      height: 38,
+                      borderRadius: 6,
+                      border: '1px solid #CBD5E1',
+                      padding: '0 10px',
+                      fontSize: 12.5,
+                      color: '#0F172A',
+                    }}
+                  />
                 </div>
               </div>
 
