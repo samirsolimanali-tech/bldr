@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { PRODUCTS_CATALOG } from '../../products/data';
+import { getVentureConfig } from '../../../lib/ventures';
 
 const API_BASE = process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 const BLDR_API_KEY = process.env.BLDR_API_KEY || process.env.BLDR_VENTURE_API_KEY || 'sk_test_bldr_2026';
@@ -11,13 +12,28 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { productId, customer, returnUrl, cancelUrl } = body;
 
+    // ── PRICE & CATALOG SECURITY ──────────────────────────────────────────────
+    // Checkout must NEVER take price from client request body or URL parameters.
+    // Price, currency, title, and owning venture MUST be resolved strictly on the server.
     const matchedProduct = PRODUCTS_CATALOG.find(
       (p) => p.id === productId || p.slug === productId || p.paySlug === productId
     );
 
-    const title = body.title || matchedProduct?.title || 'bldr Founder Edition — Lifetime Access';
-    const priceEGP = body.amountEgp || matchedProduct?.priceEGP || 1500;
+    if (!matchedProduct) {
+      return NextResponse.json(
+        { error: `Invalid product or listing ID "${productId}". Product not found in catalog.` },
+        { status: 400 }
+      );
+    }
+
+    const title = matchedProduct.title;
+    const priceEGP = matchedProduct.priceEGP;
+    const currency = 'EGP';
     const amountPiasters = Math.round(priceEGP * 100);
+
+    // Owning venture attribution
+    const owningVentureCode = matchedProduct.ventureId || matchedProduct.providerCode || 'BLDR';
+    const ventureConfig = getVentureConfig(owningVentureCode);
 
     const orderId = body.orderId || `bldr_ord_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`;
     const idempotencyKey = `buy-now-${orderId}`;
@@ -29,26 +45,28 @@ export async function POST(request: Request) {
     };
 
     const payload = {
-      venture_id: 'BLDR',
+      venture_id: ventureConfig.code,
       order_id: orderId,
       amount: amountPiasters,
-      currency: 'EGP',
+      currency,
       customer: customerData,
       line_items: [
         {
-          id: matchedProduct?.id || 'prod-custom',
+          id: matchedProduct.id,
           title,
           quantity: 1,
           unit_amount: amountPiasters,
         },
       ],
       success_url: returnUrl || `${STOREFRONT_URL}/orders/${orderId}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: cancelUrl || `${STOREFRONT_URL}/products/${matchedProduct?.slug || 'products'}`,
+      cancel_url: cancelUrl || `${STOREFRONT_URL}/products/${matchedProduct.slug || 'products'}`,
       metadata: {
-        product_id: matchedProduct?.id || 'prod-custom',
+        product_id: matchedProduct.id,
         product_title: title,
         order_id: orderId,
-        source: 'bldr_storefront_buy_now',
+        venture_id: ventureConfig.id,
+        venture_code: ventureConfig.code,
+        source: 'bldr_storefront_checkout',
       },
     };
 

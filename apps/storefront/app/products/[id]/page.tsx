@@ -198,7 +198,7 @@ function SingleProductContent() {
                 )}
 
                 <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', alignItems: 'center' }}>
-                  {/* Primary CTA: Changes to "Enroll Now" after payment */}
+                  {/* Primary CTA: Changes to "Enroll Now" after payment, respects saleMode */}
                   {isPaid ? (
                     <a
                       id="btn-enroll-now-product"
@@ -225,10 +225,12 @@ function SingleProductContent() {
                           : 'Enroll Now / Continue to Provider Website →'}
                       </span>
                     </a>
-                  ) : (
-                    <Link
-                      id="btn-pay-now-product"
-                      href={`/pay/${product.paySlug}?productId=${product.id}`}
+                  ) : product.saleMode === 'REDIRECT' && product.redirectUrl ? (
+                    <a
+                      id="btn-redirect-product"
+                      href={product.redirectUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       style={{
                         display: 'inline-flex',
                         alignItems: 'center',
@@ -246,7 +248,35 @@ function SingleProductContent() {
                       }}
                     >
                       <span>
-                        {isRtl ? 'ادفع الآن وحجز مقعدك فورياً' : 'Pay Now / Secure Your Seat'}
+                        {isRtl
+                          ? (product.ctaLabelAr || 'الانتقال إلى الموقع الرسمي ←')
+                          : (product.ctaLabel || 'Go to Official Website →')}
+                      </span>
+                    </a>
+                  ) : (
+                    <Link
+                      id="btn-pay-now-product"
+                      href={`/pay/${product.paySlug}?productId=${product.id}&ventureId=${product.ventureId || product.providerCode}`}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        height: 48,
+                        padding: '0 28px',
+                        borderRadius: 8,
+                        background: '#2E6F5E',
+                        color: '#FFFFFF',
+                        fontSize: 15,
+                        fontWeight: 700,
+                        textDecoration: 'none',
+                        boxShadow: '0 4px 14px rgba(46, 111, 94, 0.3)',
+                        transition: 'background 0.15s ease',
+                      }}
+                    >
+                      <span>
+                        {isRtl
+                          ? (product.ctaLabelAr || 'شراء الآن ←')
+                          : (product.ctaLabel || 'Buy now →')}
                       </span>
                     </Link>
                   )}
@@ -385,7 +415,7 @@ function SingleProductContent() {
                   {isRtl ? 'وسائل الدفع المقبولة فوراً:' : 'Supported Payment Methods:'}
                 </div>
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 16 }}>
-                  {['Visa', 'Mastercard', 'Meeza', 'Vodafone Cash', 'Fawry Kiosk'].map((badge) => (
+                  {['Visa', 'Mastercard', 'Vodafone Cash', 'Fawry Kiosk'].map((badge) => (
                     <span
                       key={badge}
                       style={{

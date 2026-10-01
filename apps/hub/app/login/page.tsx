@@ -220,7 +220,7 @@ export default function HubLoginPage() {
             Administrative Operations Login
           </h1>
           <p style={{ fontSize: 12.5, color: '#94A3B8', margin: 0, lineHeight: 1.5 }}>
-            Authenticate with verified platform keys to manage multi-gateway routing (Geidea, Paymob, Fawry), escrow settlements, and brand payouts.
+            Authenticate with verified platform keys to manage multi-gateway routing (Geidea, Paymob, Fawry), provider settlements, and brand payouts.
           </p>
         </div>
 
@@ -565,8 +565,8 @@ export default function HubLoginPage() {
               <div style={{ fontSize: 9, color: '#64748B' }}>Certified Scope</div>
             </div>
             <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '6px 4px', borderRadius: 6, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-              <div style={{ fontSize: 9.5, fontWeight: 700, color: '#38BDF8' }}>EGP Dual Escrow</div>
-              <div style={{ fontSize: 9, color: '#64748B' }}>CBE Compliant</div>
+              <div style={{ fontSize: 9.5, fontWeight: 700, color: '#38BDF8' }}>Merchant of Record</div>
+              <div style={{ fontSize: 9, color: '#64748B' }}>bldr Platform</div>
             </div>
             <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '6px 4px', borderRadius: 6, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
               <div style={{ fontSize: 9.5, fontWeight: 700, color: '#A78BFA' }}>Multi-Gateway</div>

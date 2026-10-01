@@ -291,7 +291,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: 'var(--text-secondary)' }}>
                     <ShieldCheckIcon size={16} style={{ color: 'var(--success)', flexShrink: 0 }} />
-                    <span><strong>Escrow Protection:</strong> Funds held until milestone delivery</span>
+                    <span><strong>Payment Security:</strong> PCI-compliant processing &amp; verified enrollment</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: 'var(--text-secondary)' }}>
                     <CheckCircleIcon size={16} style={{ color: 'var(--brand)', flexShrink: 0 }} />

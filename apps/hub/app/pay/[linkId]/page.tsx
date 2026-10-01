@@ -380,7 +380,7 @@ export default function CentralPaymentPage() {
           </span>
         </div>
         <span style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>
-          {isRtl ? 'حساب وسيط بنكي مرخص (CBE Dual-Escrow)' : 'CBE Dual-Escrow Regulated'}
+          {isRtl ? 'معالجة مدفوعات معتمدة PCI-DSS عبر Geidea / Paymob / Fawry' : 'PCI-DSS Compliant Payment Processing via Geidea / Paymob / Fawry'}
         </span>
       </div>
 
@@ -1197,7 +1197,7 @@ export default function CentralPaymentPage() {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                             <span style={{ fontSize: 13.5, fontWeight: 800, color: '#12203C' }}>
-                              {isRtl ? 'بطاقة بنكية (فيزا، ماستركارد، ميزة)' : 'Credit / Debit Card (Visa, Mastercard, Meeza)'}
+                              {isRtl ? 'بطاقة بنكية (فيزا، ماستركارد)' : 'Credit / Debit Card (Visa, Mastercard)'}
                             </span>
                             <span style={{ fontSize: 10, fontWeight: 700, color: '#2C5F9E', background: '#E8EEF7', borderRadius: 4, padding: '1px 6px' }}>
                               via {gatewayLabel}
@@ -1419,9 +1419,9 @@ export default function CentralPaymentPage() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontSize: 10.5, fontWeight: 700, textTransform: 'uppercase', color: '#8A94A6' }}>
-                      {isRtl ? 'رقم البطاقة (فيزا / ماستركارد / ميزة)' : 'Card Number (Visa, Mastercard, Meeza)'}
+                      {isRtl ? 'رقم البطاقة (فيزا / ماستركارد)' : 'Card Number (Visa, Mastercard)'}
                     </span>
-                    <span style={{ fontSize: 10, color: '#2E6F5E', fontWeight: 700 }}>Meeza & International</span>
+                    <span style={{ fontSize: 10, color: '#2E6F5E', fontWeight: 700 }}>International & Local</span>
                   </div>
                   <input
                     type="text"

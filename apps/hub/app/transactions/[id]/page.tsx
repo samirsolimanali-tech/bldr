@@ -45,7 +45,7 @@ export default function TransactionDetailPage() {
       tag: 'FINANCE',
       tagFg: '#2C5F9E',
       tagBg: '#E8EEF7',
-      body: 'Double-entry accounting recorded: Credit EGP 750.00 to StudyHub escrow, Debit EGP 18.75 PSP fee, Debit EGP 2.63 VAT.',
+      body: 'Double-entry accounting recorded: Credit EGP 750.00 to StudyHub settlement balance, Debit EGP 18.75 PSP fee, Debit EGP 2.63 VAT.',
       actor: 'ledger-engine',
       dot: '#2E6F5E',
     },

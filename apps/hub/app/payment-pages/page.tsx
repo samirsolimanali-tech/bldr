@@ -111,7 +111,7 @@ export default function HubPaymentPages() {
         card: true,
         activationCode: true,
       },
-      securitySeals: ['PCI-DSS SAQ-A', 'CBE Dual Escrow', 'TLS 1.3 256-Bit'],
+      securitySeals: ['PCI-DSS SAQ-A', 'TLS 1.3 256-Bit', 'Authorized Gateway'],
       version: 'v2.6',
       isPublished: true,
       author: 'Platform Financial Super Admin',
@@ -162,10 +162,10 @@ export default function HubPaymentPages() {
                   Checkout Governance &amp; Live Pages
                 </h1>
                 <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 9px', borderRadius: 6, background: 'rgba(16, 185, 129, 0.15)', color: '#34D399', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
-                  Dual-Escrow Architecture
+                  PCI-DSS Level 1
                 </span>
                 <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 9px', borderRadius: 6, background: 'rgba(56, 189, 248, 0.12)', color: '#38BDF8', border: '1px solid rgba(56, 189, 248, 0.25)' }}>
-                  CBE Compliant
+                  Multi-Gateway Routing
                 </span>
               </div>
               <p style={{ fontSize: 13, color: '#94A3B8', marginTop: 4, marginBottom: 0 }}>
@@ -458,12 +458,12 @@ export default function HubPaymentPages() {
                           )}
                           {brand.activeRails.wallet && (
                             <span style={{ fontSize: 10, background: 'rgba(239, 68, 68, 0.15)', color: '#F87171', padding: '2px 6px', borderRadius: 4, border: '1px solid rgba(239, 68, 68, 0.3)' }}>
-                              📱 Wallets &amp; InstaPay
+                              📱 Mobile Wallets (Vodafone/Orange/WE)
                             </span>
                           )}
                           {brand.activeRails.card && (
                             <span style={{ fontSize: 10, background: 'rgba(59, 130, 246, 0.15)', color: '#60A5FA', padding: '2px 6px', borderRadius: 4, border: '1px solid rgba(59, 130, 246, 0.3)' }}>
-                              💳 Visa / MC / Meeza
+                              💳 Visa / Mastercard
                             </span>
                           )}
                           {brand.activeRails.activationCode && (
@@ -655,12 +655,12 @@ export default function HubPaymentPages() {
                           )}
                           {bp.allowedPaymentRails.wallet && (
                             <span style={{ fontSize: 10.5, background: 'rgba(239, 68, 68, 0.12)', color: '#F87171', padding: '3px 7px', borderRadius: 5 }}>
-                              📱 Mobile Wallets (Vodafone/InstaPay)
+                              📱 Mobile Wallets (Vodafone/Orange/WE)
                             </span>
                           )}
                           {bp.allowedPaymentRails.card && (
                             <span style={{ fontSize: 10.5, background: 'rgba(59, 130, 246, 0.12)', color: '#60A5FA', padding: '3px 7px', borderRadius: 5 }}>
-                              💳 Visa / MC / Meeza
+                              💳 Visa / Mastercard
                             </span>
                           )}
                           {bp.allowedPaymentRails.activationCode && (
@@ -893,7 +893,7 @@ export default function HubPaymentPages() {
                                 textAlign: 'left',
                               }}
                             >
-                              💳 بطاقة بنكية (Visa/Meeza)
+                              💳 بطاقة بنكية (Visa / Mastercard)
                             </button>
                           )}
                           {previewBrand.activeRails.activationCode && (
@@ -1016,7 +1016,7 @@ export default function HubPaymentPages() {
               {/* Modal Footer */}
               <div style={{ padding: '16px 24px', borderTop: '1px solid rgba(255, 255, 255, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255, 255, 255, 0.02)' }}>
                 <span style={{ fontSize: 12, color: '#64748B' }}>
-                  Gateway: <strong>{previewBrand.connectedGateway}</strong> • Escrow: <strong>Active</strong>
+                  Gateway: <strong>{previewBrand.connectedGateway}</strong> • PCI DSS: <strong>Certified</strong>
                 </span>
 
                 <div style={{ display: 'flex', gap: 10 }}>
@@ -1244,7 +1244,7 @@ export default function HubPaymentPages() {
                         })}
                         style={{ accentColor: '#10B981', width: 16, height: 16 }}
                       />
-                      <span>💳 Visa / Mastercard / Meeza</span>
+                      <span>💳 Visa / Mastercard</span>
                     </label>
 
                     <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5, color: '#CBD5E1', cursor: 'pointer' }}>

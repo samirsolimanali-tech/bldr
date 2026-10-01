@@ -33,6 +33,11 @@ export interface ProductItem {
   whatIncluded: string[];
   whatIncludedAr: string[];
   providerWebsiteUrl: string;
+  ventureId?: string;
+  saleMode?: 'DIRECT' | 'REDIRECT';
+  redirectUrl?: string;
+  ctaLabel?: string;
+  ctaLabelAr?: string;
 }
 
 export const PRODUCTS_CATALOG: ProductItem[] = [
@@ -89,6 +94,10 @@ export const PRODUCTS_CATALOG: ProductItem[] = [
       'شهادة إتمام معتمدة قابلة للتحقق الرقمي',
     ],
     providerWebsiteUrl: '/providers/enroll?provider=StudyHub&providerCode=SH&order=SH-COURSE-4581&product=Full-Stack+Web+Engineering+Bootcamp&status=PAID',
+    ventureId: 'SH',
+    saleMode: 'DIRECT',
+    ctaLabel: 'Enroll Now',
+    ctaLabelAr: 'سجل الآن',
   },
   {
     id: 'prod-2',
@@ -118,6 +127,10 @@ export const PRODUCTS_CATALOG: ProductItem[] = [
     paySlug: 'ac-9w3e5z',
     tags: ['Physics', 'Pure Math', 'Question Banks', 'Live Q&A'],
     tagsAr: ['فيزياء', 'رياضيات', 'بنوك أسئلة', 'بث مباشر'],
+    ventureId: 'AC',
+    saleMode: 'DIRECT',
+    ctaLabel: 'Pay Tuition Now',
+    ctaLabelAr: 'ادفع المصروفات الآن',
     syllabus: [
       { title: 'Module 1: Mechanics & Calculus Foundations', desc: 'Intensive problem solving and speed drilling.' },
       { title: 'Module 2: Electromagnetism & Modern Physics', desc: 'Conceptual mastery and high-yield question patterns.' },

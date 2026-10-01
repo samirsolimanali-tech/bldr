@@ -49,7 +49,7 @@ export default function AdminPayoutsPage() {
           <div>
             <h1 className="topbar-title">Settlement Payouts (Central Hub Redirect)</h1>
             <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: '4px 0 0 0' }}>
-              Multi-brand escrow balances and bank transfers are processed in the Central Payment Hub.
+              Multi-brand provider settlement balances and bank transfers are processed in the Central Payment Hub.
             </p>
           </div>
           <a

@@ -11,11 +11,9 @@ import { CheckoutTemplateBlueprint } from '@bldr/shared-types';
 import {
   FawryLogo,
   VodafoneCashLogo,
-  InstaPayLogo,
   OrangeCashLogo,
   EtisalatCashLogo,
   WePayLogo,
-  MeezaLogo,
   VisaLogo,
   MastercardLogo,
   GeideaLogo,
@@ -333,7 +331,7 @@ export default function MasterCheckoutStudioPage() {
                 Governed by Central Hub
               </span>
               <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 6, background: '#ECFDF5', color: '#047857', border: '1px solid #A7F3D0' }}>
-                CBE Dual-Escrow Verified
+                PCI-DSS Compliant Gateway
               </span>
             </div>
             <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0 }}>
@@ -448,7 +446,7 @@ export default function MasterCheckoutStudioPage() {
                       </div>
                     </div>
                     <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2, marginBottom: 14 }}>
-                      Template layouts, Egyptian payment rails, and Central Bank escrow compliance are managed by Central Financial Hub. Pick your academy blueprint:
+                      Template layouts and payment gateway compliance are managed by Central Financial Hub. Pick your academy blueprint:
                     </p>
 
                     {/* Blueprint Cards Grid */}
@@ -797,116 +795,41 @@ export default function MasterCheckoutStudioPage() {
                     </div>
                   </div>
 
-                  {/* Section 3: Gateway & Rails */}
+                  {/* Section 3: Read-Only Gateway & Rails (Governed by Central Hub) */}
                   <div style={{ background: 'white', borderRadius: 12, border: '1px solid var(--border)', padding: '20px 22px' }}>
-                    <h3 style={{ fontSize: 14, fontWeight: 800, margin: '0 0 14px', color: 'var(--text-primary)' }}>
-                      Payment Gateway & Security Binding
-                    </h3>
-
-                    <div style={{ marginBottom: 14 }}>
-                      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 8 }}>
-                        Provider Routing Gateway (Displays authentic logo in checkout footer):
-                      </label>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-                        {(['Geidea', 'Fawry Pay', 'Paymob (Accept)'] as const).map(gw => (
-                          <button
-                            key={gw}
-                            onClick={() => updateTemplate('gateway', gw)}
-                            style={{
-                              padding: '10px 8px',
-                              borderRadius: 8,
-                              fontSize: 12,
-                              fontWeight: 700,
-                              border: template.gateway === gw ? '2px solid var(--brand)' : '1px solid var(--border)',
-                              background: template.gateway === gw ? 'rgba(37,99,235,0.06)' : 'white',
-                              color: template.gateway === gw ? 'var(--brand)' : 'var(--text-primary)',
-                              cursor: 'pointer',
-                              display: 'flex',
-                              flexDirection: 'column',
-                              alignItems: 'center',
-                              gap: 6,
-                            }}
-                          >
-                            {gw === 'Geidea' ? (
-                              <GeideaLogo height={20} />
-                            ) : gw === 'Fawry Pay' ? (
-                              <FawryLogo height={20} />
-                            ) : (
-                              <PaymobLogo height={20} />
-                            )}
-                            <span style={{ fontSize: 10.5, fontWeight: 600, color: 'var(--text-secondary)' }}>{gw}</span>
-                          </button>
-                        ))}
-                      </div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                      <h3 style={{ fontSize: 14, fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>
+                        Payment Gateway &amp; Rails
+                      </h3>
+                      <span style={{ fontSize: 10.5, fontWeight: 700, padding: '2px 8px', borderRadius: 4, background: '#F1F5F9', color: '#475569', border: '1px solid #CBD5E1' }}>
+                        🔒 Read-Only · Governed by Hub Admin
+                      </span>
                     </div>
+                    <p style={{ margin: '0 0 14px', fontSize: 11.5, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                      Acquiring gateway assignments (Geidea / Paymob) and Egyptian payment rails (Card, Wallet, Fawry) are governed by Central Financial Hub. Providers customize approved blueprints, logos, and brand colors.
+                    </p>
 
-                    <div>
-                      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 6 }}>
-                        Enabled Payment Rails for Egyptian Students:
-                      </label>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                        {[
-                          {
-                            key: 'fawry' as const,
-                            label: 'كود دفع فوري (Fawry Reference Code)',
-                            desc: '48h cash code at 300K+ POS kiosks & myFawry',
-                            logo: <FawryLogo height={20} />,
-                          },
-                          {
-                            key: 'wallet' as const,
-                            label: 'المحافظ الإلكترونية (Vodafone Cash, Orange, WE, InstaPay)',
-                            desc: 'Instant mobile wallet prompt authorization',
-                            logo: (
-                              <div style={{ display: 'flex', gap: 3 }}>
-                                <VodafoneCashLogo height={18} />
-                                <InstaPayLogo height={18} />
-                              </div>
-                            ),
-                          },
-                          {
-                            key: 'card' as const,
-                            label: 'البطاقات البنكية وكروت ميزة (Meeza / Visa / Mastercard)',
-                            desc: '3D Secure 2.0 direct gateway integration',
-                            logo: (
-                              <div style={{ display: 'flex', gap: 3 }}>
-                                <MeezaLogo height={18} />
-                                <VisaLogo height={18} />
-                              </div>
-                            ),
-                          },
-                        ].map(m => (
-                          <div
-                            key={m.key}
-                            onClick={() => updateMethod(m.key, !template.methods[m.key])}
-                            style={{
-                              padding: '10px 12px',
-                              borderRadius: 8,
-                              border: template.methods[m.key] ? '1px solid #CBD5E1' : '1px dashed #E2E8F0',
-                              background: template.methods[m.key] ? '#F8FAFC' : '#F1F5F9',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                              gap: 10,
-                              cursor: 'pointer',
-                            }}
-                          >
-                            <div style={{ flex: 1 }}>
-                              <div style={{ fontSize: 12, fontWeight: 700, color: template.methods[m.key] ? 'var(--text-primary)' : 'var(--text-muted)' }}>
-                                {m.label}
-                              </div>
-                              <div style={{ fontSize: 10.5, color: 'var(--text-muted)' }}>{m.desc}</div>
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                              {m.logo}
-                              <input
-                                type="checkbox"
-                                checked={template.methods[m.key]}
-                                onChange={() => {}}
-                                style={{ width: 16, height: 16, cursor: 'pointer' }}
-                              />
-                            </div>
-                          </div>
-                        ))}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                      <div style={{ padding: '12px 14px', borderRadius: 8, background: '#F8FAFC', border: '1px solid #E2E8F0' }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', marginBottom: 4 }}>
+                          Assigned Card &amp; Wallet Gateway:
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          {template.gateway === 'Geidea' ? <GeideaLogo height={20} /> : <PaymobLogo height={20} />}
+                          <strong style={{ fontSize: 13, color: '#0F172A' }}>{template.gateway} (PCI-DSS)</strong>
+                        </div>
+                      </div>
+
+                      <div style={{ padding: '12px 14px', borderRadius: 8, background: '#F8FAFC', border: '1px solid #E2E8F0' }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', marginBottom: 4 }}>
+                          Fawry Cash Rail:
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <FawryLogo height={20} />
+                          <strong style={{ fontSize: 13, color: template.methods.fawry ? '#15803D' : '#94A3B8' }}>
+                            {template.methods.fawry ? 'Active (Kiosks & myFawry)' : 'Disabled'}
+                          </strong>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1449,20 +1372,19 @@ export default function MasterCheckoutStudioPage() {
                               <div style={{ flex: 1 }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
                                   <div style={{ fontSize: 13.5, fontWeight: 800, color: '#0F172A' }}>
-                                    المحافظ الإلكترونية وإنستاباي (Wallets & InstaPay)
+                                    المحافظ الإلكترونية (Mobile Wallets)
                                   </div>
                                   <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 4, background: '#E0F2FE', color: '#0369A1' }}>
                                     خصم فوري
                                   </span>
                                 </div>
                                 <div style={{ fontSize: 11, color: '#64748B' }}>
-                                  فودافون كاش، إنستاباي، أورنج، اتصالات، وي باي
+                                  فودافون كاش، أورنج، اتصالات، وي باي
                                 </div>
                               </div>
                               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap', justifyContent: 'flex-end', maxWidth: 280 }}>
                                   <VodafoneCashLogo height={22} />
-                                  <InstaPayLogo height={22} />
                                   <OrangeCashLogo height={22} />
                                   <EtisalatCashLogo height={22} />
                                   <WePayLogo height={22} />
@@ -1478,7 +1400,7 @@ export default function MasterCheckoutStudioPage() {
                             </div>
                           )}
 
-                          {/* Option 3: Meeza & Bank Cards */}
+                          {/* Option 3: Bank Cards */}
                           {template.methods.card && (
                             <div
                               onClick={() => setSelectedMethod('CARD')}
@@ -1499,19 +1421,18 @@ export default function MasterCheckoutStudioPage() {
                               <div style={{ flex: 1 }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
                                   <div style={{ fontSize: 13.5, fontWeight: 800, color: '#0F172A' }}>
-                                    البطاقات البنكية وكروت ميزة (Meeza & Cards)
+                                    البطاقات البنكية (Visa &amp; Mastercard)
                                   </div>
                                   <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 4, background: '#F3E8FF', color: '#6B21A8' }}>
                                     دفع مشفر
                                   </span>
                                 </div>
                                 <div style={{ fontSize: 11, color: '#64748B' }}>
-                                  كروت ميزة المصرية، فيزا، وماستركارد بخصم آمن مشفر 3D Secure
+                                  بطاقات فيزا وماستركارد بخصم آمن مشفر 3D Secure
                                 </div>
                               </div>
                               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                                  <MeezaLogo height={22} />
                                   <VisaLogo height={22} />
                                   <MastercardLogo height={22} />
                                 </div>
@@ -1604,7 +1525,7 @@ export default function MasterCheckoutStudioPage() {
                       {selectedMethod === 'WALLET' && (
                         <div style={{ background: '#F0F9FF', border: '2px solid #0EA5E9', borderRadius: 12, padding: '24px 20px' }}>
                           <h3 style={{ fontSize: 18, fontWeight: 800, margin: '0 0 4px', color: '#0369A1' }}>
-                            الدفع عبر المحفظة الإلكترونية وإنستاباي
+                            الدفع عبر المحفظة الإلكترونية
                           </h3>
                           <p style={{ fontSize: 12, color: '#0284C7', marginBottom: 16 }}>
                             اختر شبكة المحفظة وسيصلك إشعار فوري على هاتفك لتأكيد الخصم
@@ -1613,14 +1534,13 @@ export default function MasterCheckoutStudioPage() {
                           <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginBottom: 14, flexWrap: 'wrap' }}>
                             {[
                               { id: 'Vodafone Cash' as const, logo: <VodafoneCashLogo height={24} /> },
-                              { id: 'InstaPay' as const, logo: <InstaPayLogo height={24} /> },
                               { id: 'Orange Money' as const, logo: <OrangeCashLogo height={24} /> },
                               { id: 'Etisalat Cash' as const, logo: <EtisalatCashLogo height={24} /> },
                               { id: 'WE Pay' as const, logo: <WePayLogo height={24} /> },
                             ].map(w => (
                               <button
                                 key={w.id}
-                                onClick={() => setWalletProvider(w.id)}
+                                onClick={() => setWalletProvider(w.id as any)}
                                 style={{
                                   padding: '6px 10px',
                                   borderRadius: 8,
@@ -1667,7 +1587,7 @@ export default function MasterCheckoutStudioPage() {
                       {selectedMethod === 'CARD' && (
                         <div style={{ background: '#FAF5FF', border: '2px solid #7C3AED', borderRadius: 12, padding: '24px 20px' }}>
                           <h3 style={{ fontSize: 18, fontWeight: 800, margin: '0 0 4px', color: '#6D28D9' }}>
-                            الدفع عبر البطاقة وكروت ميزة
+                            الدفع عبر البطاقة البنكية
                           </h3>
                           <p style={{ fontSize: 12, color: '#7C3AED', marginBottom: 14 }}>
                             معاملة آمنة مشفرة عبر بوابة <strong>{template.gateway}</strong>
@@ -1675,14 +1595,13 @@ export default function MasterCheckoutStudioPage() {
 
                           <div style={{ maxWidth: 360, margin: '0 auto 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
                             <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginBottom: 4 }}>
-                              <MeezaLogo height={24} />
                               <VisaLogo height={24} />
                               <MastercardLogo height={24} />
                             </div>
                             <input
                               type="text"
-                              placeholder="رقم البطاقة (Card Number / Meeza)"
-                              defaultValue="5078 0300 •••• 9214"
+                              placeholder="رقم البطاقة (Card Number)"
+                              defaultValue="4000 0300 •••• 9214"
                               style={{ padding: '10px 14px', borderRadius: 8, border: '1px solid #CBD5E1', fontSize: 13, textAlign: 'center', fontWeight: 600 }}
                             />
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>

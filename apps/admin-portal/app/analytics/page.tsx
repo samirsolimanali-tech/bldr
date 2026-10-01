@@ -149,7 +149,7 @@ export default function AnalyticsPage() {
               { label: 'Total Platform GMV', val: `EGP ${(TOTAL_REV / 1000000).toFixed(2)}M`, sub: '+18.4% vs last period', up: true },
               { label: 'bldr Direct Brand GMV', val: 'EGP 380,000', sub: '100% margin retained', up: true },
               { label: 'Platform Net Commission', val: 'EGP 125,160', sub: '+15.2% take-rate margin', up: true },
-              { label: 'Escrow Payouts Settled', val: 'EGP 711,190', sub: 'Disbursed to academies', up: true },
+              { label: 'Provider Payouts Settled', val: 'EGP 711,190', sub: 'Disbursed to academies', up: true },
             ].map(k => (
               <div key={k.label} style={{ background: 'white', borderRadius: 12, border: '1px solid var(--border)', padding: '20px 24px' }}>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 700, letterSpacing: '-0.03em', color: 'var(--text-primary)', marginBottom: 4 }}>{k.val}</div>

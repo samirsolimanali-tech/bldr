@@ -341,7 +341,7 @@ export default function AdminProductsPage() {
               <strong>bldr Store Catalog Aggregator:</strong> The bldr store admin can curate both first-party listings and cross-brand courses originating from partner ventures (e.g. StudyHub, EL HESA, Apex Classes) to feature on the central marketplace surface.
             </div>
             <div style={{ fontSize: 12, color: '#0284C7' }}>
-              <strong>Strict RBAC Isolation (ADR-001):</strong> Catalog visibility is strictly content-level. Partner brands' financial statements, escrow balances, and gateway credentials remain protected and isolated inside the Central Payment Hub.
+              <strong>Strict RBAC Isolation (ADR-001):</strong> Catalog visibility is strictly content-level. Partner brands' financial statements, settlement balances, and gateway credentials remain protected and isolated inside the Central Payment Hub.
             </div>
           </div>
 
