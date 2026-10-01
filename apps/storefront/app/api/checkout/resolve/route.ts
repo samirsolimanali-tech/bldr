@@ -56,6 +56,43 @@ export async function GET(request: Request) {
       }
     }
 
+    // Fallback: lookup in storefront PRODUCTS_CATALOG
+    try {
+      const { PRODUCTS_CATALOG } = await import('../../../products/data');
+      const matched = PRODUCTS_CATALOG.find(
+        (p: any) =>
+          (productId && (p.id === productId || p.slug === productId || p.paySlug === productId)) ||
+          p.paySlug === slug ||
+          p.slug === slug ||
+          p.id === slug
+      );
+
+      if (matched) {
+        const venture = getVentureConfig(matched.ventureId || matched.providerCode || 'BLDR');
+        return NextResponse.json({
+          found: true,
+          productId: matched.id,
+          slug: matched.paySlug || matched.slug || slug,
+          title: matched.title,
+          titleAr: matched.titleAr || matched.title,
+          priceEGP: Number(matched.priceEGP || (matched as any).price) || 0,
+          currency: 'EGP',
+          ventureId: venture.id,
+          ventureCode: venture.code,
+          ventureName: matched.provider || venture.displayName,
+          supportPhone: venture.supportPhone,
+          supportEmail: venture.supportEmail,
+          cardWalletGateway: venture.cardWalletGateway,
+          fawryEnabled: venture.fawryEnabled,
+          codeActivationEnabled: venture.codeActivationEnabled,
+          ctaLabel: matched.ctaLabel || venture.ctaLabel || 'Buy now',
+          ctaLabelAr: matched.ctaLabelAr || venture.ctaLabelAr || 'شراء الآن',
+          saleMode: matched.saleMode || 'DIRECT',
+          redirectUrl: matched.redirectUrl || null,
+        });
+      }
+    } catch (e) {}
+
     // Fallback for direct payment link slugs without a product catalog entry
     const prefix = slug.slice(0, 2).toLowerCase();
     const venture = getVentureConfig(prefix);

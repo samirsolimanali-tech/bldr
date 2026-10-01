@@ -37,32 +37,36 @@ interface PaymentDetails {
 }
 
 function resolvePaymentFallback(slug: string, productId?: string): PaymentDetails {
-  if (productId) {
-    const prod = PRODUCTS_CATALOG.find((p) => p.id === productId || p.slug === productId);
-    if (prod) {
-      const venture = getVentureConfig(prod.ventureId || prod.providerCode);
-      return {
-        slug,
-        orderNumber: `${prod.providerCode}-${slug.slice(-4).toUpperCase()}`,
-        ventureName: prod.provider,
-        ventureCode: prod.providerCode,
-        chipBg: prod.chipBg || '#E8EEF7',
-        chipFg: prod.chipFg || '#2C5F9E',
-        description: prod.title,
-        descriptionAr: prod.titleAr,
-        amount: prod.priceEGP,
-        currency: 'EGP',
-        expiresInMinutes: 60,
-        supportEmail: venture.supportEmail,
-        supportPhone: venture.supportPhone,
-        primaryGateway: venture.cardWalletGateway,
-        fawryEnabled: venture.fawryEnabled,
-        codeActivationEnabled: venture.codeActivationEnabled,
-        ctaLabel: prod.ctaLabel || venture.ctaLabel || 'Buy now',
-        ctaLabelAr: prod.ctaLabelAr || venture.ctaLabelAr || 'شراء الآن',
-        providerRedirectUrl: `/providers/enroll?provider=${encodeURIComponent(prod.provider)}&order=${encodeURIComponent(prod.providerCode + '-' + slug)}&product=${encodeURIComponent(prod.title)}&status=PAID`,
-      };
-    }
+  const prod = PRODUCTS_CATALOG.find(
+    (p) =>
+      (productId && (p.id === productId || p.slug === productId || p.paySlug === productId)) ||
+      p.paySlug === slug ||
+      p.slug === slug ||
+      p.id === slug
+  );
+  if (prod) {
+    const venture = getVentureConfig(prod.ventureId || prod.providerCode || 'BLDR');
+    return {
+      slug,
+      orderNumber: `${prod.providerCode}-${slug.slice(-4).toUpperCase()}`,
+      ventureName: prod.provider,
+      ventureCode: prod.providerCode,
+      chipBg: prod.chipBg || '#E8EEF7',
+      chipFg: prod.chipFg || '#2C5F9E',
+      description: prod.title,
+      descriptionAr: prod.titleAr,
+      amount: prod.priceEGP,
+      currency: 'EGP',
+      expiresInMinutes: 60,
+      supportEmail: venture.supportEmail,
+      supportPhone: venture.supportPhone,
+      primaryGateway: venture.cardWalletGateway,
+      fawryEnabled: venture.fawryEnabled,
+      codeActivationEnabled: venture.codeActivationEnabled,
+      ctaLabel: prod.ctaLabel || venture.ctaLabel || 'Buy now',
+      ctaLabelAr: prod.ctaLabelAr || venture.ctaLabelAr || 'شراء الآن',
+      providerRedirectUrl: `/providers/enroll?provider=${encodeURIComponent(prod.provider)}&order=${encodeURIComponent(prod.providerCode + '-' + slug)}&product=${encodeURIComponent(prod.title)}&status=PAID`,
+    };
   }
 
   const prefix = slug.slice(0, 2).toLowerCase();

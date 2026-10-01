@@ -682,6 +682,19 @@ export class CheckoutSessionsService {
         ctaLabel: 'Join Batch',
         ctaLabelAr: 'انضم للدورة',
       },
+      {
+        id: 'prod-test-course',
+        paySlug: 'bldr-test-course',
+        slug: 'test-course',
+        title: 'Test Course',
+        titleAr: 'Test Course',
+        priceEGP: 250,
+        provider: 'Test',
+        ventureId: 'BLDR',
+        saleMode: 'DIRECT',
+        ctaLabel: 'Enroll Now',
+        ctaLabelAr: 'سجل الآن',
+      },
     ];
 
     const mockItem = MOCK_CATALOG_FALLBACK.find(
