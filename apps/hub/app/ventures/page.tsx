@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import HubSidebar from '../../components/HubSidebar';
 import HubTopBar, { matchVenture } from '../../components/HubTopBar';
+import { saveVenture, getPaymentLinks, PaymentLink } from '../../lib/payment-links-store';
 
 /* ─── Base Ventures ─────────────────────────────────────────── */
 const BASE_VENTURES = [
@@ -42,6 +43,9 @@ export default function VenturesPage() {
   const [env, setEnv] = useState<'Sandbox' | 'Production'>('Production');
   const [selectedVenture, setSelectedVenture] = useState('All ventures');
 
+  // Payment link monitoring stats (from shared store)
+  const [linksByVenture, setLinksByVenture] = useState<Record<string, PaymentLink[]>>({});
+
   // Load custom ventures from localStorage
   useEffect(() => {
     try {
@@ -67,6 +71,27 @@ export default function VenturesPage() {
     };
     window.addEventListener('bldr:venture-changed', handleVentureChanged);
     return () => window.removeEventListener('bldr:venture-changed', handleVentureChanged);
+  }, []);
+
+  // Load & sync payment-link monitoring stats
+  const reloadLinks = () => {
+    const all = getPaymentLinks();
+    const byV: Record<string, PaymentLink[]> = {};
+    all.forEach(l => {
+      if (!byV[l.ventureId]) byV[l.ventureId] = [];
+      byV[l.ventureId].push(l);
+    });
+    setLinksByVenture(byV);
+  };
+
+  useEffect(() => {
+    reloadLinks();
+    window.addEventListener('bldr:payment-links-updated', reloadLinks);
+    window.addEventListener('storage', reloadLinks);
+    return () => {
+      window.removeEventListener('bldr:payment-links-updated', reloadLinks);
+      window.removeEventListener('storage', reloadLinks);
+    };
   }, []);
 
   const filtered = ventures.filter(v => {
@@ -146,6 +171,9 @@ export default function VenturesPage() {
 
     const updatedVentures = [...ventures, newVenture];
     setVentures(updatedVentures);
+
+    // Sync to shared payment-links-store so provider portal can select this venture
+    saveVenture({ ...newVenture, status: newVenture.status as 'Active' | 'Pending' | 'Suspended', createdBy: 'hub' });
 
     try {
       // Persist list of custom ventures
@@ -243,8 +271,46 @@ export default function VenturesPage() {
               </div>
             ))}
           </div>
+          {/* ── Payment Link Monitoring Layer ── */}
+          <div style={{ marginBottom: 24 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+              <h3 style={{ fontSize: 14, fontWeight: 700, color: '#1B2A4A', margin: 0 }}>Payment Link Monitoring</h3>
+              <span style={{ fontSize: 11, color: '#059669', background: '#ECFDF5', border: '1px solid #A7F3D0', borderRadius: 6, padding: '2px 8px', fontWeight: 600 }}>Live Sync</span>
+              <span style={{ fontSize: 12, color: '#64748B' }}>— includes links created by brand portals</span>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 12 }}>
+              {ventures.filter(v => matchVenture(v.name, selectedVenture)).map(v => {
+                const vLinks = linksByVenture[v.id] ?? [];
+                const activeL = vLinks.filter(l => l.status === 'ACTIVE').length;
+                const revenue = vLinks.reduce((s, l) => s + l.amount * l.conversions, 0);
+                const providerCreated = vLinks.filter(l => l.createdBy === 'provider').length;
+                return (
+                  <div key={v.id} style={{ background: '#fff', borderRadius: 10, border: '1px solid #E4E1DA', padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                      <div style={{ width: 28, height: 28, borderRadius: 7, background: v.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: '#fff', flexShrink: 0 }}>
+                        {v.code}
+                      </div>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: '#1B2A4A', lineHeight: 1.2 }}>{v.name}</div>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
+                      <div style={{ fontSize: 11, color: '#8A9099' }}>Active links</div>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: '#14171C', textAlign: 'right' }}>{activeL} / {vLinks.length}</div>
+                      <div style={{ fontSize: 11, color: '#8A9099' }}>Revenue</div>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: '#059669', textAlign: 'right' }}>EGP {(revenue / 1000).toFixed(1)}K</div>
+                      {providerCreated > 0 && (
+                        <>
+                          <div style={{ fontSize: 11, color: '#8A9099' }}>Via provider</div>
+                          <div style={{ fontSize: 12, fontWeight: 600, color: '#7C3AED', textAlign: 'right' }}>{providerCreated}</div>
+                        </>
+                      )}
+                    </div>
+                    <Link href={`/ventures/${v.id}`} style={{ marginTop: 4, fontSize: 11, color: '#263C8B', fontWeight: 600, textDecoration: 'none' }}>Configure →</Link>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
 
-          {/* Filters */}
           <div className="hub-filters" style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 10 }}>
             <input
               className="hub-input"
