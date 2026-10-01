@@ -319,120 +319,6 @@ function HostedPaymentContent() {
         gap: 16,
       }}
     >
-      {/* ─── Institutional Trust & Language Top Bar ────────────────── */}
-      <div
-        style={{
-          width: '100%',
-          maxWidth: 680,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '0 4px',
-          flexWrap: 'wrap',
-          gap: 10,
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button
-            type="button"
-            onClick={() => {
-              if (typeof window !== 'undefined' && window.history.length > 1) {
-                window.history.back();
-              } else {
-                router.push('/products');
-              }
-            }}
-            style={{
-              background: '#FFFFFF',
-              border: '1px solid #CBD5E1',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              fontSize: 12,
-              fontWeight: 700,
-              color: '#334155',
-              padding: '5px 12px',
-              borderRadius: 20,
-              boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
-            }}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: isRtl ? 'scaleX(-1)' : 'none' }}>
-              <path d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
-            <span>{isRtl ? 'رجوع' : 'Back'}</span>
-          </button>
-
-          <a
-            href="/"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              textDecoration: 'none',
-            }}
-          >
-            <span style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-0.04em', color: '#0F172A', lineHeight: 1 }}>
-              bldr<span style={{ color: '#D10721' }}>.</span>
-            </span>
-            <span style={{ fontSize: 13, fontWeight: 500, color: '#64748B' }}>
-              / {isRtl ? 'بوابة الدفع والتسجيل' : 'Hosted Checkout'}
-            </span>
-          </a>
-        </div>
-
-        {/* Verifiable Gateway Trust Cue & Language Switcher */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              background: '#FFFFFF',
-              padding: '4px 10px',
-              borderRadius: 20,
-              border: '1px solid #CBD5E1',
-            }}
-          >
-            <div
-              style={{
-                width: 7,
-                height: 7,
-                borderRadius: '50%',
-                background: '#059669',
-                boxShadow: '0 0 0 2px rgba(5, 150, 105, 0.2)',
-              }}
-            />
-            <span style={{ fontSize: 11, color: '#334155', fontWeight: 600 }}>
-              {isRtl
-                ? `المدفوعات تُعالج عبر بوابة ${activeGatewayName} المعتمدة`
-                : `Processed by authorized ${activeGatewayName}`}
-            </span>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setLang(lang === 'AR' ? 'EN' : 'AR')}
-            style={{
-              padding: '4px 12px',
-              borderRadius: 16,
-              border: '1px solid #CBD5E1',
-              background: '#FFFFFF',
-              color: '#0F172A',
-              fontSize: 11.5,
-              fontWeight: 700,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4,
-              boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
-            }}
-          >
-            <span>{isRtl ? 'English' : 'العربية'}</span>
-          </button>
-        </div>
-      </div>
-
       {/* ─── Main Checkout Container ───────────────────────────────── */}
       <div
         style={{
@@ -445,6 +331,7 @@ function HostedPaymentContent() {
           overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
+          marginTop: 8,
         }}
       >
         {/* Order Summary Header */}
@@ -455,6 +342,79 @@ function HostedPaymentContent() {
             background: 'linear-gradient(180deg, #F8FAFC 0%, #FFFFFF 100%)',
           }}
         >
+          {/* Card Top Utility: Back button + bldr brand & Language Toggle */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <button
+                type="button"
+                onClick={() => {
+                  if (typeof window !== 'undefined' && window.history.length > 1) {
+                    window.history.back();
+                  } else {
+                    router.push('/products');
+                  }
+                }}
+                style={{
+                  background: '#FFFFFF',
+                  border: '1px solid #CBD5E1',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 5,
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: '#475569',
+                  padding: '4px 10px',
+                  borderRadius: 6,
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+                }}
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: isRtl ? 'scaleX(-1)' : 'none' }}>
+                  <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                <span>{isRtl ? 'رجوع' : 'Back'}</span>
+              </button>
+
+              <a
+                href="/"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  textDecoration: 'none',
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: '#0F172A',
+                }}
+              >
+                bldr<span style={{ color: '#D10721' }}>.</span>
+                <span style={{ fontSize: 11, fontWeight: 500, color: '#94A3B8', marginInlineStart: 4 }}>
+                  / {isRtl ? 'الدفع والتسجيل' : 'Hosted Checkout'}
+                </span>
+              </a>
+            </div>
+
+            {/* Language Switcher */}
+            <button
+              type="button"
+              onClick={() => setLang(lang === 'AR' ? 'EN' : 'AR')}
+              style={{
+                padding: '4px 12px',
+                borderRadius: 16,
+                border: '1px solid #CBD5E1',
+                background: '#FFFFFF',
+                color: '#0F172A',
+                fontSize: 11.5,
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+                boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+              }}
+            >
+              <span>{isRtl ? 'English' : 'العربية'}</span>
+            </button>
+          </div>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
