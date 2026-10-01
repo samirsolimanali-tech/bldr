@@ -238,31 +238,162 @@ export function BldrNav({ lang = 'EN', onLanguageChange, onStartProject }: BldrN
           <span style={{ fontSize: 22, fontWeight: 800, letterSpacing: -0.5, color: '#14141A' }}>bldr</span>
         </a>
 
-        {/* Navigation: Clean focused Courses & Programs link */}
-        <nav style={{ display: 'flex', alignItems: 'center', gap: 24, position: 'relative' }}>
-          <a
-            href="/products"
-            style={{
-              fontSize: 14.5,
-              fontWeight: 600,
-              color: '#1E293B',
-              textDecoration: 'none',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              padding: '8px 14px',
-              borderRadius: 8,
-              transition: 'all 0.15s ease',
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.background = 'rgba(20,20,22,0.05)';
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.background = 'transparent';
-            }}
+        {/* Navigation */}
+        <nav style={{ display: 'flex', alignItems: 'center', gap: 4, position: 'relative' }}>
+
+          {/* Services */}
+          <div
+            style={{ position: 'relative' }}
+            onMouseEnter={() => handleMouseEnter('services')}
+            onMouseLeave={handleMouseLeave}
           >
-            <span>{isRtl ? 'المنتجات والدورات' : 'Courses & Programs'}</span>
-          </a>
+            <button
+              type="button"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 5,
+                fontSize: 14.5, fontWeight: 600, color: '#1E293B',
+                background: 'none', border: 'none', cursor: 'pointer',
+                padding: '8px 14px', borderRadius: 8,
+                fontFamily: 'inherit', transition: 'background 0.15s',
+              }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(20,20,22,0.05)'; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+            >
+              {isRtl ? 'الخدمات' : 'Services'}
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4.5l4 3.5 4-3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </button>
+            {activeDropdown === 'services' && (
+              <div
+                style={{
+                  position: 'absolute', top: '100%', left: 0, zIndex: 200,
+                  background: '#FFFFFF', borderRadius: 12, minWidth: 220,
+                  boxShadow: '0 8px 32px rgba(20,20,22,0.12)', border: '1px solid rgba(20,20,22,0.08)',
+                  padding: '8px 0', marginTop: 6,
+                }}
+                onMouseEnter={() => handleMouseEnter('services')}
+                onMouseLeave={handleMouseLeave}
+              >
+                {servicesList.map((s) => (
+                  <a
+                    key={s.slug}
+                    href={`/services/${s.slug}`}
+                    style={{
+                      display: 'block', padding: '9px 18px',
+                      fontSize: 13.5, color: '#1E293B', textDecoration: 'none',
+                      transition: 'background 0.12s',
+                    }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(20,20,22,0.04)'; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+                  >
+                    {s.title}
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Products */}
+          <div
+            style={{ position: 'relative' }}
+            onMouseEnter={() => handleMouseEnter('products')}
+            onMouseLeave={handleMouseLeave}
+          >
+            <button
+              type="button"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 5,
+                fontSize: 14.5, fontWeight: 600, color: '#1E293B',
+                background: 'none', border: 'none', cursor: 'pointer',
+                padding: '8px 14px', borderRadius: 8,
+                fontFamily: 'inherit', transition: 'background 0.15s',
+              }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(20,20,22,0.05)'; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+            >
+              {isRtl ? 'المنتجات' : 'Products'}
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4.5l4 3.5 4-3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </button>
+            {activeDropdown === 'products' && (
+              <div
+                style={{
+                  position: 'absolute', top: '100%', left: 0, zIndex: 200,
+                  background: '#FFFFFF', borderRadius: 12, minWidth: 220,
+                  boxShadow: '0 8px 32px rgba(20,20,22,0.12)', border: '1px solid rgba(20,20,22,0.08)',
+                  padding: '8px 0', marginTop: 6,
+                }}
+                onMouseEnter={() => handleMouseEnter('products')}
+                onMouseLeave={handleMouseLeave}
+              >
+                {productsList.map((p) => (
+                  <a
+                    key={p.href}
+                    href={p.href}
+                    style={{
+                      display: 'block', padding: '9px 18px',
+                      fontSize: 13.5, color: '#1E293B', textDecoration: 'none',
+                      transition: 'background 0.12s',
+                    }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(20,20,22,0.04)'; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+                  >
+                    {p.title}
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Projects */}
+          <div
+            style={{ position: 'relative' }}
+            onMouseEnter={() => handleMouseEnter('projects')}
+            onMouseLeave={handleMouseLeave}
+          >
+            <button
+              type="button"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 5,
+                fontSize: 14.5, fontWeight: 600, color: '#1E293B',
+                background: 'none', border: 'none', cursor: 'pointer',
+                padding: '8px 14px', borderRadius: 8,
+                fontFamily: 'inherit', transition: 'background 0.15s',
+              }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(20,20,22,0.05)'; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+            >
+              {isRtl ? 'المشاريع' : 'Projects'}
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4.5l4 3.5 4-3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </button>
+            {activeDropdown === 'projects' && (
+              <div
+                style={{
+                  position: 'absolute', top: '100%', left: 0, zIndex: 200,
+                  background: '#FFFFFF', borderRadius: 12, minWidth: 240,
+                  boxShadow: '0 8px 32px rgba(20,20,22,0.12)', border: '1px solid rgba(20,20,22,0.08)',
+                  padding: '8px 0', marginTop: 6,
+                }}
+                onMouseEnter={() => handleMouseEnter('projects')}
+                onMouseLeave={handleMouseLeave}
+              >
+                {projectsList.map((p) => (
+                  <a
+                    key={p.href}
+                    href={p.href}
+                    style={{
+                      display: 'block', padding: '9px 18px',
+                      fontSize: 13.5, color: '#1E293B', textDecoration: 'none',
+                      transition: 'background 0.12s',
+                    }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(20,20,22,0.04)'; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+                  >
+                    {p.title}
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+
         </nav>
 
         {/* Right Actions */}
