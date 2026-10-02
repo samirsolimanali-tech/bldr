@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import { createClient } from '@vercel/edge-config';
 
 function getCmsFilePath(): string {
   const candidatePaths = [
@@ -16,16 +17,35 @@ function getCmsFilePath(): string {
 
 export async function GET() {
   try {
+    // 1. Try reading live from Global Config
+    const configUrl = process.env.GLOBAL_CONFIG || process.env.EDGE_CONFIG;
+    if (configUrl) {
+      try {
+        const edgeClient = createClient(configUrl);
+        const globalData = await edgeClient.get('cms_data');
+        if (globalData && typeof globalData === 'object') {
+          return NextResponse.json(
+            { success: true, data: globalData, source: 'global_config' },
+            { headers: { 'Cache-Control': 'no-store, max-age=0' } }
+          );
+        }
+      } catch (edgeErr) {
+        console.warn('[Global Config Read Warning in Admin]', edgeErr);
+      }
+    }
+
+    // 2. Read from filesystem
     const filePath = getCmsFilePath();
     if (fs.existsSync(filePath)) {
       const content = fs.readFileSync(filePath, 'utf-8');
       const data = JSON.parse(content);
-      return NextResponse.json({ success: true, data }, {
-        headers: { 'Cache-Control': 'no-store, max-age=0' },
-      });
+      return NextResponse.json(
+        { success: true, data, source: 'file' },
+        { headers: { 'Cache-Control': 'no-store, max-age=0' } }
+      );
     }
 
-    // Fallback default CMS structure
+    // 3. Fallback default CMS structure
     return NextResponse.json({
       success: true,
       data: {
@@ -83,13 +103,61 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: 'Invalid payload' }, { status: 400 });
     }
 
+    // A. Local filesystem write (persists in local dev)
     const filePath = getCmsFilePath();
     try {
       fs.writeFileSync(filePath, JSON.stringify(body, null, 2), 'utf-8');
     } catch (e) {
-      console.warn('CMS file write error (read-only filesystem):', e);
+      console.warn('CMS file write error (read-only filesystem on serverless):', e);
     }
-    return NextResponse.json({ success: true, timestamp: Date.now(), message: 'CMS updated successfully' });
+
+    // B. Live sync to Global Config / Edge Config if token & configUrl are present
+    const configUrl = process.env.GLOBAL_CONFIG || process.env.EDGE_CONFIG;
+    const tokenHeader = req.headers.get('x-vercel-token');
+    const vercelToken = process.env.VERCEL_API_TOKEN || process.env.VERCEL_TOKEN || tokenHeader;
+
+    let edgeSyncSuccess = false;
+    let edgeSyncError: string | null = null;
+
+    if (configUrl && vercelToken) {
+      const edgeConfigId = configUrl.match(/ecfg_[a-zA-Z0-9_-]+/)?.[0];
+      if (edgeConfigId) {
+        try {
+          const apiRes = await fetch(`https://api.vercel.com/v1/edge-config/${edgeConfigId}/items`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${vercelToken}`,
+            },
+            body: JSON.stringify({
+              items: [
+                {
+                  operation: 'upsert',
+                  key: 'cms_data',
+                  value: body,
+                },
+              ],
+            }),
+          });
+          if (apiRes.ok) {
+            edgeSyncSuccess = true;
+          } else {
+            const errData = await apiRes.json().catch(() => ({}));
+            edgeSyncError = errData?.error?.message || 'Edge config API error';
+          }
+        } catch (err: any) {
+          edgeSyncError = err.message;
+        }
+      }
+    }
+
+    return NextResponse.json({
+      success: true,
+      timestamp: Date.now(),
+      message: 'CMS updated successfully',
+      edgeSync: edgeSyncSuccess,
+      edgeError: edgeSyncError,
+    });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }

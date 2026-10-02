@@ -10,11 +10,12 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@bldr/shared-types": "workspace:*",
+    "@bldr/ui": "workspace:*",
+    "@vercel/edge-config": "^1.5.1",
     "next": "^15.0.3",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "@bldr/ui": "workspace:*",
-    "@bldr/shared-types": "workspace:*"
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@types/node": "^22.7.5",
