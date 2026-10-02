@@ -531,7 +531,7 @@ export default function HomePage() {
       </main>
 
       {/* ─── Footer ────────────────────────────────────────────── */}
-      <BldrFooter />
+      <BldrFooter lang={lang} customData={cms?.footer} />
 
       {/* ─── Contact Modal ─────────────────────────────────────── */}
       <ProjectContactModal

@@ -1072,8 +1072,34 @@ export function ProjectContactModal({ isOpen, onClose, lang = 'EN' }: ProjectCon
 }
 
 // ─── Main Website Footer (BldrFooter.dc.html) ───────────────────────────────
-export function BldrFooter({ lang = 'EN' }: { lang?: 'EN' | 'AR' } = {}) {
+export function BldrFooter({
+  lang = 'EN',
+  customData,
+}: {
+  lang?: 'EN' | 'AR';
+  customData?: any;
+} = {}) {
   const isRtl = lang === 'AR';
+
+  const footerDesc = isRtl
+    ? (customData?.descriptionAr || customData?.footerDescriptionAr || 'تمكين شركات تكنولوجيا التعليم والأكاديميات بالحلول الرقمية المتخصصة، البنية التحتية الذكية، وأنظمة المدفوعات المتكاملة.')
+    : (customData?.description || customData?.footerDescription || 'Empowering EdTech businesses and educational academies with tailored digital solutions, automated operations, and payment infrastructure.');
+
+  const instagramHref = customData?.instagram || customData?.instagramUrl || 'https://www.instagram.com/bldr.management';
+  const facebookHref = customData?.facebook || customData?.facebookUrl || 'https://www.facebook.com/share/14uAjf399GL/';
+  const linkedinHref = customData?.linkedin || customData?.linkedinUrl || 'https://www.linkedin.com/company/bldrmanagement/';
+
+  const locationText = isRtl
+    ? (customData?.locationAr || 'الجيزة، جمهورية مصر العربية')
+    : (customData?.location || 'Giza, Egypt');
+
+  const phoneText = customData?.phone || '+20 10 30165000';
+  const emailText = customData?.email || 'bldr.management@gmail.com';
+
+  const copyrightText = isRtl
+    ? (customData?.copyrightAr || `© ${new Date().getFullYear()} bldr. تشغيل شركة إيفولف بيلدر لإدارة الأعمال، الجيزة، مصر.`)
+    : (customData?.copyright || `© ${new Date().getFullYear()} bldr. Operated by Evolve bldr for Business Management, Giza, Egypt.`);
+
   return (
     <footer dir={isRtl ? 'rtl' : 'ltr'} style={{ background: tokens.colors.brandDark, color: '#FFFFFF', fontFamily: isRtl ? "'Readex Pro', sans-serif" : tokens.fonts.display }}>
       <style>{`
@@ -1096,15 +1122,13 @@ export function BldrFooter({ lang = 'EN' }: { lang?: 'EN' | 'AR' } = {}) {
               }}>.</span>
             </div>
             <p style={{ margin: 0, fontSize: 13.5, fontWeight: 300, lineHeight: 1.68, color: 'rgba(255, 255, 255, 0.65)', maxWidth: 320 }}>
-              {isRtl 
-                ? 'تمكين شركات تكنولوجيا التعليم والأكاديميات بالحلول الرقمية المتخصصة، البنية التحتية الذكية، وأنظمة المدفوعات المتكاملة.'
-                : 'Empowering EdTech businesses and educational academies with tailored digital solutions, automated operations, and payment infrastructure.'}
+              {footerDesc}
             </p>
             <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
               {[
-                { label: 'Instagram', href: 'https://www.instagram.com/bldr.management' },
-                { label: 'Facebook',  href: 'https://www.facebook.com/share/14uAjf399GL/' },
-                { label: 'LinkedIn',  href: 'https://www.linkedin.com/company/bldrmanagement/' },
+                { label: 'Instagram', href: instagramHref },
+                { label: 'Facebook',  href: facebookHref },
+                { label: 'LinkedIn',  href: linkedinHref },
               ].map(({ label, href }) => (
                 <a
                   key={label}
@@ -1170,18 +1194,18 @@ export function BldrFooter({ lang = 'EN' }: { lang?: 'EN' | 'AR' } = {}) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13.5, fontWeight: 300, color: 'rgba(255,255,255,0.85)' }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
                 <span style={{ color: tokens.colors.gradientEnd, fontSize: 11, marginTop: 2 }}>LOC</span>
-                <span>{isRtl ? 'الجيزة، جمهورية مصر العربية' : 'Giza, Egypt'}</span>
+                <span>{locationText}</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <span style={{ color: tokens.colors.gradientEnd, fontSize: 11 }}>TEL</span>
-                <a href="tel:+201030165000" style={{ color: '#FFFFFF', textDecoration: 'none', fontWeight: 500, direction: 'ltr', unicodeBidi: 'embed' }}>
-                  +20 10 30165000
+                <a href={`tel:${phoneText.replace(/\s+/g, '')}`} style={{ color: '#FFFFFF', textDecoration: 'none', fontWeight: 500, direction: 'ltr', unicodeBidi: 'embed' }}>
+                  {phoneText}
                 </a>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <span style={{ color: tokens.colors.gradientEnd, fontSize: 11 }}>EMAIL</span>
-                <a href="mailto:bldr.management@gmail.com" style={{ color: '#FFFFFF', textDecoration: 'none', fontWeight: 400 }}>
-                  bldr.management@gmail.com
+                <a href={`mailto:${emailText}`} style={{ color: '#FFFFFF', textDecoration: 'none', fontWeight: 400 }}>
+                  {emailText}
                 </a>
               </div>
               <div style={{ marginTop: 4 }}>
@@ -1198,7 +1222,7 @@ export function BldrFooter({ lang = 'EN' }: { lang?: 'EN' | 'AR' } = {}) {
 
         {/* Copyright */}
         <div style={{ fontSize: 12, fontWeight: 300, color: 'rgba(255,255,255,0.5)', textAlign: 'center' }}>
-          © {new Date().getFullYear()} bldr. Operated by Evolve bldr for Business Management, Giza, Egypt.
+          {copyrightText}
         </div>
       </div>
     </footer>

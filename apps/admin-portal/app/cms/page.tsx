@@ -61,7 +61,7 @@ function StatusBadge({ status }: { status: string }) {
 // ─── TAB: Content / CMS ───────────────────────────────────────────────────────
 function ContentTab() {
   const [data, setData] = useState<any>(null);
-  const [activeSection, setActiveSection] = useState<'hero' | 'broken' | 'specialisms' | 'showcase' | 'carousel' | 'brand'>('hero');
+  const [activeSection, setActiveSection] = useState<'hero' | 'broken' | 'specialisms' | 'showcase' | 'carousel' | 'brand' | 'footer'>('hero');
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState<string | null>(null);
 
@@ -107,6 +107,7 @@ function ContentTab() {
     { id: 'showcase', label: 'Projects Showcase' },
     { id: 'carousel', label: 'Project Carousel' },
     { id: 'brand', label: 'Brand & Contact' },
+    { id: 'footer', label: 'Footer & Social' },
   ];
 
   if (!data) return (
@@ -516,7 +517,152 @@ function ContentTab() {
         </div>
       )}
 
-      <div style={{ marginTop: 32, display: 'flex', justifyContent: 'flex-end' }}>
+      {activeSection === 'footer' && (
+        <div className="card-panel">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+            <div>
+              <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>Storefront Footer & Social Media</h3>
+              <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
+                Control footer bio, direct contact phone & email, social channels (Instagram, Facebook, LinkedIn), and copyright notices.
+              </p>
+            </div>
+            <span className="badge badge-green">Live Storefront Sync</span>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            {/* Footer Descriptions */}
+            <div className="form-group" style={{ gridColumn: 'span 2' }}>
+              <label className="form-label">Footer Brand Bio / Description (EN)</label>
+              <textarea
+                className="form-input"
+                rows={3}
+                value={data.footer?.description || ''}
+                onChange={e => set(['footer', 'description'], e.target.value)}
+                placeholder="Empowering EdTech businesses and educational academies with tailored digital solutions..."
+              />
+            </div>
+            <div className="form-group" style={{ gridColumn: 'span 2' }}>
+              <label className="form-label">Footer Brand Bio / Description (AR)</label>
+              <textarea
+                className="form-input"
+                rows={3}
+                dir="rtl"
+                value={data.footer?.descriptionAr || ''}
+                onChange={e => set(['footer', 'descriptionAr'], e.target.value)}
+                placeholder="تمكين شركات تكنولوجيا التعليم والأكاديميات بالحلول الرقمية المتخصصة..."
+              />
+            </div>
+
+            {/* Social Media Links */}
+            <div className="form-group">
+              <label className="form-label">Instagram URL</label>
+              <input
+                className="form-input"
+                value={data.footer?.instagram || ''}
+                onChange={e => set(['footer', 'instagram'], e.target.value)}
+                placeholder="https://www.instagram.com/bldr.management"
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Facebook URL</label>
+              <input
+                className="form-input"
+                value={data.footer?.facebook || ''}
+                onChange={e => set(['footer', 'facebook'], e.target.value)}
+                placeholder="https://www.facebook.com/..."
+              />
+            </div>
+            <div className="form-group" style={{ gridColumn: 'span 2' }}>
+              <label className="form-label">LinkedIn URL</label>
+              <input
+                className="form-input"
+                value={data.footer?.linkedin || ''}
+                onChange={e => set(['footer', 'linkedin'], e.target.value)}
+                placeholder="https://www.linkedin.com/company/bldrmanagement/"
+              />
+            </div>
+
+            {/* Direct Contact & HQ */}
+            <div className="form-group">
+              <label className="form-label">Contact / Inquiries Phone</label>
+              <input
+                className="form-input"
+                value={data.footer?.phone || data.brand?.phone || ''}
+                onChange={e => {
+                  set(['footer', 'phone'], e.target.value);
+                  set(['brand', 'phone'], e.target.value);
+                }}
+                placeholder="+20 10 30165000"
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Contact / Operations Email</label>
+              <input
+                className="form-input"
+                value={data.footer?.email || data.brand?.email || ''}
+                onChange={e => {
+                  set(['footer', 'email'], e.target.value);
+                  set(['brand', 'email'], e.target.value);
+                }}
+                placeholder="bldr.management@gmail.com"
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">HQ Location (EN)</label>
+              <input
+                className="form-input"
+                value={data.footer?.location || data.brand?.location || ''}
+                onChange={e => {
+                  set(['footer', 'location'], e.target.value);
+                  set(['brand', 'location'], e.target.value);
+                }}
+                placeholder="Giza, Egypt"
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">HQ Location (AR)</label>
+              <input
+                className="form-input"
+                dir="rtl"
+                value={data.footer?.locationAr || data.brand?.locationAr || ''}
+                onChange={e => {
+                  set(['footer', 'locationAr'], e.target.value);
+                  set(['brand', 'locationAr'], e.target.value);
+                }}
+                placeholder="الجيزة، جمهورية مصر العربية"
+              />
+            </div>
+
+            {/* Copyright Notices */}
+            <div className="form-group" style={{ gridColumn: 'span 2' }}>
+              <label className="form-label">Copyright Notice (EN)</label>
+              <input
+                className="form-input"
+                value={data.footer?.copyright || ''}
+                onChange={e => set(['footer', 'copyright'], e.target.value)}
+                placeholder="© 2026 bldr. Operated by Evolve bldr for Business Management, Giza, Egypt."
+              />
+            </div>
+            <div className="form-group" style={{ gridColumn: 'span 2' }}>
+              <label className="form-label">Copyright Notice (AR)</label>
+              <input
+                className="form-input"
+                dir="rtl"
+                value={data.footer?.copyrightAr || ''}
+                onChange={e => set(['footer', 'copyrightAr'], e.target.value)}
+                placeholder="© ٢٠٢٦ bldr. تشغيل شركة إيفولف بيلدر لإدارة الأعمال، الجيزة، مصر."
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div style={{ marginTop: 32, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 16 }}>
+        {saveMsg && (
+          <span style={{ fontSize: 13, fontWeight: 600, color: saveMsg.includes('failed') ? '#DC2626' : '#16A34A' }}>
+            {saveMsg}
+          </span>
+        )}
         <button className="btn btn-primary btn-lg" onClick={save} disabled={saving} style={{ minWidth: 220 }}>
           {saving ? 'Publishing…' : 'Save & Publish to Storefront'}
         </button>

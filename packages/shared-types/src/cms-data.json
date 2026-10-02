@@ -281,5 +281,18 @@
     "announcement": "Accepting Q4 2026 venture partnerships across Cairo and the Gulf.",
     "announcementAr": "نستقبل الآن شراكات الربع الرابع لعام ٢٠٢٦ في مصر والخليج العربي.",
     "isAnnouncementActive": true
+  },
+  "footer": {
+    "description": "Empowering EdTech businesses and educational academies with tailored digital solutions, automated operations, and payment infrastructure.",
+    "descriptionAr": "تمكين شركات تكنولوجيا التعليم والأكاديميات بالحلول الرقمية المتخصصة، البنية التحتية الذكية، وأنظمة المدفوعات المتكاملة.",
+    "instagram": "https://www.instagram.com/bldr.management",
+    "facebook": "https://www.facebook.com/share/14uAjf399GL/",
+    "linkedin": "https://www.linkedin.com/company/bldrmanagement/",
+    "location": "Giza, Egypt",
+    "locationAr": "الجيزة، جمهورية مصر العربية",
+    "phone": "+20 10 30165000",
+    "email": "bldr.management@gmail.com",
+    "copyright": "© 2026 bldr. Operated by Evolve bldr for Business Management, Giza, Egypt.",
+    "copyrightAr": "© ٢٠٢٦ bldr. تشغيل شركة إيفولف بيلدر لإدارة الأعمال، الجيزة، مصر."
   }
 }
