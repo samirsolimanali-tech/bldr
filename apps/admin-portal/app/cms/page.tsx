@@ -83,8 +83,14 @@ function ContentTab() {
     const res = await fetch('/api/cms', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
     const result = await res.json();
     setSaving(false);
-    setSaveMsg(result.success ? 'Saved & published to storefront' : 'Save failed');
-    setTimeout(() => setSaveMsg(null), 3000);
+    if (result.edgeSync) {
+      setSaveMsg('✓ Live synced to Storefront via Global Config!');
+    } else if (result.success) {
+      setSaveMsg('✓ Saved & published to storefront' + (result.edgeError ? ` (${result.edgeError})` : ''));
+    } else {
+      setSaveMsg('Save failed: ' + (result.error || 'Unknown error'));
+    }
+    setTimeout(() => setSaveMsg(null), 4000);
   };
 
   const set = (path: string[], val: any) => {
