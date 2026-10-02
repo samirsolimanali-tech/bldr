@@ -410,7 +410,7 @@ export default function ProductsPage() {
         </div>
       </main>
 
-      <BldrFooter />
+      <BldrFooter lang={lang} />
 
       <ProjectContactModal
         isOpen={isContactOpen}

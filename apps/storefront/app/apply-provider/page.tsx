@@ -382,7 +382,7 @@ export default function ApplyProviderPage() {
         </div>
       </main>
 
-      <BldrFooter />
+      <BldrFooter lang={lang} />
 
       <ProjectContactModal
         isOpen={isContactOpen}

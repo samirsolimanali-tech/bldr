@@ -1080,25 +1080,60 @@ export function BldrFooter({
   customData?: any;
 } = {}) {
   const isRtl = lang === 'AR';
+  const [data, setData] = React.useState<any>(customData || null);
+
+  React.useEffect(() => {
+    let isCancelled = false;
+    const fetchCmsData = () => {
+      fetch('/api/cms')
+        .then((res) => (res.ok ? res.json() : null))
+        .then((json) => {
+          if (isCancelled || !json?.data) return;
+          const merged = {
+            ...(json.data.brand || {}),
+            ...(json.data.footer || {}),
+            ...(customData || {}),
+          };
+          setData(merged);
+        })
+        .catch(() => {});
+    };
+
+    fetchCmsData();
+
+    // Re-sync when window gains focus (e.g. after updating CMS in Admin Portal)
+    if (typeof window !== 'undefined') {
+      window.addEventListener('focus', fetchCmsData);
+    }
+
+    return () => {
+      isCancelled = true;
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('focus', fetchCmsData);
+      }
+    };
+  }, [customData]);
+
+  const active = data || customData;
 
   const footerDesc = isRtl
-    ? (customData?.descriptionAr || customData?.footerDescriptionAr || 'تمكين شركات تكنولوجيا التعليم والأكاديميات بالحلول الرقمية المتخصصة، البنية التحتية الذكية، وأنظمة المدفوعات المتكاملة.')
-    : (customData?.description || customData?.footerDescription || 'Empowering EdTech businesses and educational academies with tailored digital solutions, automated operations, and payment infrastructure.');
+    ? (active?.descriptionAr || active?.footerDescriptionAr || 'تمكين شركات تكنولوجيا التعليم والأكاديميات بالحلول الرقمية المتخصصة، البنية التحتية الذكية، وأنظمة المدفوعات المتكاملة.')
+    : (active?.description || active?.footerDescription || 'Empowering EdTech businesses and educational academies with tailored digital solutions, automated operations, and payment infrastructure.');
 
-  const instagramHref = customData?.instagram || customData?.instagramUrl || 'https://www.instagram.com/bldr.management';
-  const facebookHref = customData?.facebook || customData?.facebookUrl || 'https://www.facebook.com/share/14uAjf399GL/';
-  const linkedinHref = customData?.linkedin || customData?.linkedinUrl || 'https://www.linkedin.com/company/bldrmanagement/';
+  const instagramHref = active?.instagram || active?.instagramUrl || 'https://www.instagram.com/bldr.management';
+  const facebookHref = active?.facebook || active?.facebookUrl || 'https://www.facebook.com/share/14uAjf399GL/';
+  const linkedinHref = active?.linkedin || active?.linkedinUrl || 'https://www.linkedin.com/company/bldrmanagement/';
 
   const locationText = isRtl
-    ? (customData?.locationAr || 'الجيزة، جمهورية مصر العربية')
-    : (customData?.location || 'Giza, Egypt');
+    ? (active?.locationAr || 'الجيزة، جمهورية مصر العربية')
+    : (active?.location || 'Giza, Egypt');
 
-  const phoneText = customData?.phone || '+20 10 30165000';
-  const emailText = customData?.email || 'bldr.management@gmail.com';
+  const phoneText = active?.phone || '+20 10 30165000';
+  const emailText = active?.email || 'bldr.management@gmail.com';
 
   const copyrightText = isRtl
-    ? (customData?.copyrightAr || `© ${new Date().getFullYear()} bldr. تشغيل شركة إيفولف بيلدر لإدارة الأعمال، الجيزة، مصر.`)
-    : (customData?.copyright || `© ${new Date().getFullYear()} bldr. Operated by Evolve bldr for Business Management, Giza, Egypt.`);
+    ? (active?.copyrightAr || `© ${new Date().getFullYear()} bldr. تشغيل شركة إيفولف بيلدر لإدارة الأعمال، الجيزة، مصر.`)
+    : (active?.copyright || `© ${new Date().getFullYear()} bldr. Operated by Evolve bldr for Business Management, Giza, Egypt.`);
 
   return (
     <footer dir={isRtl ? 'rtl' : 'ltr'} style={{ background: tokens.colors.brandDark, color: '#FFFFFF', fontFamily: isRtl ? "'Readex Pro', sans-serif" : tokens.fonts.display }}>
@@ -1113,14 +1148,16 @@ export function BldrFooter({
           
           {/* Studio Brand */}
           <div style={{ flex: '1 1 260px', minWidth: 200, display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.045em', lineHeight: 1 }}>
-              bldr
-              <span style={{
-                background: `linear-gradient(90deg, ${tokens.colors.gradientStart}, ${tokens.colors.gradientEnd})`,
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              }}>.</span>
-            </div>
+            <a href="/" style={{ textDecoration: 'none', color: '#FFFFFF', display: 'inline-flex', alignItems: 'center' }}>
+              <span style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.045em', lineHeight: 1 }}>
+                bldr
+                <span style={{
+                  background: `linear-gradient(90deg, ${tokens.colors.gradientStart}, ${tokens.colors.gradientEnd})`,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}>.</span>
+              </span>
+            </a>
             <p style={{ margin: 0, fontSize: 13.5, fontWeight: 300, lineHeight: 1.68, color: 'rgba(255, 255, 255, 0.65)', maxWidth: 320 }}>
               {footerDesc}
             </p>
@@ -1159,8 +1196,14 @@ export function BldrFooter({
             <a href="/" style={{ fontSize: 13.5, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>
               {isRtl ? 'الرئيسية' : 'Home'}
             </a>
+            <a href="/services" style={{ fontSize: 13.5, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>
+              {isRtl ? 'الخدمات' : 'Services'}
+            </a>
             <a href="/products" style={{ fontSize: 13.5, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>
               {isRtl ? 'المنتجات والدورات' : 'Courses & Programs'}
+            </a>
+            <a href="/projects" style={{ fontSize: 13.5, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>
+              {isRtl ? 'المشاريع' : 'Projects'}
             </a>
             <a href="/apply-provider" style={{ fontSize: 13.5, fontWeight: 300, color: 'rgba(255,255,255,0.82)', textDecoration: 'none' }}>
               {isRtl ? 'كن شريكاً معنا' : 'Partner with bldr'}

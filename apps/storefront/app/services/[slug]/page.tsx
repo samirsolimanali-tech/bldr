@@ -306,7 +306,7 @@ export default function ServiceDetailPage() {
         </div>
       </main>
 
-      <BldrFooter />
+      <BldrFooter lang={lang} />
 
       <ProjectContactModal
         isOpen={isContactOpen}
