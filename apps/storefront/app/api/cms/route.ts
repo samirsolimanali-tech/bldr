@@ -3,7 +3,16 @@ import fs from 'fs';
 import path from 'path';
 import { createClient } from '@vercel/edge-config';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 const CMS_FILE_PATH = path.resolve(process.cwd(), 'packages/shared-types/src/cms-data.json');
+
+const NO_CACHE_HEADERS = {
+  'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0, s-maxage=0',
+  'CDN-Cache-Control': 'no-store',
+  'Vercel-CDN-Cache-Control': 'no-store',
+};
 
 export async function GET() {
   try {
@@ -16,7 +25,7 @@ export async function GET() {
         if (globalData && typeof globalData === 'object') {
           return NextResponse.json(
             { success: true, data: globalData, source: 'global_config' },
-            { headers: { 'Cache-Control': 'no-store, max-age=0' } }
+            { headers: NO_CACHE_HEADERS }
           );
         }
       } catch (edgeErr) {
@@ -37,13 +46,13 @@ export async function GET() {
         const data = JSON.parse(content);
         return NextResponse.json(
           { success: true, data, source: 'file' },
-          { headers: { 'Cache-Control': 'no-store, max-age=0' } }
+          { headers: NO_CACHE_HEADERS }
         );
       }
     }
 
-    return NextResponse.json({ success: false, error: 'CMS file not found' }, { status: 404 });
+    return NextResponse.json({ success: false, error: 'CMS file not found' }, { status: 404, headers: NO_CACHE_HEADERS });
   } catch (err: any) {
-    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: err.message }, { status: 500, headers: NO_CACHE_HEADERS });
   }
 }

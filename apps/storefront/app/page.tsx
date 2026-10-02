@@ -12,14 +12,30 @@ export default function HomePage() {
   const [cms, setCms] = useState<any>(null);
 
   useEffect(() => {
-    fetch('/api/cms')
-      .then((r) => r.json())
-      .then((res) => {
-        if (res?.success && res?.data) {
-          setCms(res.data);
-        }
-      })
-      .catch(() => {});
+    let isCancelled = false;
+    const loadCms = () => {
+      fetch(`/api/cms?t=${Date.now()}`, { cache: 'no-store' })
+        .then((r) => r.json())
+        .then((res) => {
+          if (!isCancelled && res?.success && res?.data) {
+            setCms(res.data);
+          }
+        })
+        .catch(() => {});
+    };
+
+    loadCms();
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('focus', loadCms);
+    }
+
+    return () => {
+      isCancelled = true;
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('focus', loadCms);
+      }
+    };
   }, []);
 
   useEffect(() => {

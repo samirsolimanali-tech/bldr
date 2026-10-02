@@ -1085,7 +1085,7 @@ export function BldrFooter({
   React.useEffect(() => {
     let isCancelled = false;
     const fetchCmsData = () => {
-      fetch('/api/cms')
+      fetch(`/api/cms?t=${Date.now()}`, { cache: 'no-store' })
         .then((res) => (res.ok ? res.json() : null))
         .then((json) => {
           if (isCancelled || !json?.data) return;
@@ -1117,15 +1117,15 @@ export function BldrFooter({
   const active = data || customData;
 
   const footerDesc = isRtl
-    ? (active?.descriptionAr || active?.footerDescriptionAr || 'تمكين شركات تكنولوجيا التعليم والأكاديميات بالحلول الرقمية المتخصصة، البنية التحتية الذكية، وأنظمة المدفوعات المتكاملة.')
-    : (active?.description || active?.footerDescription || 'Empowering EdTech businesses and educational academies with tailored digital solutions, automated operations, and payment infrastructure.');
+    ? (active?.descriptionAr || active?.footerDescriptionAr || 'تمكين شركات تكنولوجيا التعليم والأكاديميات بالحلول الرقمية المتخصصة، البنية التحتية الذكية.')
+    : (active?.description || active?.footerDescription || 'Empowering EdTech businesses and educational academies with tailored digital solutions, automated operations.');
 
   const instagramHref = active?.instagram || active?.instagramUrl || 'https://www.instagram.com/bldr.management';
   const facebookHref = active?.facebook || active?.facebookUrl || 'https://www.facebook.com/share/14uAjf399GL/';
   const linkedinHref = active?.linkedin || active?.linkedinUrl || 'https://www.linkedin.com/company/bldrmanagement/';
 
   const locationText = isRtl
-    ? (active?.locationAr || 'الجيزة، جمهورية مصر العربية')
+    ? (active?.locationAr || 'الجيزة، مصر')
     : (active?.location || 'Giza, Egypt');
 
   const phoneText = active?.phone || '+20 10 30165000';
